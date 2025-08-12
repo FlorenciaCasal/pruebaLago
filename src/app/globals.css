@@ -19,8 +19,55 @@
   }
 }
 
+@media (max-width: 767px) {
+  .rdp {
+    font-size: 14px !important;
+  }
+
+  .rdp-caption_label,
+  .rdp-weekday,
+  .rdp-day {
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .rdp-day {
+    width: 0.2rem !important;
+    height: 0.2rem !important;
+  }
+
+  .rdp-day_button {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.rdp-caption_label {
+  justify-content: center;
+  width: 100% !important;
+}
+
+/* Estilo de la grilla de meses */
+.custom-daypicker {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2rem !important;
+  justify-content: center !important; 
+}
+
+.rdp-months {
+  justify-content: center;
+  flex-wrap: nowrap !important;  
+}
+
+.rdp-weekday {
+  font-size: 14px !important;
+  text-transform: capitalize !important;
 }
