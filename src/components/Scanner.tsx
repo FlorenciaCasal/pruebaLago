@@ -1,67 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import React, { useEffect } from "react";
 
-export default function ControlAcceso() {
-  const [dni, setDni] = useState("");
-  const [resultado, setResultado] = useState<null | string>(null);
+interface ScannerProps {
+  onScan: (dni: string) => void;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+export default function Scanner({ onScan }: ScannerProps) {
+  // Esto es un simulador de escaneo
+  useEffect(() => {
+    // Simulamos que después de 5 segundos escaneamos un DNI
+    const timer = setTimeout(() => {
+      const scannedDni = "12345678"; // DNI simulado
+      onScan(scannedDni);
+    }, 5000);
 
-    if (!dni.trim()) return;
-
-    try {
-      const res = await fetch(`/api/visitas-confirmadas?dni=${dni}`);
-      if (!res.ok) throw new Error("Error de conexión");
-
-      const data = await res.json();
-
-      if (data?.permitido) {
-        setResultado(`✅ Acceso permitido a ${data.nombre}`);
-      } else {
-        setResultado(`❌ Acceso denegado`);
-      }
-    } catch (err) {
-      setResultado("⚠️ Error validando DNI");
-    }
-
-    // Limpia el campo para el próximo escaneo
-    setDni("");
-  };
+    return () => clearTimeout(timer);
+  }, [onScan]);
 
   return (
-    <div style={{ padding: 20, maxWidth: 400, margin: "auto", textAlign: "center" }}>
-      <h1>Control de Acceso</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          autoFocus
-          value={dni}
-          onChange={(e) => setDni(e.target.value)}
-          placeholder="Escanear DNI..."
-          style={{
-            padding: 10,
-            width: "100%",
-            fontSize: 18,
-            marginBottom: 10,
-            textAlign: "center",
-          }}
-        />
-      </form>
-
-      {resultado && (
-        <div
-          style={{
-            marginTop: 20,
-            fontSize: 20,
-            fontWeight: "bold",
-            color: resultado.startsWith("✅") ? "green" : "red",
-          }}
-        >
-          {resultado}
-        </div>
-      )}
+    <div style={{ padding: 20, textAlign: "center" }}>
+      <p>Escaneando... (simulado)</p>
+      {/* Aquí iría la lógica real del lector DS8178 */}
     </div>
   );
 }
