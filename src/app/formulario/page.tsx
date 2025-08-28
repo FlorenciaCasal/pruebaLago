@@ -9,26 +9,17 @@ function FormularioContent() {
   const fechaSeleccionada = fechaParam ? new Date(fechaParam) : null;
 
   return (
-    <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
-      <h1 className="text-2xl font-bold mb-6">Reservá tu visita</h1>
-      <RegisterForm fechaSeleccionada={fechaSeleccionada} />
-    </main>
+      <RegisterForm fechaSeleccionada={fechaSeleccionada} />   
   );
 }
 
 export default function FormularioPage() {
-  // const searchParams = useSearchParams();
-  // const fechaParam = searchParams.get("fecha");
-
-  // // Convertir a objeto Date si existe fecha
-  // const fechaSeleccionada = fechaParam ? new Date(fechaParam) : null;
 
   return (
-    <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
-      <h1 className="text-2xl font-bold mb-6">Reservá tu visita</h1>
+       <main className="min-h-screen flex flex-col items-center justify-center overflow-x-hidden">
       <Suspense fallback={<div>Cargando...</div>}>
         <FormularioContent />
       </Suspense>
-    </main>
+   </main>
   );
 }

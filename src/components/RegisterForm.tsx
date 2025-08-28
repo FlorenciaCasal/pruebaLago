@@ -1,498 +1,554 @@
 "use client";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useEffect, useState } from "react";
-import { useForm, useFieldArray, Resolver, SubmitHandler } from "react-hook-form";
-import { ChevronDown, ChevronUp } from "lucide-react";
 
+import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
-interface Acompaniante {
+const POLICIES_URL = "/politicas-de-visita"; // 👈 cambiá por tu ruta real
+
+type ComoNosConociste = "redes" | "recomendacion" | "sitio" | "publicidad" | "otro";
+
+type ReservationFormData = {
+    // Datos personales
+    nombre: string;
+    apellido: string;
     dni: string;
-    nacimiento: string; // cambio a string
-}
+    telefono: string;
+    correo: string;
 
-interface RegisterFormProps {
+    // Contadores
+    adultos14: number;         // 14+ (incluye al titular)
+    menores14: number;         // <14
+    movilidadReducida: number; // de las personas ingresadas
+
+    // Alergias / comentarios
+    alergias: "si" | "no";
+    detalleAlergias?: string;
+    comentarios?: string;
+
+    // Nuevos
+    origenVisita: string;
+    comoNosConociste: ComoNosConociste | "";
+
+    // Reglas
+    aceptaReglas: boolean;
+};
+
+interface RegistroProps {
     fechaSeleccionada: Date | null;
 }
 
-const schema = yup.object({
-    nombre: yup.string()
-        .required("El nombre es obligatorio")
-        .min(3, "Mínimo 3 caracteres")
-        .matches(/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/, "Solo letras y espacios"),
-    apellido: yup.string()
-        .required("El apellido es obligatorio")
-        .min(3, "Mínimo 3 caracteres")
-        .matches(/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/, "Solo letras y espacios"),
-    dni: yup.string()
-        .required("El DNI es obligatorio")
-        .matches(/^\d{8}$/, "Debe tener 8 dígitos"),
-    telefono: yup.string()
-        .required("El teléfono es obligatorio")
-        .matches(/^\d{10,11}$/, "Ingresá sin 0 ni 15"),
-    email: yup.string().required("El email es obligatorio").email(),
-    nacimiento: yup
-        // .date()
-        .string()
-        .typeError("Debe ser una fecha válida")
-        .matches(/^\d{4}-\d{2}-\d{2}$/, "Debe tener formato YYYY-MM-DD")
-        .test("mayor-de-18", "Debes ser mayor de 18 años", (value) => {
-            if (!value) return false;
-            const fechaNacimiento = new Date(value);
-            const hoy = new Date();
-            const fecha18 = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate());
-            return fechaNacimiento <= fecha18;
-        })
-        .required("La fecha es obligatoria"),
-    tipoVisitante: yup
-        .string<"particular" | "institucionEducativa">()
-        .required("Debe seleccionar el tipo de visitante"),
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // dejalo vacío si no hay backend aún
+const MOCK_SUBMIT = !API_URL; // si no hay URL, mockeamos
 
-    cantidadAcompaniantes: yup
-        .number()
-        .typeError("Debe ingresar un número")
-        .min(0, "No puede ser negativo")
-        .required("Debe ingresar la cantidad de acompañantes"),
+const lineColor = "border-white/80";
+const textMain = "text-white";
+const textSoft = "text-white/70";
+const accentBg = "bg-white";
+const accentText = "text-gray-900";
 
-    acompaniantes: yup
-        .array()
-        .of(
-            yup.object({
-                dni: yup
-                    .string()
-                    .matches(/^\d{8}$/, "El DNI debe tener 8 dígitos")
-                    .required("El DNI del acompañante es obligatorio"),
-                nacimiento: yup
-                    .string()
-                    .typeError("Debe ser una fecha válida")
-                    .matches(/^\d{4}-\d{2}-\d{2}$/, "Debe tener formato YYYY-MM-DD")
-                    .test("es-fecha-valida", "Fecha inválida", (value) => {
-                        if (!value) return false;
-                        return !isNaN(Date.parse(value));
-                    })
-                    .required("La fecha de nacimiento del acompañante es obligatoria"),
-            })
-        )
-        .when(["tipoVisitante", "cantidadAcompaniantes"], {
-            is: (tipo: "particular" | "institucionEducativa", cantidad?: number) =>
-                tipo === "particular" && (cantidad ?? 0) > 0,
-            then: (schema) =>
-                schema.required().min(1, "Debe agregar al menos un acompañante"),
-            otherwise: (schema) => schema.notRequired(),
-        }),
-    cantidadEstudiantes: yup.number().when("tipoVisitante", {
-        is: "institucionEducativa",
-        then: (schema) => schema.required("Cantidad obligatoria").min(1),
-        otherwise: (schema) => schema.notRequired(),
-    }),
-    comentario: yup.string().notRequired(),
-});
+const inputBase =
+    `w-full bg-transparent ${textMain} placeholder:${textSoft}
+   border-0 border-b ${lineColor} focus:border-b-2
+   outline-none focus:outline-none ring-0 focus:ring-0
+   py-3 transition`;
 
-type BaseFormData = yup.InferType<typeof schema> & { acompaniantes: Acompaniante[] };
-type FormData = Omit<BaseFormData, "cantidadEstudiantes"> & {
-    cantidadEstudiantes?: number; // la hacemos opcional para evitar conflicto TS
-};
+const textareaBase =
+    `w-full bg-transparent ${textMain} placeholder:${textSoft}
+   border ${lineColor} border-t-0 border-l-0 border-r-0
+   focus:border-b-2 outline-none ring-0 focus:ring-0
+   py-3 transition`;
 
-// Resolver tipado
-const resolver: Resolver<FormData> = yupResolver(schema) as Resolver<FormData>;
+const textareaBase2 =
+    `w-full bg-transparent ${textMain} placeholder:${textSoft}
+   border ${lineColor} border-t-0 border-l-0 border-r-0
+   focus:border-b-2 outline-none ring-0 focus:ring-0 px-4
+   py-3 transition`;
 
-export default function Registro({ fechaSeleccionada }: RegisterFormProps) {
-    const [acompaniantes, setAcompaniantes] = useState<Acompaniante[]>([]);
+const sectionRow = "py-3 border-b border-white/10"; // separador sutil
+const hintText = "text-sm " + textSoft;
+
+const buttonPrimary =
+    `inline-flex items-center justify-center rounded-md
+   px-5 py-2 font-medium ${accentBg} ${accentText}
+   hover:opacity-90 active:opacity-80 transition`;
+
+const radioDot =
+    `appearance-none w-4 h-4 rounded-full border ${lineColor}
+   checked:bg-cream checked:shadow-[inset_0_0_0_3px_rgba(17,24,39,1)] 
+   // alt para sin cream: checked:bg-white checked:shadow-[inset_0_0_0_3px_rgba(17,24,39,1)]
+  `;
+
+const checkboxBox =
+    `appearance-none w-4 h-4 rounded-sm border ${lineColor}
+   checked:bg-cream checked:shadow-[inset_0_0_0_2px_rgba(17,24,39,1)]
+  `;
+
+export default function Formulario({ fechaSeleccionada }: RegistroProps) {
+    const [currentStep, setCurrentStep] = useState(0);
     const [serverError, setServerError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
-    const [dni, setDni] = useState("");
-    const [dniError, setDniError] = useState<string | null>(null);
-    const [telefono, setTelefono] = useState("");
-    const [telefonoError, setTelefonoError] = useState<string | null>(null);
-    const [nombreError, setNombreError] = useState<string | null>(null);
-    const [apellidoError, setApellidoError] = useState<string | null>(null);
-    const [emailError, setEmailError] = useState<string | null>(null);
-    const [mostrarAcompaniantes] = useState(false);
-    const [acompanianteAbierto, setAcompanianteAbierto] = useState<boolean[]>([]);
+    const [uxError, setUxError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
 
 
-    const { register, handleSubmit, watch, control, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
-        resolver,
+    const { register, watch, setValue, handleSubmit } = useForm<ReservationFormData>({
         defaultValues: {
-            tipoVisitante: "particular",
-            cantidadAcompaniantes: 0,
-            acompaniantes: [],
-        }
+            nombre: "",
+            apellido: "",
+            dni: "",
+            telefono: "",
+            correo: "",
+            adultos14: 1,
+            menores14: 0,
+            movilidadReducida: 0,
+            alergias: "no",
+            detalleAlergias: "",
+            comentarios: "",
+            origenVisita: "",
+            comoNosConociste: "",
+            aceptaReglas: false,
+        },
     });
 
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "acompaniantes",
-    });
+    const aceptaReglas = watch("aceptaReglas") ?? false;
+    const alergias = watch("alergias");
+    const adultos14 = Math.max(1, watch("adultos14") ?? 1);
+    const menores14 = Math.max(0, watch("menores14") ?? 0);
+    const movilidadReducida = Math.max(0, watch("movilidadReducida") ?? 0);
+    const totalPersonas = adultos14 + menores14;
 
-    const cantidadAcompaniantes = watch("cantidadAcompaniantes");
-    const tipoVisitante = watch("tipoVisitante");
+    const comoNosConociste = watch("comoNosConociste");
+    const origenVisita = (watch("origenVisita") ?? "").trim();
 
-    // Mantener cantidad de acompañantes sincronizada con el array
-    useEffect(() => {
-        if (tipoVisitante === "particular") {
-            const diff = cantidadAcompaniantes - fields.length;
-            if (diff > 0) {
-                for (let i = 0; i < diff; i++) append({ dni: "", nacimiento: new Date().toISOString().split("T")[0] });
-            } else if (diff < 0) {
-                for (let i = 0; i < Math.abs(diff); i++) remove(fields.length - 1 - i);
-            }
-        } else {
-            setValue("acompaniantes", []);
-        }
-    }, [cantidadAcompaniantes, tipoVisitante, append, fields.length, remove, setValue]);
+    // --- Steps ---
+    const steps = [
+        { label: "Completá tus datos personales", type: "text" as const },
+        { label: "¿Cuántas personas son?", type: "group" as const },
+        { label: "¿Desde dónde nos visitás?", type: "origen" as const },
+        { label: "¿Cómo te enteraste de nuestra existencia?", type: "conociste" as const },
+        { label: "Revisión y envío", type: "submit" as const },
+    ];
 
+    const nextStep = () => setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
+    const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
-    const handleTelefonoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setTelefono(value);
-
-        if (!/^\d*$/.test(value)) {
-            setTelefonoError("El teléfono solo puede contener números");
-        } else if (value.length < 10 || value.length > 11) {
-            setTelefonoError("Ingresá el celular sin el 0 y sin el 15 (10-11 dígitos)");
-        } else {
-            setTelefonoError(null);
-        }
-        setValue("telefono", value);
-    };
-
-    const handleDniChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setDni(value);
-        if (!/^\d*$/.test(value)) {
-            setDniError("El DNI solo puede contener números");
-        } else if (value.length !== 8) {
-            setDniError("El DNI debe tener exactamente 8 dígitos");
-        } else {
-            setDniError(null);
-        }
-    };
-
-    const handleNombreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const onlyLetters = value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ\s]/g, "");
-
-        if (value !== onlyLetters) {
-            setNombreError("Solo se permiten letras y espacios");
-        } else if (value.length < 3) {
-            setNombreError("El nombre debe contener al menos 3 caracteres");
-        } else {
-            setNombreError(null);
-        }
-        setValue("nombre", onlyLetters);
-    };
-
-    const handleApellidoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const onlyLetters = value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ\s]/g, "");
-
-        if (value !== onlyLetters) {
-            setApellidoError("Solo se permiten letras y espacios");
-        } else if (value.length < 3) {
-            setApellidoError("El apellido debe contener al menos 3 caracteres");
-        } else {
-            setApellidoError(null);
-        }
-
-        setValue("apellido", onlyLetters)
-    };
-
-    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        // Regex básico para validar email en tiempo real
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (value.length === 0 || emailRegex.test(value)) {
-            setEmailError(null);
-        } else {
-            setEmailError("Debe tener un formato de email válido (ej: usuario@dominio.com)");
-        }
-        setValue("email", value)
-    };
-
-
-
-    // const onSubmit = async (data: FormData) => {
-    const onSubmit: SubmitHandler<FormData> = async (data) => {
-        try {
-            if (!fechaSeleccionada) {
-                throw new Error("No hay fecha seleccionada");
-            }
-
-            console.log("Paso 2: creando reserva...");
-            const reservationResponse = await fetch("http://localhost:8080/api/reservations", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    nombre: data.nombre,
-                    email: data.email,
-                    dni: data.dni,
-                    telefono: data.telefono,
-                    nacimiento: data.nacimiento,
-                    reservationDate: fechaSeleccionada.toISOString().split("T")[0],
-                    tipoVisitante: data.tipoVisitante,
-                    cantidadAcompaniantes: data.tipoVisitante === "particular" ? data.cantidadAcompaniantes : undefined,
-                    acompaniantes: data.tipoVisitante === "particular" ? acompaniantes : undefined,
-                    cantidadEstudiantes: data.tipoVisitante === "institucionEducativa" ? data.cantidadEstudiantes : undefined,
-                    comentario: data.comentario,
-                }),
-            });
-
-            if (!reservationResponse.ok) {
-                const errorText = await reservationResponse.text();
-                throw new Error(`Error creando reserva: ${reservationResponse.status} - ${errorText}`);
-            }
-
-            const reservation = await reservationResponse.json();
-            console.log("Reserva creada:", reservation);
-
-            setSuccessMsg("Registro y reserva exitosos");
-        } catch {
-            console.error();
-            setServerError("Error inesperado");
-        }
-    };
-
-
-    return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-xl space-y-6">
-            {fechaSeleccionada && (
-                <p className="text-lg text-gray-700">
-                    Fecha seleccionada: <span className="font-semibold">{fechaSeleccionada.toLocaleDateString()}</span>
-                </p>
-            )}
-
-            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-                {/* 👇 Acá usamos un grid con 2 columnas en md+ */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Nombre</label>
-                        <input
-                            type="text"
-                            {...register("nombre")}
-                            onChange={handleNombreChange}
-                            className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2 transition-all duration-200" />
-                        {errors.nombre && <p className="text-sm text-red-500">{errors.nombre.message}</p>}
-                        {nombreError && <p className="text-sm text-red-500">{nombreError}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Apellido</label>
-                        <input
-                            type="text"
-                            {...register("apellido")}
-                            onChange={handleApellidoChange}
-                            className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2 transition-all duration-200" />
-                        {errors.apellido && <p className="text-sm text-red-500">{errors.apellido.message}</p>}
-                        {apellidoError && <p className="text-sm text-red-500">{apellidoError}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">DNI</label>
-                        <input
-                            type="text"
-                            {...register("dni")}
-                            value={dni}
-                            onChange={handleDniChange}
-                            className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2 transition-all duration-200" />
-                        {dniError && <p className="text-sm text-red-500">{dniError}</p>}
-                        {!dniError && errors.dni && <p className="text-sm text-red-500">{errors.dni.message}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Teléfono <span className="text-xs text-gray-500">(sin 0 y sin 15)</span>
-                        </label>
-                        <input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="\d*"
-                            {...register("telefono")}
-                            value={telefono}
-                            onChange={handleTelefonoChange}
-                            className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2 transition-all duration-200" />
-                        {telefonoError && <p className="text-sm text-red-500">{telefonoError}</p>}
-                        {!telefonoError && errors.telefono && <p className="text-sm text-red-500">{errors.telefono.message}</p>}
-                    </div>
-
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Email</label>
-                        <input
-                            type="email"
-                            {...register("email")}
-                            onChange={handleEmailChange}
-                            className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2 transition-all duration-200" />
-                        {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-                        {emailError && <p className="text-sm text-red-500">{emailError}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Fecha de nacimiento</label>
-                        <input
-                            type="date"
-                            {...register("nacimiento")}
-                            className="appearance-none w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2 transition-all duration-200" />
-                        {errors.nacimiento && <p className="text-sm text-red-500">{errors.nacimiento.message}</p>}
-                    </div>
-
-                    <div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">¿Qué tipo de visitante sos?</label>
-                            <label className="flex items-center space-x-2 text-sm">
-                                <input
-                                    type="radio"
-                                    value="particular"
-                                    {...register("tipoVisitante")}
-                                    className="form-radio"
-                                />
-                                <span>Particular</span>
-                            </label>
-                            <label className="flex items-center space-x-2 text-sm mt-1">
-                                <input
-                                    type="radio"
-                                    value="institucionEducativa"
-                                    {...register("tipoVisitante")}
-                                    className="form-radio"
-                                />
-                                <span>Institución educativa</span>
-                            </label>
-                            {errors.tipoVisitante && <p className="text-sm text-red-500 mt-1">{errors.tipoVisitante.message}</p>}
-                        </div>
-
-                        {tipoVisitante === "particular" && (
-                            <div>
-                                <label className="block text-sm font-medium mt-3">¿Con cuántas personas vas a venir?</label>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    {...register("cantidadAcompaniantes", { valueAsNumber: true })}
-                                    className="w-full border-b border-gray-300 focus:border-blue-600 py-2"
-                                />
-                                {errors.cantidadAcompaniantes && <p className="text-sm text-red-500">{errors.cantidadAcompaniantes.message}</p>}
-                            </div>
-                        )}
-
-                        {tipoVisitante === "particular" && cantidadAcompaniantes > 0 && (
-                            <div className="mt-4 space-y-4">
-                                {Array.from({ length: cantidadAcompaniantes }).map((_, i) => (
-                                    <div key={i} className="border p-4 rounded bg-gray-50">
-                                        <h4 className="font-semibold mb-2">Acompañante #{i + 1}</h4>
-
-                                        <div>
-                                            <label className="text-sm font-medium">DNI</label>
-                                            <input
-                                                type="text"
-                                                {...register(`acompaniantes.${i}.dni`)}
-                                                className="w-full border-b border-gray-300 py-2"
-                                            />
-                                            {errors.acompaniantes?.[i]?.dni && (
-                                                <p className="text-sm text-red-500">{errors.acompaniantes[i]?.dni?.message}</p>
-                                            )}
-                                        </div>
-
-                                        <div className="mt-2">
-                                            <label className="text-sm font-medium">Fecha de nacimiento</label>
-                                            <input
-                                                type="date"
-                                                {...register(`acompaniantes.${i}.nacimiento`)}
-                                                className="w-full border-b border-gray-300 py-2"
-                                            />
-                                            {errors.acompaniantes?.[i]?.nacimiento && (
-                                                <p className="text-sm text-red-500">{errors.acompaniantes[i]?.nacimiento?.message}</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {mostrarAcompaniantes && acompaniantes.map((acom, i) => (
-                            <div key={i} className="border p-4 rounded-md space-y-2 bg-gray-50">
-                                <h4 className="font-semibold flex items-center justify-between">
-                                    Acompañante #{i + 1}
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setAcompanianteAbierto(prev => {
-                                                const newState = [...prev];
-                                                newState[i] = !newState[i];
-                                                return newState;
-                                            })
-                                        }
-                                    >
-                                        {acompanianteAbierto[i] ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                                    </button>
-                                </h4>
-                                {acompanianteAbierto[i] && (
-                                    <>
-                                        <div>
-                                            <label className="text-sm font-medium">DNI</label>
-                                            <input
-                                                type="text"
-                                                value={acom.dni}
-                                                // onChange={}
-                                                className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium">Fecha de nacimiento</label>
-                                            <input
-                                                type="text"
-                                                value={acom.nacimiento}
-                                                onChange={(e) => {
-                                                    const newList = [...acompaniantes];
-                                                    newList[i].nacimiento = e.target.value;
-                                                    setAcompaniantes(newList);
-                                                }}
-                                                className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2"
-                                            />
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        ))}
-
-                        {tipoVisitante === "institucionEducativa" && (
-                            <div>
-                                <label className="block text-sm font-medium mt-3">¿Cuántos estudiantes vienen?</label>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    {...register("cantidadEstudiantes")}
-                                    className="w-full border-b border-gray-300 focus:border-blue-600 focus:outline-none py-2"
-                                />
-                                {errors.cantidadEstudiantes && (
-                                    <p className="text-sm text-red-500">{errors.cantidadEstudiantes.message}</p>
-                                )}
-                            </div>
-                        )}
-
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Comentario o motivo de la visita (opcional)</label>
-                        <textarea
-                            {...register("comentario")}
-                            rows={4}
-                            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {errors.comentario && <p className="text-sm text-red-500">{errors.comentario.message}</p>}
-                    </div>
+    // --- Counters (Airbnb-like) ---
+    const Counter = ({
+        label,
+        value,
+        onChange,
+        min = 0,
+        max = Infinity,
+        description,
+        disableMinusWhenMin = false,
+    }: {
+        label: string;
+        value: number;
+        onChange: (next: number) => void;
+        min?: number;
+        max?: number;
+        description?: string;
+        disableMinusWhenMin?: boolean;
+    }) => {
+        const dec = () => onChange(Math.max(min, value - 1));
+        const inc = () => onChange(Math.min(max, value + 1));
+        return (
+            // Wrapper del item del contador
+            <div className={`flex items-center justify-between ${sectionRow}`}>
+                <div>
+                    <p className="font-medium">{label}</p>
+                    {description ? <p className={hintText}>{description}</p> : null}
                 </div>
 
-                {serverError && <p className="text-red-600 text-sm text-center">{serverError}</p>}
-                {successMsg && <p className="text-green-600 text-sm text-center">{successMsg}</p>}
+                <div className="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onClick={dec}
+                        disabled={disableMinusWhenMin && value <= min}
+                        className={`h-10 w-10 grid place-items-center rounded-full border ${lineColor}
+                  ${textMain} disabled:opacity-50`}
+                        aria-label={`Disminuir ${label}`}
+                    >
+                        –
+                    </button>
+                    <span className="w-8 text-center">{value}</span>
+                    <button
+                        type="button"
+                        onClick={inc}
+                        disabled={value >= max}
+                        className={`h-10 w-10 grid place-items-center rounded-full border ${lineColor}
+                  ${textMain} disabled:opacity-50`}
+                        aria-label={`Aumentar ${label}`}
+                    >
+                        +
+                    </button>
+                </div>
+            </div>
+        );
+    };
 
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full cursor-pointer bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
-                >
-                    {isSubmitting ? "Reservando..." : "Reservar"}
-                </button>
+    // --- Validaciones por step ---
+    const validateGroup = () => {
+        setUxError(null);
+        if (adultos14 < 1) {
+            setUxError("Debe haber al menos 1 persona de 14 años o más (te incluimos a vos).");
+            return false;
+        }
+        if (movilidadReducida > totalPersonas) {
+            setUxError("La cantidad con movilidad reducida no puede superar el total de personas.");
+            return false;
+        }
+        return true;
+    };
+
+    const validateOrigen = () => {
+        if (!origenVisita) {
+            setUxError("Por favor, contanos desde dónde nos visitás.");
+            return false;
+        }
+        setUxError(null);
+        return true;
+    };
+
+    const validateConociste = () => {
+        if (!comoNosConociste) {
+            setUxError("Elegí una opción sobre cómo nos conociste.");
+            return false;
+        }
+        setUxError(null);
+        return true;
+    };
+
+    const guardedNext = () => {
+        const t = steps[currentStep].type;
+        if (t === "group" && !validateGroup()) return;
+        if (t === "origen" && !validateOrigen()) return;
+        if (t === "conociste" && !validateConociste()) return;
+        nextStep();
+    };
+
+    // --- Submit ---
+    const onSubmit: SubmitHandler<ReservationFormData> = async (data) => {
+        // última validación defensiva
+        if (!validateGroup() || !validateOrigen() || !validateConociste()) return;
+
+        setServerError(null);
+        setSuccessMsg(null);
+        setSubmitting(true);
+        try {
+            if (!fechaSeleccionada) throw new Error("No hay fecha seleccionada");
+
+            const payload = {
+                ...data,
+                totalPersonas,
+                reservationDate: fechaSeleccionada.toISOString().split("T")[0],
+            };
+
+            //   // TODO: reemplazar por tu endpoint real
+            //   const res = await fetch("http://localhost:8080/api/reservations", {
+            //     method: "POST",
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify(payload),
+            //   });
+
+            if (MOCK_SUBMIT) {
+                // Simulación de latencia
+                await new Promise((r) => setTimeout(r, 700));
+                setSuccessMsg("¡Reserva realizada con éxito!");
+                return;
+            }
+
+            const res = await fetch(`${API_URL}/api/reservations`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) throw new Error("Error creando reserva");
+
+            // ✅ Éxito: mostramos pantalla final con recomendaciones y recordatorio
+            setSuccessMsg("¡Reserva realizada con éxito!");
+        } catch (e: any) {
+            console.error(e);
+            setServerError(e?.message || "Error inesperado");
+        } finally {
+            setSubmitting(false); // 👈 termina envío
+        }
+    };
+
+    // --- Handlers reglas para counters ---
+    const setAdultos = (next: number) => {
+        const safe = Math.max(1, next || 1);
+        setValue("adultos14", safe, { shouldDirty: true });
+        const newTotal = safe + menores14;
+        if (movilidadReducida > newTotal) {
+            setValue("movilidadReducida", newTotal, { shouldDirty: true });
+        }
+    };
+    const setMenores = (next: number) => {
+        const safe = Math.max(0, next || 0);
+        setValue("menores14", safe, { shouldDirty: true });
+        const newTotal = adultos14 + safe;
+        if (movilidadReducida > newTotal) {
+            setValue("movilidadReducida", newTotal, { shouldDirty: true });
+        }
+    };
+    const setMovilidad = (next: number) => {
+        const max = totalPersonas;
+        const safe = Math.min(Math.max(0, next || 0), max);
+        setValue("movilidadReducida", safe, { shouldDirty: true });
+    };
+
+    // --- Pantalla de éxito (post-submit) ---
+    if (successMsg) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white px-4">
+                <div className="w-full max-w-xl">
+                    <div className="mb-4 rounded-lg bg-green-600/20 border border-green-600 px-4 py-3">
+                        <h2 className="text-xl font-semibold">{successMsg}</h2>
+                        <p className="mt-1 text-sm text-gray-200">
+                            Te enviaremos un recordatorio <b>48 horas antes</b> para confirmar tu llegada.
+                            Recordá llegar <b>15 minutos antes</b> del horario indicado. ¡Nos vemos pronto! ✨
+                        </p>
+                    </div>
+
+                    <div className="rounded-2xl bg-gray-950/40 p-5 space-y-3">
+                        <h3 className="text-lg font-semibold">Antes de tu visita</h3>
+                        <ul className="list-disc pl-6 space-y-2 text-gray-200">
+                            <li>No se permiten mascotas.</li>
+                            <li>Traé ropa cómoda.</li>
+                            <li>Botella recargable de agua.</li>
+                            <li>Gorro y protector solar.</li>
+                            <li>No contamos con servicio de venta de alimentos.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // --- Form con steps ---
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-800">
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-xl text-left px-6 py-10 text-white">
+                {serverError && (
+                    <div className="mb-4 rounded-lg bg-red-600/20 border border-red-600 px-3 py-2 text-sm">
+                        {serverError}
+                    </div>
+                )}
+
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentStep}
+                        initial={{ x: 100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -100, opacity: 0 }}
+                        transition={{ duration: 0.35 }}
+                    >
+                        {/* Encabezado */}
+                        <div className="flex items-center gap-2 mb-6">
+                            <span className="text-xl font-medium">{currentStep + 2}</span>
+                            <ArrowRight className="w-5 h-5" />
+                            <h2 className="text-xl font-semibold">{steps[currentStep].label}</h2>
+                        </div>
+
+
+                        {/* Paso 1: Datos personales */}
+                        {steps[currentStep].type === "text" && (
+                            <div className="space-y-3">
+                                <input {...register("nombre")} placeholder="Nombre" className={inputBase} />
+                                <input {...register("apellido")} placeholder="Apellido" className={inputBase} />
+                                <input {...register("dni")} placeholder="DNI" className={inputBase} />
+                                <input {...register("telefono")} placeholder="Teléfono" className={inputBase} />
+                                <input {...register("correo")} placeholder="Correo" className={inputBase} />
+                            </div>
+                        )}
+
+                        {/* Paso 2: ¿Cuántas personas son? */}
+                        {steps[currentStep].type === "group" && (
+                            <div className="space-y-6">
+                                <div className="rounded-2xl  p-4">
+                                    <Counter
+                                        label="De 14 años o más (incluyéndote)"
+                                        value={adultos14}
+                                        onChange={setAdultos}
+                                        min={1}
+                                        disableMinusWhenMin
+                                    />
+                                    <Counter
+                                        label="Menores de 14"
+                                        value={menores14}
+                                        onChange={setMenores}
+                                        min={0}
+                                    />
+                                </div>
+
+                                {/* <div className="text-sm text-gray-300">
+                  Total: <span className="font-semibold text-white">{totalPersonas}</span>
+                </div> */}
+
+                                <div className="rounded-2xl p-4">
+                                    <Counter
+                                        label="De las personas que ingresaste, ¿cuántas tienen movilidad reducida?"
+                                        value={movilidadReducida}
+                                        onChange={setMovilidad}
+                                        min={0}
+                                        max={totalPersonas}
+                                    // description="No puede superar el total."
+                                    />
+                                </div>
+
+                                {uxError && (
+                                    <div className="rounded-lg bg-yellow-600/20 border border-yellow-600 px-3 py-2 text-sm">
+                                        {uxError}
+                                    </div>
+                                )}
+
+                                {/* Alergias */}
+                                <div className="mt-2 p-4">
+                                    <p className="font-semibold mb-2">¿Alguno de los acompañantes es alérgico?</p>
+                                    <div className="flex gap-6">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="radio" value="no" {...register("alergias")} className={radioDot} defaultChecked />
+                                            <span>No</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="radio" value="si" {...register("alergias")} className={radioDot} />
+                                            <span>Sí</span>
+                                        </label>
+                                    </div>
+
+
+                                    {alergias === "si" && (
+                                        <textarea
+                                            {...register("detalleAlergias")}
+                                            placeholder="Contanos quiénes son y a qué son alérgicos"
+                                            className={textareaBase}
+                                            rows={3}
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Comentarios libres */}
+                                <div>
+                                    <label className="block p-4 font-semibold">
+                                        ¿Querés agregar algún comentario o algo que debamos saber?
+                                    </label>
+                                    <textarea
+                                        {...register("comentarios")}
+                                        placeholder="Ej: una persona se marea fácil; llegamos con cochecito; necesitamos ayuda al llegar..."
+                                        className={textareaBase2}
+                                        rows={3}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Paso 3: Desde dónde nos visitás */}
+                        {steps[currentStep].type === "origen" && (
+                            <div className="space-y-3">
+                                <textarea
+                                    {...register("origenVisita")}
+                                    placeholder="Contanos desde dónde nos visitás (ciudad, provincia/país)."
+                                    className={textareaBase}
+                                    rows={3}
+                                />
+                                {uxError && <p className="text-yellow-400 text-sm">{uxError}</p>}
+                            </div>
+                        )}
+
+                        {/* Paso 4: ¿Cómo nos conociste? */}
+                        {steps[currentStep].type === "conociste" && (
+                            <div className="space-y-3">
+                                <div className="grid gap-3">
+                                    {[
+                                        { v: "redes", t: "Redes sociales" },
+                                        { v: "recomendacion", t: "Recomendación" },
+                                        { v: "sitio", t: "Sitio web" },
+                                        { v: "publicidad", t: "Publicidad" },
+                                        { v: "otro", t: "Otro" },
+                                    ].map(({ v, t }) => (
+                                        <label key={v} className="flex items-center gap-3 cursor-pointer">
+                                            <input type="radio" value={v} {...register("comoNosConociste")} className={radioDot} />
+                                            <span>{t}</span>
+                                        </label>
+                                    ))}
+                                </div>
+
+                                {uxError && <p className="text-yellow-400 text-sm">{uxError}</p>}
+                            </div>
+                        )}
+
+                        {/* Paso 5: Revisión y envío */}
+                        {steps[currentStep].type === "submit" && (
+                            <div className="space-y-4">
+                                {/* Mini resumen opcional */}
+                                <div className="rounded-xl bg-gray-950/40 p-4 text-sm text-gray-200">
+                                    <div><b>Personas:</b> {adultos14} de 14+ y {menores14} menores (total {totalPersonas}).</div>
+                                    <div><b>Movilidad reducida:</b> {movilidadReducida}</div>
+                                    <div><b>Alergias:</b> {alergias === "si" ? "Sí" : "No"}</div>
+                                    {origenVisita && <div><b>Origen:</b> {origenVisita}</div>}
+                                    {comoNosConociste && <div><b>Cómo nos conociste:</b> {comoNosConociste}</div>}
+                                </div>
+
+                                {/* Aceptación de políticas (letra chica + link) */}
+                                <label className={`flex items-start gap-3 text-xs ${textSoft} cursor-pointer select-none`}>
+                                    <input
+                                        type="checkbox"
+                                        {...register("aceptaReglas")}
+                                        className="mt-0.5 w-4 h-4 cursor-pointer appearance-none border border-white/80 rounded-sm
+               checked:bg-white checked:shadow-[inset_0_0_0_2px_rgba(17,24,39,1)]"
+                                    />
+                                    <span>
+                                        Acepto las{" "}
+                                        <a href={POLICIES_URL} target="_blank" className="underline hover:opacity-90 text-white">
+                                            políticas de visita
+                                        </a>{" "}
+                                        (derecho de admisión y manejo de datos).
+                                    </span>
+                                </label>
+
+                            </div>
+                        )}
+
+                        {/* Navegación */}
+                        <div className="mt-10 flex items-center gap-3">
+                            {currentStep > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={prevStep}
+                                    className="px-6 py-3 rounded-full border border-white/80 text-white hover:bg-white hover:text-gray-900 transition"
+                                >
+                                    Anterior
+                                </button>
+                            )}
+
+                            <div className="ml-auto">
+                                {currentStep < steps.length - 1 ? (
+                                    <button
+                                        type="button"
+                                        onClick={guardedNext}
+                                        className="px-6 py-3 rounded-full bg-white text-gray-900 hover:opacity-90 transition"
+                                    >
+                                        Siguiente
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="submit"
+                                        disabled={!aceptaReglas || submitting}
+                                        className={`px-6 py-3 rounded-full bg-white text-gray-900 transition
+          ${(!aceptaReglas || submitting) ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"}`}
+                                    >
+                                        {submitting ? "Enviando..." : "Enviar"}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                    </motion.div>
+                </AnimatePresence>
             </form>
         </div>
     );
