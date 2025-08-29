@@ -59,12 +59,12 @@ body {
   display: flex !important;
   flex-direction: row !important;
   gap: 2rem !important;
-  justify-content: center !important; 
+  justify-content: center !important;
 }
 
 .rdp-months {
   justify-content: center;
-  flex-wrap: nowrap !important;  
+  flex-wrap: nowrap !important;
 }
 
 .rdp-weekday {

@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type Acompaniante = {
+  dni: string;
+  nacimiento: string;
+};
 
 type Reserva = {
   id: string;
@@ -13,10 +18,25 @@ type Reserva = {
   reservationDate: string;
   tipoVisitante: string;
   cantidadAcompaniantes?: number;
-  acompaniantes?: Array<{ dni: string; nacimiento: string }>;
+  acompaniantes?: Acompaniante[];
   cantidadEstudiantes?: number;
   comentario?: string;
   status: "pendiente" | "confirmada" | "rechazada";
+};
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+
+const fmtDate = (iso: string) => {
+  // Ajustá el locale si preferís otro formato
+  try {
+    return new Intl.DateTimeFormat("es-AR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
 };
 
 export default function AdministrarVisitas() {
@@ -28,38 +48,52 @@ export default function AdministrarVisitas() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://localhost:8080/api/reservations");
+      const res = await fetch(`${API_URL}/api/reservations`, { cache: "no-store" });
       if (!res.ok) throw new Error("Error al cargar las reservas");
-      const data = await res.json();
-      setReservas(data);
-    } catch (e: any) {
-      setError(e.message || "Error inesperado");
+
+      const data: unknown = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error("Respuesta inesperada del servidor");
+      }
+
+      // Si querés ser extra estricto, podrías validar cada item acá.
+      setReservas(data as Reserva[]);
+    } catch (err: unknown) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Error inesperado");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchReservas();
+    void fetchReservas();
   }, []);
 
   const actualizarEstado = async (id: string, nuevoEstado: "confirmada" | "rechazada") => {
     try {
-      const res = await fetch(`http://localhost:8080/api/reservations/${id}`, {
+      const res = await fetch(`${API_URL}/api/reservations/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nuevoEstado }),
       });
       if (!res.ok) throw new Error("Error actualizando el estado");
-      // Refrescar lista
-      await fetchReservas();
-    } catch (e) {
-      alert("Error al actualizar el estado");
+
+      // Opción A: refrescar todo desde el server
+      // await fetchReservas();
+
+      // Opción B (más rápido): actualizar localmente
+      setReservas((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: nuevoEstado } as Reserva : r))
+      );
+    } catch (err: unknown) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Error al actualizar el estado");
     }
   };
 
-  const pendientes = reservas.filter((r) => r.status === "pendiente");
-  const confirmadas = reservas.filter((r) => r.status === "confirmada");
+  const pendientes = useMemo(() => reservas.filter((r) => r.status === "pendiente"), [reservas]);
+  const confirmadas = useMemo(() => reservas.filter((r) => r.status === "confirmada"), [reservas]);
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -68,74 +102,86 @@ export default function AdministrarVisitas() {
       {loading && <p>Cargando reservas...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
-      <section className="mb-8">
+      {/* PENDIENTES */}
+      <section className="mb-10">
         <h2 className="text-xl font-semibold mb-3">Reservas Pendientes</h2>
-        {pendientes.length === 0 && <p>No hay reservas pendientes.</p>}
-        <ul className="space-y-4">
-          {pendientes.map((reserva) => (
-            <li
-              key={reserva.id}
-              className="border rounded p-4 bg-gray-50 flex flex-col md:flex-row md:justify-between md:items-center"
-            >
-              <div>
+        {pendientes.length === 0 ? (
+          <p className="text-gray-600">No hay reservas pendientes.</p>
+        ) : (
+          <ul className="space-y-4">
+            {pendientes.map((reserva) => (
+              <li
+                key={reserva.id}
+                className="border rounded p-4 bg-gray-50 flex flex-col md:flex-row md:justify-between md:items-center"
+              >
+                <div className="space-y-1">
+                  <p>
+                    <strong>
+                      {reserva.nombre} {reserva.apellido}
+                    </strong>{" "}
+                    — DNI: {reserva.dni}
+                  </p>
+                  <p>Fecha visita: {fmtDate(reserva.reservationDate)}</p>
+                  <p>Tipo visitante: {reserva.tipoVisitante}</p>
+                  {typeof reserva.cantidadAcompaniantes === "number" && (
+                    <p>Acompañantes: {reserva.cantidadAcompaniantes}</p>
+                  )}
+                  {typeof reserva.cantidadEstudiantes === "number" && (
+                    <p>Estudiantes: {reserva.cantidadEstudiantes}</p>
+                  )}
+                  {reserva.comentario && <p>Comentario: {reserva.comentario}</p>}
+                </div>
+
+                <div className="flex gap-2 mt-3 md:mt-0">
+                  <button
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    onClick={() => actualizarEstado(reserva.id, "confirmada")}
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    onClick={() => actualizarEstado(reserva.id, "rechazada")}
+                  >
+                    Rechazar
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* CONFIRMADAS */}
+      <section>
+        <h2 className="text-xl font-semibold mb-3">Reservas Confirmadas</h2>
+        {confirmadas.length === 0 ? (
+          <p className="text-gray-600">No hay reservas confirmadas.</p>
+        ) : (
+          <ul className="space-y-4">
+            {confirmadas.map((reserva) => (
+              <li key={reserva.id} className="border rounded p-4 bg-green-50">
                 <p>
-                  <strong>{reserva.nombre} {reserva.apellido}</strong> - DNI: {reserva.dni}
+                  <strong>
+                    {reserva.nombre} {reserva.apellido}
+                  </strong>{" "}
+                  — DNI: {reserva.dni}
                 </p>
-                <p>Fecha visita: {new Date(reserva.reservationDate).toLocaleDateString()}</p>
+                <p>Fecha visita: {fmtDate(reserva.reservationDate)}</p>
                 <p>Tipo visitante: {reserva.tipoVisitante}</p>
-                {reserva.cantidadAcompaniantes !== undefined && (
+                {typeof reserva.cantidadAcompaniantes === "number" && (
                   <p>Acompañantes: {reserva.cantidadAcompaniantes}</p>
                 )}
-                {reserva.cantidadEstudiantes !== undefined && (
+                {typeof reserva.cantidadEstudiantes === "number" && (
                   <p>Estudiantes: {reserva.cantidadEstudiantes}</p>
                 )}
                 {reserva.comentario && <p>Comentario: {reserva.comentario}</p>}
-              </div>
-
-              <div className="flex space-x-2 mt-3 md:mt-0">
-                <button
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                  onClick={() => actualizarEstado(reserva.id, "confirmada")}
-                >
-                  Confirmar
-                </button>
-                <button
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  onClick={() => actualizarEstado(reserva.id, "rechazada")}
-                >
-                  Rechazar
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-3">Reservas Confirmadas</h2>
-        {confirmadas.length === 0 && <p>No hay reservas confirmadas.</p>}
-        <ul className="space-y-4">
-          {confirmadas.map((reserva) => (
-            <li
-              key={reserva.id}
-              className="border rounded p-4 bg-green-50"
-            >
-              <p>
-                <strong>{reserva.nombre} {reserva.apellido}</strong> - DNI: {reserva.dni}
-              </p>
-              <p>Fecha visita: {new Date(reserva.reservationDate).toLocaleDateString()}</p>
-              <p>Tipo visitante: {reserva.tipoVisitante}</p>
-              {reserva.cantidadAcompaniantes !== undefined && (
-                <p>Acompañantes: {reserva.cantidadAcompaniantes}</p>
-              )}
-              {reserva.cantidadEstudiantes !== undefined && (
-                <p>Estudiantes: {reserva.cantidadEstudiantes}</p>
-              )}
-              {reserva.comentario && <p>Comentario: {reserva.comentario}</p>}
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );
 }
+

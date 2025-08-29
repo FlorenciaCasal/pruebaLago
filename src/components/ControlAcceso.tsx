@@ -30,7 +30,7 @@ export default function ControlAcceso({ dniInicial = "" }: ControlAccesoProps) {
       } else {
         setResultado(`❌ Acceso denegado`);
       }
-    } catch (err) {
+    } catch {
       setResultado("⚠️ Error validando DNI");
     }
   };
