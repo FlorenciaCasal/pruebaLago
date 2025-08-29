@@ -46,11 +46,11 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
     const isPrevDisabled = isBefore(subMonths(month, 1), startOfMonth(new Date()));
 
     return (
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center">
             <div
                 className={`
-        bg-black rounded-xl p-4 max-w-full
-        ${isMobile ? 'overflow-y-scroll h-[80vh] [&_.rdp-weekday]:hidden' : 'flex items-center justify-center gap-3'} 
+        bg-black rounded-xl w-full 
+        ${isMobile ? 'px-4 overflow-y-scroll h-[80vh] [&_.rdp-weekday]:hidden'  : 'p-4 flex items-center justify-center gap-1 overflow-x-hidden'} 
       `}
             >
                 {isMobile ? (
@@ -58,7 +58,7 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
                         {Array.from({ length: monthsToShow }, (_, i) => {
                             const thisMonth = addMonths(new Date(), i);
                             return (
-                                <div key={i} className="flex bg-black relative max-w-full sm:max-w-md">
+                                <div key={i} className="flex bg-black justify-center relative max-w-full sm:max-w-md">
                                     <DayPicker
                                         className="custom-daypicker"
                                         mode="single"
@@ -79,7 +79,7 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
                         <div className="flex justify-center w-full mt-4">
                             <button
                                 onClick={() => setMonthsToShow((prev) => prev + 3)}
-                                className="px-4 pt-2 pb-4 w-full max-w-xs rounded-lg bg-white text-gray-900 hover:opacity-90 transition"
+                                className="px-4 pt-2 pb-4 w-full max-w-xs rounded-lg cursor-pointer bg-white text-gray-900 hover:opacity-90 transition"
                             >
                                 Cargar más fechas
                             </button>

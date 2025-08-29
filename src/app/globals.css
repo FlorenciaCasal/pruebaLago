@@ -19,6 +19,12 @@
   }
 }
 
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 @media (max-width: 767px) {
   .rdp {
     font-size: 14px !important;
@@ -33,20 +39,14 @@
 
 @media (max-width: 767px) {
   .rdp-day {
-    width: 0.2rem !important;
-    height: 0.2rem !important;
+    width: 0.1rem !important;
+    height: 0.1rem !important;
   }
 
   .rdp-day_button {
-    width: 2.5rem !important;
-    height: 2.5rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .rdp-caption_label {
@@ -65,9 +65,46 @@ body {
 .rdp-months {
   justify-content: center;
   flex-wrap: nowrap !important;
+  width: 100% !important;
 }
 
 .rdp-weekday {
   font-size: 14px !important;
   text-transform: capitalize !important;
+}
+
+
+
+@media (max-width: 767px) {
+
+  /* El root de DayPicker trae .custom-daypicker y .rdp en el mismo nodo */
+  .custom-daypicker.rdp {
+    /* un toque más grande pero sin desbordar (px-4 del wrapper = 32px) */
+    --rdp-cell-size: clamp(22px, calc((100vw - 64px) / 7), 36px);
+    display: inline-block !important;
+    /* para que el margin auto centre el bloque */
+    margin: 0 !important;
+  }
+
+  /* Evitá que los meses se estiren a 100% (si quedó alguna regla vieja) */
+  .custom-daypicker .rdp-months {
+    width: auto !important;
+    justify-content: center !important;
+  }
+
+  /* mostrar los nombres de los días y fijarlos arriba */
+  .custom-daypicker .rdp-head {
+    position: sticky;
+    top: 0;
+    background: #000;
+    /* mismo bg que tu wrapper negro */
+    z-index: 10;
+  }
+
+  .custom-daypicker .rdp-weekday {
+    display: table-cell !important;
+    /* por si algo los ocultaba */
+
+
+  }
 }

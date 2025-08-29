@@ -150,7 +150,7 @@ export default function RegisterForm() {
     // Success screen
     if (successMsg) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white px-4">
+            <div className="flex w-full items-center justify-center min-h-screen bg-gray-900 text-white px-4">
                 <div className="w-full max-w-xl">
                     <div className="mb-4 rounded-lg bg-green-600/20 border border-green-600 px-4 py-3">
                         <h2 className="text-xl font-semibold">{successMsg}</h2>
@@ -177,7 +177,7 @@ export default function RegisterForm() {
     // Form
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-900">
-            <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-xl text-left px-6 py-10 text-white">
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-3xl text-left px-4 sm:px-6 py-10 text-white overflow-x-hidden">
                 {serverError && (
                     <div className="mb-4 rounded-lg bg-red-600/20 border border-red-600 px-3 py-2 text-sm">
                         {serverError}
@@ -210,13 +210,6 @@ export default function RegisterForm() {
                                 <div className="grid gap-3">
                                     {circuitos.map(({ key, titulo }) => (
                                         <label key={key} className={radioCard}>
-                                            {/* input accesible pero oculto visualmente */}
-                                            {/* <input
-                                                type="radio"
-                                                value={key}
-                                                {...register("circuito")}
-                                                className={radioHidden}
-                                            /> */}
                                             <input
                                                 type="radio"
                                                 value={key}
@@ -235,18 +228,16 @@ export default function RegisterForm() {
 
                         {steps[currentStep].type === "fecha" && (
                             <div className="space-y-3">
-                                {/* <CalendarPicker
-                                    selectedISO={watch("fechaISO")}
-                                    onSelectISO={(iso) => setValue("fechaISO", iso, { shouldDirty: true })}
-                                /> */}
-                                <CalendarPicker
-                                    selectedISO={fechaISO}
-                                    onSelectISO={(iso) => {
-                                        setValue("fechaISO", iso, { shouldDirty: true });
-                                        setUxError(null);
-                                        nextStep();
-                                    }}
-                                />
+                                <div className="mx-auto w-full">
+                                    <CalendarPicker
+                                        selectedISO={fechaISO}
+                                        onSelectISO={(iso) => {
+                                            setValue("fechaISO", iso, { shouldDirty: true });
+                                            setUxError(null);
+                                            nextStep();
+                                        }}
+                                    />
+                                </div>
                                 <p className="text-sm text-white/80">
                                     {watch("fechaISO") ? `Fecha seleccionada: ${watch("fechaISO")}` : "Elegí un día del calendario"}
                                 </p>
