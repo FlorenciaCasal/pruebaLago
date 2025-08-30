@@ -1,16 +1,5 @@
 "use client";
 import React from "react";
-import { lineColor, textMain, sectionRow, hintText } from "@/styles/ui";
-
-type Props = {
-    label: string;
-    value: number;
-    onChange: (next: number) => void;
-    min?: number;
-    max?: number;
-    description?: string;
-    disableMinusWhenMin?: boolean;
-};
 
 // Counter.tsx (o donde lo tengas)
 export default function Counter({

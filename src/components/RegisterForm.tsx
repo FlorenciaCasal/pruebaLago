@@ -11,6 +11,7 @@ import { submitReservation } from "@/services/reservations";
 import type { ReservationFormData } from "@/types/reservation";
 import { useFieldArray } from "react-hook-form";
 import CalendarPicker from "@/components/CalendarPicker";
+import Image from "next/image";
 
 
 const POLICIES_URL = "/politicas-de-visita";
@@ -28,7 +29,7 @@ export default function RegisterForm() {
         validateGroup, validateOrigen, validateConociste,
     } = useReservationForm();
 
-    const { fields, append, remove, replace } = useFieldArray({ name: "personas", control });
+    const { fields, append, remove } = useFieldArray({ name: "personas", control });
 
     const aceptaReglas = watch("aceptaReglas") ?? false;
     const alergias = watch("alergias");
@@ -238,7 +239,7 @@ export default function RegisterForm() {
                                                 peer-checked:[&_.badge]:bg-white peer-checked:[&_.badge]:text-gray-900 peer-checked:[&_.badge]:border-gray-900">
                                                     {/* fila 1: IMAGEN — centrada, sin recorte, alto fijo por breakpoint */}
                                                     <div className="h-44 sm:h-56 md:h-64 flex items-center justify-center overflow-hidden rounded-lg p-1 md:p-1.5">
-                                                        <img
+                                                        <Image
                                                             src={img}
                                                             alt={`Imagen del ${titulo}`}
                                                             className="block max-w-full max-h-full object-contain mx-auto"
