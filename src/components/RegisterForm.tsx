@@ -35,10 +35,10 @@ export default function RegisterForm() {
     const origenVisita = (watch("origenVisita") ?? "").trim();
     const comoNosConociste = watch("comoNosConociste");
     const circuitos = [
-        { key: "A", titulo: "Circuito A: Bosque y Mirador" },
-        { key: "B", titulo: "Circuito B: Cascadas y Senderos" },
-        { key: "C", titulo: "Circuito C: Avifauna y Laguna" },
-        { key: "D", titulo: "Circuito D: Cumbre y Vistas" },
+        { key: "A", titulo: "Circuito Panorámico", img: "/img/circuito1.jpg" },
+        { key: "B", titulo: "Circuito de Senderos", img: "/img/circuito2.jpg" },
+        { key: "C", titulo: "Circuito de Senderos", img: "/img/circuito3.jpg" },
+        { key: "D", titulo: "Circuito de Senderos", img: "/img/circuito4.jpg" },
     ] as const;
     // dentro del componente
     const circuito = watch("circuito");
@@ -82,15 +82,20 @@ export default function RegisterForm() {
     const nextStep = () => setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
     const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
+    const validators: Record<(typeof steps)[number]['type'], () => string | null> = {
+        circuito: validateCircuito,
+        fecha: validateFecha,
+        text: () => null,
+        group: validateGroup,
+        origen: validateOrigen,
+        conociste: validateConociste,
+        submit: () => null,
+    };
+
     const guardedNext = () => {
         const t = steps[currentStep].type;
-        const msg =
-            t === "circuito" ? validateCircuito() :
-                t === "fecha" ? validateFecha() :
-                    t === "group" ? validateGroup() :
-                        t === "origen" ? validateOrigen() :
-                            t === "conociste" ? validateConociste() : null;
-
+        const v = validators[t];
+        const msg = v ? v() : null;
         if (msg) { setUxError(msg); return; }
         setUxError(null);
         nextStep();
@@ -207,24 +212,57 @@ export default function RegisterForm() {
 
                         {steps[currentStep].type === "circuito" && (
                             <div className="space-y-3">
-                                <div className="grid gap-3">
-                                    {circuitos.map(({ key, titulo }) => (
-                                        <label key={key} className={radioCard}>
-                                            <input
-                                                type="radio"
-                                                value={key}
-                                                {...register("circuito", { onChange: () => { setValue("circuito", key, { shouldDirty: true }); setUxError(null); nextStep(); } })}
-                                            />
-                                            {/* badge con letra */}
-                                            <span className={radioBadge} aria-hidden="true">{key}</span>
-                                            <span>{titulo}</span>
-                                        </label>
-                                    ))}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {circuitos.map(({ key, titulo, img }, i) => {
+                                        const letter = String.fromCharCode(65 + i);
+                                        return (
+                                            <label
+                                                key={key}
+                                                className={`${radioCard} flex-col items-center text-center gap-3`} // ← fuerza columna
+                                            >
+                                                {/* input oculto (peer) */}
+                                                <input
+                                                    type="radio"
+                                                    value={key}
+                                                    className={radioHidden} // sr-only peer
+                                                    {...register("circuito")}
+                                                    onChange={() => {
+                                                        setValue("circuito", key, { shouldDirty: true, shouldValidate: true });
+                                                        setUxError(null);
+                                                        nextStep();
+                                                    }}
+                                                />
+
+                                                {/* Contenido en 2 filas: [imagen crece] / [texto fijo abajo] */}
+                                                <div className="w-full grid grid-rows-[1fr_auto] gap-2
+                                                peer-checked:[&_.badge]:bg-white peer-checked:[&_.badge]:text-gray-900 peer-checked:[&_.badge]:border-gray-900">
+                                                    {/* fila 1: IMAGEN — centrada, sin recorte, alto fijo por breakpoint */}
+                                                    <div className="h-44 sm:h-56 md:h-64 flex items-center justify-center overflow-hidden rounded-lg p-1 md:p-1.5">
+                                                        <img
+                                                            src={img}
+                                                            alt={`Imagen del ${titulo}`}
+                                                            className="block max-w-full max-h-full object-contain mx-auto"
+                                                            loading="lazy"
+                                                            decoding="async"
+                                                        />
+                                                    </div>
+
+                                                    {/* fila 2: LETRA + NOMBRE — siempre abajo */}
+                                                    <div className="inline-flex items-center justify-center gap-2">
+                                                        <span className={`${radioBadge} badge`} aria-hidden="true">{letter}</span>
+                                                        <span className="font-medium">{titulo}</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        );
+                                    })}
                                 </div>
-                                {/* error UX si lo necesitás */}
+
                                 {uxError && <p className="text-red-400 text-sm">{uxError}</p>}
                             </div>
                         )}
+
+
 
                         {steps[currentStep].type === "fecha" && (
                             <div className="space-y-3">
