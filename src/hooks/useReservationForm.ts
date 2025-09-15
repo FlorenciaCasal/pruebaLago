@@ -1,35 +1,90 @@
 "use client";
 import { useForm } from "react-hook-form";
 import type { ReservationFormData } from "@/types/reservation";
+import { useEffect } from "react";
 
 export function useReservationForm() {
   const form = useForm<ReservationFormData>({
     defaultValues: {
-      nombre: "", apellido: "", dni: "", telefono: "", correo: "",
-      adultos14: 1, menores14: 0, movilidadReducida: 0,
-      alergias: "no", detalleAlergias: "", comentarios: "",
-      origenVisita: "", comoNosConociste: "", aceptaReglas: false,
+      // datos de contacto (si los seguís usando)
+      nombre: "", apellido: "", dni: "", telefono: "", correo: "", origenVisita: "",
+
+      // NUEVO modelo de grupo
+      adultos: 1,        // 18 años o más (incluye a quien reserva)
+      ninos: 0,          // 2 a 17 años
+      bebes: 0,          // < 2 años
+      movilidadReducida: 0,
+      movilidadReducidaSiNo: "no",
+
+      // otros
+      alergicos: 0,
+      alergias: "no",
+      detalleAlergias: "",
+      comentarios: "",
+      comoNosConociste: undefined,
+      aceptaReglas: false,
+
+      // campos de flujo
+      tipoVisitante: undefined,
+      circuito: undefined,
+      fechaISO: undefined,
+
+      // acompañantes / institución
+      personas: [],
+      institucion: "", institucionLocalidad: "", institucionEmail: "", institucionTelefono: "",
+      responsableNombre: "", responsableApellido: "", responsableDni: "",
+
+      // inputs auxiliares de UI
+      tmpNombreApe: "", tmpDni: "",
     },
   });
 
   const w = form.watch;
-  const adultos14 = Math.max(1, w("adultos14") ?? 1);
-  const menores14 = Math.max(0, w("menores14") ?? 0);
+  // Derivados y clamps
+  const adultos = Math.max(1, w("adultos") ?? 1);
+  const ninos = Math.max(0, w("ninos") ?? 0);
+  const bebes = Math.max(0, w("bebes") ?? 0);
   const movilidadReducida = Math.max(0, w("movilidadReducida") ?? 0);
-  const totalPersonas = adultos14 + menores14;
+  const totalPersonas = adultos + ninos + bebes;
 
+  // 🔄 Si cambia el sí/no, ajustamos la cantidad:
+  useEffect(() => {
+    const flag = w("movilidadReducidaSiNo");
+    if (flag === "no" && movilidadReducida !== 0) {
+      form.setValue("movilidadReducida", 0, { shouldDirty: true });
+    }
+    if (flag === "si" && movilidadReducida === 0) {
+      form.setValue("movilidadReducida", 1, { shouldDirty: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [w("movilidadReducidaSiNo")]);
+
+  // Setters seguros
   const setAdultos = (next: number) => {
     const safe = Math.max(1, next || 1);
-    form.setValue("adultos14", safe, { shouldDirty: true });
-    const newTotal = safe + menores14;
-    if (movilidadReducida > newTotal) form.setValue("movilidadReducida", newTotal, { shouldDirty: true });
+    form.setValue("adultos", safe, { shouldDirty: true });
+    const newTotal = safe + ninos + bebes;
+    if (movilidadReducida > newTotal) {
+      form.setValue("movilidadReducida", newTotal, { shouldDirty: true });
+    }
   };
 
-  const setMenores = (next: number) => {
+  const setNinos = (next: number) => {
     const safe = Math.max(0, next || 0);
-    form.setValue("menores14", safe, { shouldDirty: true });
-    const newTotal = adultos14 + safe;
-    if (movilidadReducida > newTotal) form.setValue("movilidadReducida", newTotal, { shouldDirty: true });
+    form.setValue("ninos", safe, { shouldDirty: true });
+    const newTotal = adultos + safe + bebes;
+    if (movilidadReducida > newTotal) {
+      form.setValue("movilidadReducida", newTotal, { shouldDirty: true });
+    }
+  };
+
+  const setBebes = (next: number) => {
+    const safe = Math.max(0, next || 0);
+    form.setValue("bebes", safe, { shouldDirty: true });
+    const newTotal = adultos + ninos + safe;
+    if (movilidadReducida > newTotal) {
+      form.setValue("movilidadReducida", newTotal, { shouldDirty: true });
+    }
   };
 
   const setMovilidad = (next: number) => {
@@ -38,19 +93,23 @@ export function useReservationForm() {
     form.setValue("movilidadReducida", safe, { shouldDirty: true });
   };
 
+  // Validaciones
   const validateGroup = () => {
-    if (adultos14 < 1) return "Debe haber al menos 1 persona de 14 años o más (te incluimos a vos).";
+    if (adultos < 1) return "Debe haber al menos 1 adulto (18 años o más).";
     if (movilidadReducida > totalPersonas) return "La cantidad con movilidad reducida no puede superar el total de personas.";
     return null;
   };
 
-  const validateOrigen = () => ((w("origenVisita") ?? "").trim() ? null : "Por favor, contanos desde dónde nos visitás.");
-  const validateConociste = () => (w("comoNosConociste") ? null : "Elegí una opción sobre cómo nos conociste.");
+  const validateOrigen = () =>
+    ((w("origenVisita") ?? "").trim() ? null : "Por favor, contanos desde dónde nos visitás.");
+
+  const validateConociste = () =>
+    (w("comoNosConociste") ? null : "Elegí una opción sobre cómo nos conociste.");
 
   return {
     ...form,
-    adultos14, menores14, movilidadReducida, totalPersonas,
-    setAdultos, setMenores, setMovilidad,
+    adultos, ninos, bebes, movilidadReducida, totalPersonas,
+    setAdultos, setNinos, setBebes, setMovilidad,
     validateGroup, validateOrigen, validateConociste,
   };
 }
