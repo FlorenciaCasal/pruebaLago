@@ -74,7 +74,7 @@ export default function ContactoStep({
                     <label className="block mb-1">¿Desde dónde nos visitás?</label>
                     <input
                         {...register("origenVisita", {
-                            setValueAs: v => String(v ?? "").replace(/\d+/g, "").trim(),   // 👈 quita números
+                            setValueAs: v => String(v ?? "").trim(),   // 👈 quita números
                         })}
                         className={inputBase}
                         placeholder="Ej. Córdoba, AR"

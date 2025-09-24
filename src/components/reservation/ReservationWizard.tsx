@@ -14,7 +14,7 @@ import { formatVisitorsFromForm } from "./utils";
 
 
 // 🚦 disponibilidad actual (cámbialo a false cuando vuelvan los cupos)
-const SCHOOL_BOOKINGS_BLOCKED = true;
+const SCHOOL_BOOKINGS_BLOCKED = false;
 
 // ⭐ Payload legacy que tu page.tsx necesita
 type LegacyOnCompletePayload = {

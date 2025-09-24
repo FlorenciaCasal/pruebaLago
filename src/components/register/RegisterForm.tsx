@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import StepHeader from "@/components/forms/StepHeader";
@@ -18,8 +18,10 @@ import ListadoStep from "./steps/ListadoStep";
 import InstitucionStep from "./steps/InstitucionStep";
 import SubmitStep from "./steps/SubmitStep";
 import { isVisitante, type Visitante } from "@/utils/visitante";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { registerSchema } from "@/schemas/registerSchema";
+import * as Yup from "yup";
+import { institucionSchema } from "@/schemas/institucionSchemas";
+import { listadoSchemaExact } from "@/schemas/listadoSchema";
 
 
 const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '’-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
@@ -31,7 +33,6 @@ const LETTERS_LEN = (s: string) =>
 const clean = (v: unknown) => String(v ?? "").trim();
 
 
-
 export default function RegisterForm() {
     const router = useRouter();
     const pathname = usePathname();
@@ -41,7 +42,6 @@ export default function RegisterForm() {
     const [serverError, setServerError] = useState<string | null>(null);
     const [uxError, setUxError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
-
 
     const {
         register,
@@ -59,28 +59,35 @@ export default function RegisterForm() {
     const { fields, append, remove } = useFieldArray({ name: "personas", control });
 
     const aceptaReglas = watch("aceptaReglas") ?? false;
-    const tipoVisitante = watch("tipoVisitante"); // puede ser string | undefined
 
-    // Precarga desde QS
+    // 1) leé el valor actual del form
+    const tipoForm = watch("tipoVisitante");// puede ser string | undefined
+    // 2) seguís leyendo el QS
     const { tipoFromQS } = useRegisterPrefillFromQS(searchParams, setValue, watch);
-    // 👇 aseguramos que 'tipo' sea Visitante | null
+    // 3) sembrá SOLO una vez desde QS si el form aún no tiene valor
+    const [seeded, setSeeded] = useState(false);
+    useEffect(() => {
+        if (!seeded && tipoFromQS && !isVisitante(tipoForm)) {
+            setValue("tipoVisitante", tipoFromQS, { shouldDirty: true, shouldValidate: false });
+            setSeeded(true);
+        }
+    }, [seeded, tipoFromQS, tipoForm, setValue]);
+    // 4) el "tipo" efectivo: prioriza lo que está en el form; si no hay, usa el QS
     const tipo: Visitante | null = useMemo(() => {
-        if (tipoFromQS) return tipoFromQS;
-        return isVisitante(tipoVisitante) ? tipoVisitante : null;
-    }, [tipoFromQS, tipoVisitante]);
+        return isVisitante(tipoForm) ? (tipoForm as Visitante) : (tipoFromQS ?? null);
+    }, [tipoForm, tipoFromQS]);
+    // 5) cuando cambia el tipo, volvemos al paso 0 (esto ya lo tenías)
+    useEffect(() => { setCurrentStep(0); }, [tipo]);
 
     const totalWizard = (adultos ?? 0) + (ninos ?? 0) + (bebes ?? 0);
-    const totalEsperado = Math.max(0, totalWizard - 1);
+    const totalEsperado = tipo === "INSTITUCION_EDUCATIVA"
+        ? totalWizard
+        : Math.max(0, totalWizard - 1);
 
-    // Reset de step al cambiar tipo
-    // (el efecto original era un useEffect: setCurrentStep(0); lo mantenemos con setState directo al detectar cambio)
-    // Como no tenemos dependency hook aquí, lo hacemos vía memo var de steps.
     type StepType = "contacto" | "institucion" | "listado" | "salud" | "conociste" | "submit";
 
-    const steps = useMemo(() => {
-        // cuando cambia el tipo, volvemos a 0
-        setCurrentStep(0);
 
+    const steps = useMemo(() => {
         if (tipo === "INSTITUCION_EDUCATIVA") {
             return [
                 { label: "Datos de la institución y responsable", type: "institucion" as const },
@@ -111,7 +118,7 @@ export default function RegisterForm() {
 
         if (!nombre) return "Completá tu nombre.";
         if (!NAME_RE.test(nombre)) return "Nombre inválido: sólo letras y espacios.";
-        if (LETTERS_LEN(nombre) < 3) return "Nombre inválido: mínimo 3 letras."; 
+        if (LETTERS_LEN(nombre) < 3) return "Nombre inválido: mínimo 3 letras.";
 
         if (!apellido) return "Completá tu apellido.";
         if (!NAME_RE.test(apellido)) return "Apellido inválido: sólo letras y espacios.";
@@ -127,7 +134,7 @@ export default function RegisterForm() {
         if (!PHONE_RE.test(telefono)) return "Teléfono inválido.";
 
         if (!origenVisita) return "Contanos desde dónde nos visitás.";
-        if (/\d/.test(origenVisita)) return "El origen no debe incluir números.";   
+        if (/\d/.test(origenVisita)) return "Origen inválido: sólo letras.";
         if (LETTERS_LEN(origenVisita) < 3) return "Origen inválido: mínimo 3 letras.";      // 👈
 
         return null;
@@ -173,7 +180,8 @@ export default function RegisterForm() {
 
     const validators: Record<StepType, () => string | null> = {
         contacto: validateContacto,
-        institucion: validateInstitucion,
+        // institucion: validateInstitucion,
+        institucion: () => null,
         listado: validateListado,
         salud: validateNecesidades,
         conociste: validateConociste,
@@ -183,8 +191,93 @@ export default function RegisterForm() {
     const nextStep = () => setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
     const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
-    const guardedNext = () => {
+    const getContactoValues = () => ({
+        nombre: clean(watch("nombre")),
+        apellido: clean(watch("apellido")),
+        dni: clean(watch("dni")),
+        correo: clean(watch("correo")),
+        telefono: clean(watch("telefono")),
+        origenVisita: clean(watch("origenVisita")),
+    });
+
+    const validateContactoWithYup = async (): Promise<string | null> => {
+        try {
+            // usa tu schema de contacto tal cual
+            await registerSchema.validate(getContactoValues(), { abortEarly: true });
+            return null;
+        } catch (e) {
+            if (e instanceof Yup.ValidationError) return e.message;
+            return "Revisá los datos.";
+        }
+    };
+
+    const getInstitucionValues = () => ({
+        institucion: (watch("institucion") ?? "").trim(),
+        institucionLocalidad: (watch("institucionLocalidad") ?? "").trim(),
+        institucionEmail: (watch("institucionEmail") ?? "").trim(),
+        institucionTelefono: (watch("institucionTelefono") ?? "").trim(),
+        responsableNombre: (watch("responsableNombre") ?? "").trim(),
+        responsableApellido: (watch("responsableApellido") ?? "").trim(),
+        responsableDni: (watch("responsableDni") ?? "").trim(),
+    });
+
+    const validateInstitucionWithYup = async (): Promise<string | null> => {
+        try {
+            await institucionSchema.validate(getInstitucionValues(), { abortEarly: true });
+            return null;
+        } catch (e) {
+            return e instanceof Yup.ValidationError ? e.message : "Revisá los datos.";
+        }
+    };
+
+    const getListadoValues = () =>
+        (watch("personas") ?? []) as Array<{ nombre: string; apellido: string; dni: string }>;
+
+    /** Opcional: mejora el mensaje de Yup para indicar el índice del visitante */
+    const prettyArrayError = (e: Yup.ValidationError) => {
+        if (e.path) {
+            // posibles paths: "[2].dni" o "personas[2].dni"
+            const m = e.path.match(/\[(\d+)\]\.(\w+)$/);
+            if (m) {
+                const idx = Number(m[1]) + 1;
+                return `Visitante ${idx}: ${e.message}`;
+            }
+        }
+        return e.message;
+    };
+
+    const validateListadoWithYup = async (n: number): Promise<string | null> => {
+        try {
+            await listadoSchemaExact(n).validate(getListadoValues(), { abortEarly: true });
+            return null;
+        } catch (e) {
+            return e instanceof Yup.ValidationError ? prettyArrayError(e) : "Revisá el listado.";
+        }
+    };
+
+
+    const guardedNext = async () => {
         const t = steps[currentStep].type as StepType;
+        if (t === "contacto") {
+            const msg = await validateContactoWithYup();
+            if (msg) { setUxError(msg); return; }
+            setUxError(null);
+            nextStep();
+            return;
+        }
+        if (t === "institucion") {
+            const msg = await validateInstitucionWithYup();
+            if (msg) { setUxError(msg); return; }
+            setUxError(null);
+            nextStep();
+            return;
+        }
+        if (t === "listado") {
+            const msg = await validateListadoWithYup(totalEsperado);
+            if (msg) { setUxError(msg); return; }
+            setUxError(null); nextStep(); return;
+        }
+        // Resto de steps con tus validaciones de grupo
         const msg = validators[t]();
         if (msg) { setUxError(msg); return; }
         setUxError(null);
@@ -204,16 +297,58 @@ export default function RegisterForm() {
         adultos, ninos, bebes,
     });
 
+    useEffect(() => {
+        if (!tipo) return;
+        setUxError(null);
+
+        if (tipo === "INSTITUCION_EDUCATIVA") {
+            // limpiá contacto
+            setValue("nombre", "");
+            setValue("apellido", "");
+            setValue("dni", "");
+            setValue("correo", "");
+            setValue("telefono", "");
+            setValue("origenVisita", "");
+        } else {
+            // limpiá institución
+            setValue("institucion", "");
+            setValue("institucionLocalidad", "");
+            setValue("institucionEmail", "");
+            setValue("institucionTelefono", "");
+            setValue("responsableNombre", "");
+            setValue("responsableApellido", "");
+            setValue("responsableDni", "");
+        }
+
+        // siempre reiniciá el listado cuando cambia el tipo
+        setValue("personas", []);
+    }, [tipo, setValue]);
+
+
     // Submit idéntico
     const onSubmit = async (data: ReservationFormData) => {
-        const errs = (
-            tipo === "INSTITUCION_EDUCATIVA"
-                ? [validateInstitucion(), validateListado(), validateNecesidades()]
-                : [validateContacto(), validateListado(), validateNecesidades()]
-        ).concat([
+        // const contactoErr = tipo === "INSTITUCION_EDUCATIVA" ? null : await validateContactoWithYup();
+        // const errs = (
+        //     tipo === "INSTITUCION_EDUCATIVA"
+        //         ? [validateInstitucion(), validateListado(), validateNecesidades()]
+        //         : [contactoErr, validateListado(), validateNecesidades()]
+        // ).concat([
+        //     !watch("aceptaReglas") ? "Debés aceptar las políticas de visita." : null,
+        //     !watch("fechaISO") ? "Falta la fecha de la reserva." : null,
+        // ]).filter(Boolean) as string[];
+
+        // if (errs.length) { setUxError(errs[0]!); return; }
+        const contactoErr = tipo === "INSTITUCION_EDUCATIVA" ? null : await validateContactoWithYup();
+        const institErr = tipo === "INSTITUCION_EDUCATIVA" ? await validateInstitucionWithYup() : null;
+        const listadoErr = await validateListadoWithYup(totalEsperado);
+        const necesidadesErr = validateNecesidades();
+        const otros = [
             !watch("aceptaReglas") ? "Debés aceptar las políticas de visita." : null,
             !watch("fechaISO") ? "Falta la fecha de la reserva." : null,
-        ]).filter(Boolean) as string[];
+        ];
+
+        const errs = [contactoErr, institErr, listadoErr, necesidadesErr, ...otros]
+            .filter(Boolean) as string[];
 
         if (errs.length) { setUxError(errs[0]!); return; }
 

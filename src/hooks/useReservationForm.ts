@@ -103,16 +103,19 @@ export function useReservationForm(options?: UseFormProps<ReservationFormData>) 
     return null;
   };
 
-  const validateOrigen = () =>
-    ((w("origenVisita") ?? "").trim() ? null : "Por favor, contanos desde dónde nos visitás.");
+  // const validateOrigen = () =>
+  //   ((w("origenVisita") ?? "").trim() ? null : "Por favor, contanos desde dónde nos visitás.");
 
   const validateConociste = () =>
     (w("comoNosConociste") ? null : "Elegí una opción sobre cómo nos conociste.");
 
   return {
     ...form,
+    trigger: form.trigger,
+    errors: form.formState.errors,
     adultos, ninos, bebes, movilidadReducida, totalPersonas,
     setAdultos, setNinos, setBebes, setMovilidad,
-    validateGroup, validateOrigen, validateConociste,
+    // validateGroup, validateOrigen, validateConociste,
+    validateGroup, validateConociste,
   };
 }
