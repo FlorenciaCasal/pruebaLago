@@ -1,10 +1,13 @@
 "use client";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormProps } from "react-hook-form";
 import type { ReservationFormData } from "@/types/reservation";
 import { useEffect } from "react";
 
-export function useReservationForm() {
+
+export function useReservationForm(options?: UseFormProps<ReservationFormData>) {
   const form = useForm<ReservationFormData>({
+    mode: "onChange",
+    ...options,
     defaultValues: {
       // datos de contacto (si los seguís usando)
       nombre: "", apellido: "", dni: "", telefono: "", correo: "", origenVisita: "",
@@ -26,7 +29,7 @@ export function useReservationForm() {
 
       // campos de flujo
       tipoVisitante: undefined,
-      circuito: undefined,
+      // circuito: undefined,
       fechaISO: undefined,
 
       // acompañantes / institución
