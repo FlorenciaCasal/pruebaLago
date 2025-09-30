@@ -33,7 +33,13 @@ const LETTERS_LEN = (s: string) =>
 const clean = (v: unknown) => String(v ?? "").trim();
 
 
-export default function RegisterForm() {
+export default function RegisterForm({
+    initialTipo,
+    onCancel,
+}: {
+    initialTipo?: Visitante | null;
+    onCancel?: () => void;
+}) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -67,15 +73,24 @@ export default function RegisterForm() {
     // 3) sembrá SOLO una vez desde QS si el form aún no tiene valor
     const [seeded, setSeeded] = useState(false);
     useEffect(() => {
-        if (!seeded && tipoFromQS && !isVisitante(tipoForm)) {
-            setValue("tipoVisitante", tipoFromQS, { shouldDirty: true, shouldValidate: false });
+        if (seeded) return;
+        if (!isVisitante(tipoForm)) {
+            const seed = (initialTipo && isVisitante(initialTipo) ? initialTipo : null)
+                ?? (tipoFromQS ?? null);
+            if (seed) {
+                setValue("tipoVisitante", seed as Visitante, { shouldDirty: true, shouldValidate: false });
+                setSeeded(true);
+            }
+        } else {
             setSeeded(true);
         }
-    }, [seeded, tipoFromQS, tipoForm, setValue]);
+    }, [seeded, initialTipo, tipoFromQS, tipoForm, setValue]);
     // 4) el "tipo" efectivo: prioriza lo que está en el form; si no hay, usa el QS
     const tipo: Visitante | null = useMemo(() => {
-        return isVisitante(tipoForm) ? (tipoForm as Visitante) : (tipoFromQS ?? null);
-    }, [tipoForm, tipoFromQS]);
+        return isVisitante(tipoForm)
+            ? (tipoForm as Visitante)
+            : (initialTipo ?? tipoFromQS ?? null);
+    }, [tipoForm, initialTipo, tipoFromQS]);
     // 5) cuando cambia el tipo, volvemos al paso 0 (esto ya lo tenías)
     useEffect(() => { setCurrentStep(0); }, [tipo]);
 
@@ -136,22 +151,6 @@ export default function RegisterForm() {
         if (!origenVisita) return "Contanos desde dónde nos visitás.";
         if (/\d/.test(origenVisita)) return "Origen inválido: sólo letras.";
         if (LETTERS_LEN(origenVisita) < 3) return "Origen inválido: mínimo 3 letras.";      // 👈
-
-        return null;
-    };
-
-
-    const validateInstitucion = () => {
-        const inst = (watch("institucion") ?? "").trim();
-        const localidad = (watch("institucionLocalidad") ?? "").trim();
-        const mail = (watch("institucionEmail") ?? "").trim();
-        const tel = (watch("institucionTelefono") ?? "").trim();
-        const respNom = (watch("responsableNombre") ?? "").trim();
-        const respApe = (watch("responsableApellido") ?? "").trim();
-        const respDni = (watch("responsableDni") ?? "").trim();
-        if (!inst || !localidad || !mail || !tel || !respNom || !respApe || !respDni) {
-            return "Completá los datos de la institución y del responsable.";
-        }
         return null;
     };
 
@@ -327,17 +326,6 @@ export default function RegisterForm() {
 
     // Submit idéntico
     const onSubmit = async (data: ReservationFormData) => {
-        // const contactoErr = tipo === "INSTITUCION_EDUCATIVA" ? null : await validateContactoWithYup();
-        // const errs = (
-        //     tipo === "INSTITUCION_EDUCATIVA"
-        //         ? [validateInstitucion(), validateListado(), validateNecesidades()]
-        //         : [contactoErr, validateListado(), validateNecesidades()]
-        // ).concat([
-        //     !watch("aceptaReglas") ? "Debés aceptar las políticas de visita." : null,
-        //     !watch("fechaISO") ? "Falta la fecha de la reserva." : null,
-        // ]).filter(Boolean) as string[];
-
-        // if (errs.length) { setUxError(errs[0]!); return; }
         const contactoErr = tipo === "INSTITUCION_EDUCATIVA" ? null : await validateContactoWithYup();
         const institErr = tipo === "INSTITUCION_EDUCATIVA" ? await validateInstitucionWithYup() : null;
         const listadoErr = await validateListadoWithYup(totalEsperado);
@@ -444,32 +432,45 @@ export default function RegisterForm() {
                                 policiesUrl={POLICIES_URL}
                                 uxError={uxError}
                                 submitting={submitting}
+                                renderActions={false}
                             />
                         )}
 
                         {/* Navegación */}
                         <div className="mt-10 flex items-center gap-3">
-                            {currentStep > 0 && (
-                                <button
-                                    type="button"
-                                    onClick={prevStep}
-                                    className="px-4 py-2 sm:px-6 sm:py-3 rounded-lg border border-white/80 text-white hover:bg-white hover:text-gray-900 transition"
-                                >
-                                    Volver
-                                </button>
-                            )}
-                            {steps[currentStep].type !== "submit" && (
-                                <div className="ml-auto">
+                            {/* Volver SIEMPRE visible. En step 0 vuelve al wizard; si no, retrocede el step */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (currentStep === 0) onCancel?.();
+                                    else prevStep();
+                                }}
+                                className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border border-white/80 text-white hover:bg-white hover:text-gray-900 transition cursor-pointer"
+                            >
+                                Volver
+                            </button>
+
+                            <div className="ml-auto">
+                                {steps[currentStep].type === "submit" ? (
+                                    <button
+                                        type="submit"
+                                        disabled={submitting || !aceptaReglas}
+                                        className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-gray-900 hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
+                                    >
+                                        Enviar
+                                    </button>
+                                ) : (
                                     <button
                                         type="button"
                                         onClick={guardedNext}
-                                        className="px-4 py-2 sm:px-6 sm:py-3 rounded-lg bg-white text-gray-900 hover:opacity-90 transition"
+                                        className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-gray-900 hover:opacity-90 transition cursor-pointer"
                                     >
                                         Continuar
                                     </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
+
                     </motion.div>
                 </AnimatePresence>
             </form>

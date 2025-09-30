@@ -2,6 +2,8 @@ import * as yup from "yup";
 import { NAME_RE } from "./registerSchema";
 import { LETTERS_LEN } from "./registerSchema";
 
+type Visitante = yup.InferType<typeof listadoSchema>;
+
 export const listadoSchema = yup.object({
     nombre: yup.string().transform(v => String(v ?? "").trim())
         .required("Completá el nombre del/la responsable.")
@@ -26,7 +28,8 @@ export const listadoSchemaExact = (n: number) =>
             if (!arr) return false;
             const seen = new Set<string>();
             for (const it of arr) {
-                const d = String((it as any)?.dni ?? "");
+                // const d = String((it as any)?.dni ?? "");
+                const d = it?.dni ?? "";
                 if (!d) return false;
                 if (seen.has(d)) return false;
                 seen.add(d);

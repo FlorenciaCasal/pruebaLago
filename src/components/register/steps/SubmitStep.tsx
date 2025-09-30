@@ -3,7 +3,7 @@ import type { UseFormSetValue, UseFormWatch } from "react-hook-form";
 import type { ReservationFormData } from "@/types/reservation";
 
 export default function SubmitStep({
-    tipo, adultos, ninos, bebes, watch, aceptaReglas, setValue, policiesUrl, uxError, submitting,
+    tipo, adultos, ninos, bebes, watch, aceptaReglas, setValue, policiesUrl, uxError, submitting, renderActions = true,
 }: {
     tipo: "PARTICULAR" | "INSTITUCION_EDUCATIVA" | null;
     adultos: number | undefined;
@@ -15,6 +15,7 @@ export default function SubmitStep({
     policiesUrl: string;
     uxError: string | null;
     submitting: boolean;
+    renderActions?: boolean;
 }) {
     return (
         <div className="space-y-4">
@@ -64,14 +65,11 @@ export default function SubmitStep({
                 onChange={(v) => setValue("aceptaReglas", v, { shouldDirty: true })}
             />
 
-            <button
-                type="submit"
-                disabled={!aceptaReglas || submitting}
-                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-lg bg-white text-gray-900 transition
-          ${(!aceptaReglas || submitting) ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"}`}
-            >
-                {submitting ? "Enviando..." : "Enviar"}
-            </button>
+            {renderActions && (
+                <div className="mt-6 flex items-center justify-between">
+                    {/* aquí estaban tus botones "Volver" y "Enviar" */}
+                </div>
+            )}
         </div>
     );
 }

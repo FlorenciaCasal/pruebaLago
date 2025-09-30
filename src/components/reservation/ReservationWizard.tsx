@@ -36,6 +36,7 @@ export default function ReservationWizard({
     handleSubmit,
     setValue,
     watch,
+    trigger,
     formState: { errors, isValid },
   } = useForm<WizardStepData>({
     mode: "onChange",
@@ -53,6 +54,8 @@ export default function ReservationWizard({
   const bebes = watch("bebes");
   const isSchool = tipoVisitante === "INSTITUCION_EDUCATIVA";
   const isSchoolSoldOut = isSchool && SCHOOL_BOOKINGS_BLOCKED;
+  // válido si hay al menos 1 adulto (misma regla que Yup)
+  const visitorsValid = adultos >= 1;
 
   // const circuitoInfo = useMemo(
   //   () => CIRCUITS.find((c) => c.key === (circuito as CircuitoKey)),
@@ -78,7 +81,8 @@ export default function ReservationWizard({
       <h1 className="text-2xl font-semibold mb-4">Reserva tu visita</h1>
 
       {/* Steps */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">  paso el cols a 3 porque saque circuito */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <Step
           label="Tipo de visitante"
           value={tipoVisitante ? (tipoVisitante === "PARTICULAR" ? "Particular" : "Institución educativa") : undefined}
@@ -219,8 +223,20 @@ export default function ReservationWizard({
           value={bebes}
           onChange={(n) => setValue("bebes", Math.max(0, n), { shouldValidate: true })}
         />
+
+        {/* 👇 Mensaje visible en el panel */}
+        <div className="mt-2 text-sm text-red-300 min-h-5">
+          {errors.adultos?.message || (!visitorsValid && "Debe haber al menos 1 adulto")}
+        </div>
+
         <div className="flex justify-end pt-3">
-          <button className="rounded-md bg-white text-gray-900 px-4 py-2" onClick={() => setOpen(null)} type="button">
+          <button type="button" className="rounded-md bg-white w-full text-gray-900 px-4 py-2 disabled:opacity-40"
+            disabled={!visitorsValid} onClick={async () => {
+              const ok = await trigger(["adultos", "ninos", "bebes"]); // sincroniza errors/isValid
+              if (!ok) return;
+              setOpen(null);
+            }}
+          >
             Confirmar
           </button>
         </div>
@@ -229,11 +245,9 @@ export default function ReservationWizard({
       {/* CTA */}
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex items-center justify-between">
         <div className="text-sm text-red-300 space-x-3">
-          {errors.tipoVisitante && <span>Elegí el tipo de visitante</span>}
-          {/* {errors.circuito && <span>Elegí un circuito</span>} */}
-          {errors.fechaISO && <span>Elegí una fecha</span>}
+
         </div>
-        <button className="rounded-md bg-white px-5 py-2 text-gray-900 disabled:opacity-40" disabled={!isValid || isSchoolSoldOut}>
+        <button className="rounded-md bg-white w-full px-5 py-2 text-gray-900 disabled:opacity-40" disabled={!isValid || isSchoolSoldOut}>
           Continuar
         </button>
       </form>

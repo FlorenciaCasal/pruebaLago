@@ -51,7 +51,8 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
             <label className="inline-flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                className="accent-white"
+                // className="accent-white"
+                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={movSiNo === "si"}
                 onChange={() => {
                   setValue("movilidadReducidaSiNo", "si", { shouldDirty: true });
@@ -63,7 +64,8 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
             <label className="inline-flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                className="accent-white"
+                // className="accent-white"
+                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={movSiNo === "no"}
                 onChange={() => {
                   setValue("movilidadReducidaSiNo", "no", { shouldDirty: true });
@@ -75,7 +77,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
           </div>
 
           {movSiNo === "si" && (
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-2 md:ml-auto">
               <label className="text-sm text-white/80">¿Cuántas?</label>
               <input
                 type="number"
@@ -105,7 +107,8 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
             <label className="inline-flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                className="accent-white"
+                // className="accent-white"
+                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={alergias === "si"}
                 onChange={() => {
                   setValue("alergias", "si", { shouldDirty: true });
@@ -117,7 +120,8 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
             <label className="inline-flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                className="accent-white"
+                // className="accent-white"
+                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={alergias === "no"}
                 onChange={() => {
                   setValue("alergias", "no", { shouldDirty: true });
@@ -129,7 +133,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
           </div>
 
           {alergias === "si" && (
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-2 md:ml-auto">
               <label className="text-sm text-white/80">¿Cuántas?</label>
               <input
                 type="number"
@@ -153,7 +157,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
 
       {/* Comentarios */}
       <section className="space-y-2">
-        <label className="font-medium">Comentarios (opcional)</label>
+        <label className="px-2 font-medium">Comentarios (opcional)</label>
         <textarea
           {...register("comentarios")}
           rows={4}

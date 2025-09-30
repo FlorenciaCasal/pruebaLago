@@ -21,9 +21,20 @@ export const schema: yup.ObjectSchema<WizardStepData> = yup
             .required(),
         // circuito: yup.string().required(),
         fechaISO: yup.string().required().matches(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida (YYYY-MM-DD)"),
-        adultos: yup.number().transform(int).integer().min(0).required(),
-        ninos: yup.number().transform(int).integer().min(0).required(),
-        bebes: yup.number().transform(int).integer().min(0).required(),
+        adultos: yup.number()
+            .integer("Número inválido")
+            .min(1, "Debe haber al menos 1 adulto")
+            .required(),
+        ninos: yup.number()
+            .transform(int)
+            .integer()
+            .min(0)
+            .required(),
+        bebes: yup.number()
+            .transform(int)
+            .integer()
+            .min(0)
+            .required(),
     })
     .required().test("al-menos-uno", "Agregá al menos 1 visitante", (v) =>
         (v?.adultos ?? 0) + (v?.ninos ?? 0) + (v?.bebes ?? 0) > 0

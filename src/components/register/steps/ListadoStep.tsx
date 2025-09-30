@@ -74,6 +74,7 @@ export default function ListadoStep({
           className={inputBase}
           disabled={!canAddMore}
         />
+         <div className="flex justify-end">
         <button
           type="button"
           className={`rounded-md bg-white text-gray-900 px-4 py-2 ${!canAddMore ? "opacity-50 cursor-not-allowed" : ""
@@ -96,6 +97,7 @@ export default function ListadoStep({
         >
           Agregar
         </button>
+        </div>
         {!canAddMore && (
           <p className="text-xs text-white/70 mt-2">
             Ya cargaste el total esperado ({totalEsperado}). Para agregar más,

@@ -15,7 +15,7 @@ export function SidePanel({
   return (
     <div className="fixed inset-0 z-50 bg-black/50 md:items-center md:justify-center" onClick={onClose}>
       <div
-        className="absolute right-0 top-0 h-full w-full max-w-md md:max-w-full bg-gray-900 text-white shadow-xl border-l border-white/10"
+        className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-full max-w-md md:max-w-3xl bg-gray-900 text-white shadow-xl border-l border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-white/10 p-4">
