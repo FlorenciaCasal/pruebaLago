@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import type { ReservationFormData, CircuitoKey } from "@/types/reservation";
+import type { ReservationFormData } from "@/types/reservation";
 
 // Campos requeridos en ESTE paso del wizard (no opcionales)
 export type WizardStepData = {

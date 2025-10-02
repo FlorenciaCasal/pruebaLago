@@ -1,6 +1,6 @@
 "use client";
 import React, { Suspense, useState } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import ReservationWizard from "@/components/reservation/ReservationWizard";
 import RegisterForm from "@/components/register/RegisterForm";
 

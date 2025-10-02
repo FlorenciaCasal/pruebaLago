@@ -2,7 +2,6 @@ import * as yup from "yup";
 import { NAME_RE } from "./registerSchema";
 import { LETTERS_LEN } from "./registerSchema";
 
-type Visitante = yup.InferType<typeof listadoSchema>;
 
 export const listadoSchema = yup.object({
     nombre: yup.string().transform(v => String(v ?? "").trim())
