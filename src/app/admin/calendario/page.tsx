@@ -153,7 +153,7 @@ export default function CalendarioAdminPage() {
                     </div>
 
                     <div className="grid grid-cols-7 gap-2 rounded-2xl border border-neutral-800 p-4 bg-neutral-950">
-                        {["D", "L", "M", "M", "J", "V", "S"].map(h => (
+                        {["Do","Lu","Ma","Mi","Ju","Vi","Sa"].map(h => (
                             <div key={h} className="text-center text-neutral-400 text-xs">
                                 {h}
                             </div>
