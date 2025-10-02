@@ -110,32 +110,30 @@ export async function getCalendarState(year: number, month: number): Promise<imp
     return { year, month, disabled: false, disabledDays };
 }
 
-// export async function setDayEnabled(dateISO: string, enabled: boolean): Promise<void> {
-export async function setDayEnabled(): Promise<void> {
+export async function setDayEnabled(dateISO: string, enabled: boolean): Promise<void> {
     // Hoy no hay endpoint admin para esto; dejalo como NOOP para que el UI no rompa.
-    if (MOCK) { await new Promise(r => setTimeout(r, 250)); }
-    return;
-}
-//     if (MOCK) { await new Promise(r => setTimeout(r, 250)); return; }
-//     const res = await fetch(`${API_URL}/api/admin/calendario/dia`, {
-//         method: enabled ? "DELETE" : "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ dateISO }),
-//     });
-//     await handle(res);
-// }
-
-// export async function setMonthEnabled(year: number, month: number, enabled: boolean): Promise<void> {
-export async function setMonthEnabled(): Promise<void> {
-    //     if (MOCK) { await new Promise(r => setTimeout(r, 250)); return; }
-    //     const res = await fetch(`${API_URL}/api/admin/calendario/mes`, {
-    //         method: enabled ? "DELETE" : "POST",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({ year, month }),
-    //     });
-    //     await handle(res);
+    //     if (MOCK) { await new Promise(r => setTimeout(r, 250)); }
+    //     return;
     // }
-    // Hoy no hay endpoint admin para esto; dejalo como NOOP para que el UI no rompa.
-    if (MOCK) { await new Promise(r => setTimeout(r, 250)); }
-    return;
+    if (MOCK) { await new Promise(r => setTimeout(r, 250)); return; }
+    const res = await fetch(`${API_URL}/api/admin/calendario/dia`, {
+        method: enabled ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dateISO }),
+    });
+    await handle(res);
 }
+
+export async function setMonthEnabled(year: number, month: number, enabled: boolean): Promise<void> {
+    if (MOCK) { await new Promise(r => setTimeout(r, 250)); return; }
+    const res = await fetch(`${API_URL}/api/admin/calendario/mes`, {
+        method: enabled ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ year, month }),
+    });
+    await handle(res);
+}
+// Hoy no hay endpoint admin para esto; dejalo como NOOP para que el UI no rompa.
+//     if (MOCK) { await new Promise(r => setTimeout(r, 250)); }
+//     return;
+// }
