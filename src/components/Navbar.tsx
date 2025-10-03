@@ -14,7 +14,7 @@ export default function Navbar() {
     }}>
       {/* Logo o título */}
       <div style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-        Mi App
+        Reserva Natural Lago Escondido
       </div>
 
       {/* Links */}
@@ -22,8 +22,11 @@ export default function Navbar() {
         <Link href="/" style={{ color: "white", textDecoration: "none" }}>
           Home
         </Link>
-        <Link href="/admin" style={{ color: "white", textDecoration: "none" }}>
+        {/* <Link href="/admin" style={{ color: "white", textDecoration: "none" }}>
           Panel Admin
+        </Link> */}
+        <Link href="/login" style={{ color: "white", textDecoration: "none" }}>
+          Ingresar
         </Link>
       </div>
     </nav>

@@ -18,7 +18,7 @@ import ListadoStep from "./steps/ListadoStep";
 import InstitucionStep from "./steps/InstitucionStep";
 import SubmitStep from "./steps/SubmitStep";
 import { isVisitante, type Visitante } from "@/utils/visitante";
-import { registerSchema } from "@/schemas/registerSchema";
+import { formSchema } from "@/schemas/formSchema";
 import * as Yup from "yup";
 import { institucionSchema } from "@/schemas/institucionSchemas";
 import { listadoSchemaExact } from "@/schemas/listadoSchema";
@@ -199,13 +199,30 @@ export default function RegisterForm({
         origenVisita: clean(watch("origenVisita")),
     });
 
+    const CONTACT_FIELD_ORDER = [
+        "nombre",
+        "apellido",
+        "dni",
+        "correo",
+        "telefono",
+        "origenVisita",
+    ] as const;
+
     const validateContactoWithYup = async (): Promise<string | null> => {
         try {
-            // usa tu schema de contacto tal cual
-            await registerSchema.validate(getContactoValues(), { abortEarly: true });
+            // Pedí TODOS los errores
+            await formSchema.validate(getContactoValues(), { abortEarly: false });
             return null;
         } catch (e) {
-            if (e instanceof Yup.ValidationError) return e.message;
+            if (e instanceof Yup.ValidationError) {
+                // Buscar el primer error siguiendo nuestro orden
+                for (const k of CONTACT_FIELD_ORDER) {
+                    const found = e.inner.find(err => err.path === k);
+                    if (found) return found.message;
+                }
+                // fallback
+                return e.errors[0] ?? "Revisá los datos.";
+            }
             return "Revisá los datos.";
         }
     };

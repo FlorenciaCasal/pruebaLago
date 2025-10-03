@@ -1,16 +1,16 @@
 import * as yup from "yup";
-import { NAME_RE } from "./registerSchema";
-import { LETTERS_LEN } from "./registerSchema";
+import { NAME_RE } from "./formSchema";
+import { LETTERS_LEN } from "./formSchema";
 
 
 export const listadoSchema = yup.object({
     nombre: yup.string().transform(v => String(v ?? "").trim())
         .required("Completá el nombre del/la responsable.")
-        .matches(NAME_RE, "Nombre y/o Apellido inválido: sólo letras, espacios, apóstrofes y guiones.")
+        .matches(NAME_RE, "Nombre y/o Apellido inválido: No se aceptan números ni carateres especiales.")
         .test("min-letters", "Nombre y/o Apellido inválido: mínimo 3 letras cada uno.", v => LETTERS_LEN(v || "") >= 3),
     apellido: yup.string().transform(v => String(v ?? "").trim())
         .required("Completá el apellido del/la responsable.")
-        .matches(NAME_RE, "Nombre y/o Apellido inválido: sólo letras, espacios, apóstrofes y guiones.")
+        .matches(NAME_RE, "Nombre y/o Apellido inválido: No se aceptan números ni carateres especiales.")
         .test("min-letters", "Nombre y/o Apellido inválido: mínimo 3 letras cada uno.", v => LETTERS_LEN(v || "") >= 3),
     dni: yup.string()
         .transform(v => String(v ?? "").replace(/\D+/g, ""))

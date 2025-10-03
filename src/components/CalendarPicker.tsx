@@ -24,8 +24,15 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
     const [month, setMonth] = useState(new Date());
     const [monthsToShow, setMonthsToShow] = useState(6);
 
-    // selected Date derivado de selectedISO
-    const selectedDate = selectedISO ? new Date(selectedISO) : undefined;
+    // // selected Date derivado de selectedISO
+    // const selectedDate = selectedISO ? new Date(selectedISO) : undefined;
+
+    // selected Date derivado de selectedISO (LOCAL, no UTC)
+    function fromISODateLocal(iso: string) {
+        const [y, m, d] = iso.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+    const selectedDate = selectedISO ? fromISODateLocal(selectedISO) : undefined;
 
     useEffect(() => {
         const check = () => setIsMobile(window.innerWidth < 768);
@@ -35,7 +42,12 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
     }, []);
 
     const handleSelect = (date: Date | undefined) => {
-        if (date) onSelectISO(toISO(date));
+        if (date) {
+            // normalizar a medianoche local antes de guardar
+            const normalized = new Date(date);
+            normalized.setHours(0, 0, 0, 0);
+            onSelectISO(toISO(normalized));
+        }
     };
 
     const goPrevious = () => {
@@ -50,7 +62,7 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
             <div
                 className={`
         bg-black rounded-xl w-full 
-        ${isMobile ? 'px-4 overflow-y-scroll h-[80vh] [&_.rdp-weekday]:hidden'  : 'p-4 flex items-center justify-center gap-1 overflow-x-hidden'} 
+        ${isMobile ? 'px-4 overflow-y-scroll h-[80vh] [&_.rdp-weekday]:hidden' : 'p-4 flex items-center justify-center gap-1 overflow-x-hidden'} 
       `}
             >
                 {isMobile ? (

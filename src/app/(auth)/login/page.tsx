@@ -1,0 +1,158 @@
+"use client";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Link from "next/link";
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Página de Login (Next.js App Router) – estilo oscuro + Tailwind
+// Ruta sugerida: app/(auth)/login/page.tsx
+// ──────────────────────────────────────────────────────────────────────────────
+
+type FormValues = {
+  email: string;
+  password: string;
+//   remember?: boolean;
+};
+
+const schema = yup
+  .object({
+    email: yup
+      .string()
+      .email("Ingresá un correo válido")
+      .required("El correo es obligatorio"),
+    password: yup
+      .string()
+      .min(6, "Mínimo 6 caracteres")
+      .required("La contraseña es obligatoria"),
+    // remember: yup.boolean().optional(),
+  })
+  .required();
+
+export default function LoginPage() {
+  const [showPwd, setShowPwd] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({ resolver: yupResolver(schema) });
+
+  const onSubmit = async (data: FormValues) => {
+    // TODO: Reemplazar por tu llamada real al backend / proveedor de auth
+    // Ejemplo:
+    // const res = await fetch("/api/login", { method: "POST", body: JSON.stringify(data) });
+    // if (!res.ok) { /* manejar error */ }
+    await new Promise((r) => setTimeout(r, 600));
+    alert("Login enviado\n" + JSON.stringify(data, null, 2));
+  };
+
+  return (
+    <main className="min-h-[calc(100dvh-4rem)] w-full bg-neutral-950 text-neutral-100 grid place-items-center px-4">
+      {/* Contenedor */}
+      <div className="w-full max-w-md">
+        {/* Tarjeta */}
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/70 shadow-2xl backdrop-blur p-6 sm:p-8">
+          {/* Encabezado */}
+          <div className="mb-6 text-center">
+            {/* Logo opcional */}
+            {/* <Image src="/logo.svg" alt="logo" width={40} height={40} className="mx-auto mb-2"/> */}
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Ingresar</h1>
+            <p className="mt-2 text-sm text-neutral-400">
+              Si todavía no tenés cuenta, {" "}
+              <Link href="/register" className="text-white underline-offset-4 hover:underline">
+                creá una
+              </Link>
+              .
+            </p>
+          </div>
+
+          {/* Formulario */}
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-300">
+                Correo electrónico
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="mt-1 w-full rounded-xl bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm outline-none focus:border-neutral-500 focus:ring-0 placeholder:text-neutral-500"
+                placeholder="tu@correo.com"
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-sm font-medium text-neutral-300">
+                  Contraseña
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPwd((v) => !v)}
+                  className="text-xs text-neutral-400 hover:text-neutral-200"
+                  aria-label={showPwd ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPwd ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
+              <input
+                id="password"
+                type={showPwd ? "text" : "password"}
+                autoComplete="current-password"
+                className="mt-1 w-full rounded-xl bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm outline-none focus:border-neutral-500 focus:ring-0 placeholder:text-neutral-500"
+                placeholder="••••••••"
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              {/* <label className="inline-flex items-center gap-2 text-sm text-neutral-300">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-neutral-600 bg-neutral-800 text-neutral-200 focus:ring-0"
+                  {...register("remember")}
+                />
+                Recordarme
+              </label> */}
+              <Link href="/forgot" className="text-xs text-neutral-400 hover:text-neutral-200">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="mt-2 w-full rounded-xl bg-white/95 text-neutral-900 py-2 text-sm font-semibold hover:bg-white focus:outline-none disabled:opacity-70"
+            >
+              {isSubmitting ? "Ingresando…" : "Ingresar"}
+            </button>
+
+            {/* Separador opcional */}
+            {/* <div className="flex items-center gap-3 text-neutral-500">
+              <div className="h-px flex-1 bg-neutral-800" />
+              <span className="text-xs">o</span>
+              <div className="h-px flex-1 bg-neutral-800" />
+            </div>
+            <button type="button" className="w-full rounded-xl border border-neutral-700 py-2 text-sm hover:bg-neutral-800/60">
+              Continuar con Google
+            </button> */}
+          </form>
+        </div>
+
+        {/* Texto legal opcional
+        <p className="mt-4 text-center text-xs text-neutral-500">
+          Al continuar aceptás nuestros <Link href="/terminos" className="underline underline-offset-2">Términos</Link> y la {" "}
+          <Link href="/privacidad" className="underline underline-offset-2">Política de privacidad</Link>.
+        </p> */}
+      </div>
+    </main>
+  );
+}
