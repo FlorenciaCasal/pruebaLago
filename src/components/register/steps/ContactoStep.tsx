@@ -1,12 +1,17 @@
 import { inputBase } from "@/styles/ui";
-import type { UseFormRegister } from "react-hook-form";
+import type { UseFormRegister, UseFormWatch, UseFormSetValue } from "react-hook-form";
 import type { ReservationFormData } from "@/types/reservation";
+import CityAutocomplete from "@/components/forms/CityAutocomplete";
 
 export default function ContactoStep({
     register,
+    watch,
+    setValue,
     uxError,
 }: {
     register: UseFormRegister<ReservationFormData>;
+    watch: UseFormWatch<ReservationFormData>;
+    setValue: UseFormSetValue<ReservationFormData>;
     uxError: string | null;
 }) {
     return (
@@ -72,12 +77,11 @@ export default function ContactoStep({
                 </div>
                 <div className="sm:col-span-2">
                     <label className="block mb-1">¿Desde dónde nos visitás?</label>
-                    <input
-                        {...register("origenVisita", {
-                            setValueAs: v => String(v ?? "").trim(),   // 👈 quita números
-                        })}
-                        className={inputBase}
+                    <CityAutocomplete
+                        value={watch("origenVisita") || ""}
+                        onChange={(value) => setValue("origenVisita", value.trim(), { shouldDirty: true })}
                         placeholder="Ej. Córdoba, AR"
+                        className={inputBase}
                         inputMode="text"
                         maxLength={80}
                     />

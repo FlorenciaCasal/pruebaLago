@@ -119,7 +119,6 @@ export default function RegisterForm({
             { label: "Encuesta rápida", type: "conociste" as const },
             { label: "Revisión y envío", type: "submit" as const },
         ] as const;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tipo]);
 
     // Validaciones (idénticas a tu versión)
@@ -397,7 +396,7 @@ export default function RegisterForm({
                         <StepHeader index={currentStep + 1} title={steps[currentStep].label} />
 
                         {steps[currentStep].type === "contacto" && (
-                            <ContactoStep register={register} uxError={uxError} />
+                            <ContactoStep register={register} watch={watch} setValue={setValue} uxError={uxError} />
                         )}
 
                         {steps[currentStep].type === "listado" && (

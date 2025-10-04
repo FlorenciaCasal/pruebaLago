@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { object, string, boolean, InferType, ref as yupRef } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
@@ -14,10 +13,10 @@ import * as yup from "yup";
 // Regex Unicode para nombres propios: letras (con tildes), espacios, apóstrofes, puntos y guiones
 // - Requiere flag "u" para \p{L} y \p{M}
 
-export const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '’-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
-export const LETTERS_LEN = (s: string) => s.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "").length;
+const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '’-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
+const LETTERS_LEN = (s: string) => s.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "").length;
 
-const schema = object({
+const schema = yup.object({
     firstname: yup.string().transform(v => String(v ?? "").trim())
         .required("Completá tu nombre.")
         .matches(NAME_RE, "Nombre inválido: No se aceptan números ni carateres especiales.")
@@ -34,11 +33,11 @@ const schema = object({
         .max(100, "Máximo 100 caracteres")
         .required("La contraseña es obligatoria"),
     confirmPassword: yup.string()
-        .oneOf([yupRef("password")], "Las contraseñas no coinciden")
+        .oneOf([yup.ref("password")], "Las contraseñas no coinciden")
         .required("Repetí tu contraseña"),
 });
 
-type FormValues = InferType<typeof schema>;
+type FormValues = yup.InferType<typeof schema>;
 
 export default function RegisterPage() {
     const [showPwd, setShowPwd] = useState(false);

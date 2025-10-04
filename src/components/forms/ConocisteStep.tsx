@@ -15,17 +15,17 @@ export default function ConocisteStep({ register, watch, setValue, uxError }: Pr
   const [open, setOpen] = useState(false);
   const value = watch("comoNosConociste") as ComoNosConociste | undefined;
 
-  const opciones: { v: ComoNosConociste; t: string }[] = [
-    { v: "redes", t: "Redes sociales" },
-    { v: "recomendacion", t: "Recomendación" },
-    { v: "sitio", t: "Sitio web" },
-    { v: "publicidad", t: "Publicidad" },
-    { v: "otro", t: "Otro" },
-  ];
+  const opciones = useMemo(() => [
+    { v: "redes" as ComoNosConociste, t: "Redes sociales" },
+    { v: "recomendacion" as ComoNosConociste, t: "Recomendación" },
+    { v: "sitio" as ComoNosConociste, t: "Sitio web" },
+    { v: "publicidad" as ComoNosConociste, t: "Publicidad" },
+    { v: "otro" as ComoNosConociste, t: "Otro" },
+  ], []);
 
   const label = useMemo(
     () => opciones.find(o => o.v === value)?.t ?? "Elegí una opción",
-    [value]
+    [value, opciones]
   );
 
   return (
