@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { login, saveAuth } from "@/services/auth";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Página de Login (Next.js App Router) – estilo oscuro + Tailwind
@@ -32,6 +34,9 @@ const schema = yup
 
 export default function LoginPage() {
   const [showPwd, setShowPwd] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const router = useRouter();
+  
   const {
     register,
     handleSubmit,
@@ -39,12 +44,23 @@ export default function LoginPage() {
   } = useForm<FormValues>({ resolver: yupResolver(schema) });
 
   const onSubmit = async (data: FormValues) => {
-    // TODO: Reemplazar por tu llamada real al backend / proveedor de auth
-    // Ejemplo:
-    // const res = await fetch("/api/login", { method: "POST", body: JSON.stringify(data) });
-    // if (!res.ok) { /* manejar error */ }
-    await new Promise((r) => setTimeout(r, 600));
-    alert("Login enviado\n" + JSON.stringify(data, null, 2));
+    try {
+      setErrorMsg("");
+      // Llamar al servicio de login
+      const response = await login({
+        email: data.email,
+        password: data.password,
+      });
+
+      // Guardar autenticación
+      saveAuth(response);
+
+      // Redirigir al admin
+      router.push("/admin");
+    } catch (error) {
+      console.error("Error en login:", error);
+      setErrorMsg(error instanceof Error ? error.message : "Error al iniciar sesión");
+    }
   };
 
   return (
@@ -69,6 +85,11 @@ export default function LoginPage() {
 
           {/* Formulario */}
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+            {errorMsg && (
+              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">
+                {errorMsg}
+              </div>
+            )}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-neutral-300">
                 Correo electrónico

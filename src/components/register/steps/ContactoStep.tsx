@@ -66,21 +66,26 @@ export default function ContactoStep({
 
             <div className="grid sm:grid-cols-2 gap-3">
                 <div>
-                    <label className="block mb-1">Teléfono</label>
+                    <label className="block mb-1">Teléfono (10 dígitos)</label>
                     <input
-                        {...register("telefono", { setValueAs: v => String(v ?? "").trim() })}
+                        {...register("telefono", {
+                            setValueAs: v => String(v ?? "").replace(/\D+/g, "").slice(0, 10),
+                        })}
                         className={inputBase}
                         type="tel"
-                        inputMode="tel"
+                        inputMode="numeric"
+                        pattern="^[0-9]{10}$"
+                        maxLength={10}
+                        placeholder="3512345678"
                         autoComplete="tel"
                     />
                 </div>
                 <div className="sm:col-span-2">
-                    <label className="block mb-1">¿Desde dónde nos visitás?</label>
+                    <label className="block mb-1">Ciudad de origen</label>
                     <CityAutocomplete
                         value={watch("origenVisita") || ""}
                         onChange={(value) => setValue("origenVisita", value.trim(), { shouldDirty: true })}
-                        placeholder="Ej. Córdoba, AR"
+                        placeholder="Ej. Córdoba, Argentina"
                         className={inputBase}
                         inputMode="text"
                         maxLength={80}

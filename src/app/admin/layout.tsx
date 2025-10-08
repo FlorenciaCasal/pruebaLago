@@ -1,18 +1,38 @@
+"use client";
+
 export const dynamic = "force-dynamic";
 import React from "react";
 import Link from "next/link";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { logout, getUser } from "@/services/auth";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    const user = getUser();
+    
+    const handleLogout = () => {
+        if (confirm("¿Estás seguro de que querés cerrar sesión?")) {
+            logout();
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-neutral-900 text-neutral-100">
-            <header className="sticky top-0 z-40 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur">
-                <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
-                    <h1 className="text-lg font-semibold">Panel de Administración</h1>
-                    <nav className="flex gap-4 text-sm">
-                        <Link href="/" className="text-neutral-300 hover:text-white">Volver al sitio</Link>
-                    </nav>
-                </div>
-            </header>
+        <ProtectedRoute>
+            <div className="min-h-screen bg-neutral-900 text-neutral-100">
+                <header className="sticky top-0 z-40 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur">
+                    <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
+                        <h1 className="text-lg font-semibold">Panel de Administración</h1>
+                        <nav className="flex gap-4 text-sm items-center">
+                            {user && <span className="text-neutral-400">{user.email}</span>}
+                            <Link href="/" className="text-neutral-300 hover:text-white">Volver al sitio</Link>
+                            <button 
+                                onClick={handleLogout}
+                                className="text-neutral-300 hover:text-white"
+                            >
+                                Cerrar sesión
+                            </button>
+                        </nav>
+                    </div>
+                </header>
 
             <div className="mx-auto max-w-7xl px-4 py-6 grid grid-cols-12 gap-6">
                 <aside className="col-span-12 md:col-span-3">
@@ -31,5 +51,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </main>
             </div>
         </div>
+        </ProtectedRoute>
     );
 }

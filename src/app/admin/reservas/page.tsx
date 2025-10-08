@@ -29,6 +29,7 @@ export default function ReservasPage() {
   const [loading, setLoading] = React.useState(true);
   const [actionId, setActionId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -47,12 +48,19 @@ export default function ReservasPage() {
 
   const onConfirm = async (id: string) => {
     setActionId(id);
+    setError(null);
+    setSuccessMsg(null);
     try {
       await confirmReservation(id);
-      setData(prev => status === "ALL" ? prev : prev.filter(r => r.id !== id));
-      if (status === "ALL") load();
+      setSuccessMsg("Reserva confirmada exitosamente");
+      // Actualizar la reserva en el estado local
+      setData(prev => prev.map(r => r.id === id ? { ...r, status: "CONFIRMED" } : r));
+      // Si no estamos en "ALL", remover de la lista
+      if (status !== "ALL") {
+        setTimeout(() => setData(prev => prev.filter(r => r.id !== id)), 1000);
+      }
     } catch (err: unknown) {
-      alert(getErrorMessage(err));
+      setError(getErrorMessage(err));
     } finally {
       setActionId(null);
     }
@@ -60,12 +68,19 @@ export default function ReservasPage() {
 
   const onCancel = async (id: string) => {
     setActionId(id);
+    setError(null);
+    setSuccessMsg(null);
     try {
       await cancelReservation(id);
-      setData(prev => status === "ALL" ? prev : prev.filter(r => r.id !== id));
-      if (status === "ALL") load();
+      setSuccessMsg("Reserva cancelada exitosamente");
+      // Actualizar la reserva en el estado local
+      setData(prev => prev.map(r => r.id === id ? { ...r, status: "CANCELLED" } : r));
+      // Si no estamos en "ALL", remover de la lista
+      if (status !== "ALL") {
+        setTimeout(() => setData(prev => prev.filter(r => r.id !== id)), 1000);
+      }
     } catch (err: unknown) {
-      alert(getErrorMessage(err));
+      setError(getErrorMessage(err));
     } finally {
       setActionId(null);
     }
@@ -73,6 +88,20 @@ export default function ReservasPage() {
 
   return (
     <div className="space-y-4">
+      {/* Mensajes de éxito y error */}
+      {successMsg && (
+        <div className="rounded-xl border border-green-800 bg-green-950/40 p-4 text-green-300 flex items-center justify-between">
+          <span>{successMsg}</span>
+          <button onClick={() => setSuccessMsg(null)} className="text-green-400 hover:text-green-200">✕</button>
+        </div>
+      )}
+      {error && (
+        <div className="rounded-xl border border-red-800 bg-red-950/40 p-4 text-red-300 flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-200">✕</button>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="flex gap-2">
         {TABS.map(t => (
@@ -129,20 +158,24 @@ export default function ReservasPage() {
                   <td>{r.status}</td>
                   <td className="text-neutral-400">{new Date(r.createdAt).toLocaleString()}</td>
                   <td className="text-right space-x-2">
-                    <button
-                      onClick={() => onConfirm(r.id)}
-                      disabled={actionId === r.id}
-                      className="rounded-lg bg-green-600/90 px-3 py-1.5 text-white hover:bg-green-600 disabled:opacity-60"
-                    >
-                      {actionId === r.id ? "..." : "Confirmar"}
-                    </button>
-                    <button
-                      onClick={() => onCancel(r.id)}
-                      disabled={actionId === r.id}
-                      className="rounded-lg bg-red-600/90 px-3 py-1.5 text-white hover:bg-red-600 disabled:opacity-60"
-                    >
-                      {actionId === r.id ? "..." : "Cancelar"}
-                    </button>
+                    {r.status !== "CONFIRMED" && r.status !== "CANCELLED" && (
+                      <button
+                        onClick={() => onConfirm(r.id)}
+                        disabled={actionId === r.id}
+                        className="rounded-lg bg-green-600/90 px-3 py-1.5 text-white hover:bg-green-600 disabled:opacity-60"
+                      >
+                        {actionId === r.id ? "..." : "Confirmar"}
+                      </button>
+                    )}
+                    {r.status !== "CANCELLED" && (
+                      <button
+                        onClick={() => onCancel(r.id)}
+                        disabled={actionId === r.id}
+                        className="rounded-lg bg-red-600/90 px-3 py-1.5 text-white hover:bg-red-600 disabled:opacity-60"
+                      >
+                        {actionId === r.id ? "..." : "Cancelar"}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

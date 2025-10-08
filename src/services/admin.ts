@@ -12,9 +12,36 @@ async function handle<T>(res: Response): Promise<T> {
     return res.json() as Promise<T>;
 }
 
+// Headers por defecto para peticiones autenticadas
+const getAuthHeaders = () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    return {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Content-Type': 'application/json'
+    };
+};
+
 // ---------------- RESERVAS ----------------
 export type AdminStatus = "ALL" | "PENDING" | "CONFIRMED" | "CANCELLED";
 
+
+// Tipo de respuesta del backend
+type BackendReservation = {
+    id: string;
+    visitDate: string;
+    firstName: string;
+    lastName: string;
+    adults18Plus: number;
+    children2To17: number;
+    babiesLessThan2: number;
+    email: string;
+    phone: string;
+    circuit: string;
+    visitorType: string;
+    originLocation: string;
+    status: string;
+    createdAt: string;
+};
 
 export async function fetchReservations(status: AdminStatus = "PENDING"): Promise<import("@/types/admin").AdminReservation[]> {
     if (MOCK) {
@@ -27,20 +54,52 @@ export async function fetchReservations(status: AdminStatus = "PENDING"): Promis
         return status === "ALL" ? base : base.filter(r => r.status === status);
     }
     const qs = status && status !== "ALL" ? `?status=${status}` : "";
-    const res = await fetch(`${API_URL}/api/admin/reservations${qs}`, { cache: "no-store" }); // 👈 ruta supuesta en inglés
-    return handle(res);
+    const res = await fetch(`${API_URL}/api/admin/reservations${qs}`, {
+        cache: "no-store",
+        headers: getAuthHeaders()
+    });
+    const backendData = await handle<BackendReservation[]>(res);
+
+    // Mapear del formato backend al formato frontend
+    return backendData.map(r => ({
+        id: r.id,
+        createdAt: r.createdAt,
+        reservationDate: r.visitDate,
+        circuito: r.circuit,
+        tipoVisitante: r.visitorType === "EDUCATIONAL_INSTITUTION" ? "INSTITUCION_EDUCATIVA" as const : "PARTICULAR" as const,
+        nombre: r.firstName,
+        apellido: r.lastName,
+        telefono: r.phone,
+        correo: r.email,
+        personas: r.adults18Plus + r.children2To17 + r.babiesLessThan2,
+        status: r.status as "PENDING" | "CONFIRMED" | "CANCELLED"
+    }));
 }
 
 export async function confirmReservation(id: string): Promise<void> {
     if (MOCK) { await new Promise(r => setTimeout(r, 200)); return; }
-    const res = await fetch(`${API_URL}/api/admin/reservations/${id}/confirm`, { method: "POST" }); // 👈 confirm
-    await handle(res);
+    const res = await fetch(`${API_URL}/api/admin/reservations/${id}/confirm`, {
+        method: "POST",
+        headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+        let msg = "Error confirmando reserva";
+        try { const j = await res.json(); if (j?.message) msg = j.message; } catch { }
+        throw new Error(msg);
+    }
 }
 
 export async function cancelReservation(id: string): Promise<void> {
     if (MOCK) { await new Promise(r => setTimeout(r, 200)); return; }
-    const res = await fetch(`${API_URL}/api/admin/reservations/${id}/cancel`, { method: "POST" }); // 👈 cancel
-    await handle(res);
+    const res = await fetch(`${API_URL}/api/admin/reservations/${id}/cancel`, {
+        method: "POST",
+        headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+        let msg = "Error cancelando reserva";
+        try { const j = await res.json(); if (j?.message) msg = j.message; } catch { }
+        throw new Error(msg);
+    }
 }
 
 // ---------------- EVENTOS ----------------

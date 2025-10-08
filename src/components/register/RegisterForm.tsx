@@ -24,9 +24,9 @@ import { institucionSchema } from "@/schemas/institucionSchemas";
 import { listadoSchemaExact } from "@/schemas/listadoSchema";
 
 
-const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '’-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
-const DNI_RE = /^\d{8}$/;                 // 👈 exacto 8 dígitos
-const PHONE_RE = /^[0-9+()\-.\s]{8,20}$/;
+const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ ''-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
+const DNI_RE = /^\d{8}$/;                 // exacto 8 dígitos
+const PHONE_RE = /^\d{10}$/;              // exacto 10 dígitos
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const LETTERS_LEN = (s: string) =>
     s.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "").length;
@@ -145,11 +145,10 @@ export default function RegisterForm({
         if (!EMAIL_RE.test(correo)) return "Email inválido.";
 
         if (!telefono) return "Completá tu teléfono.";
-        if (!PHONE_RE.test(telefono)) return "Teléfono inválido.";
+        if (!PHONE_RE.test(telefono)) return "Teléfono inválido: deben ser exactamente 10 dígitos.";
 
-        if (!origenVisita) return "Contanos desde dónde nos visitás.";
-        if (/\d/.test(origenVisita)) return "Origen inválido: sólo letras.";
-        if (LETTERS_LEN(origenVisita) < 3) return "Origen inválido: mínimo 3 letras.";      // 👈
+        if (!origenVisita) return "Completá tu ciudad de origen.";
+        if (LETTERS_LEN(origenVisita) < 3) return "Ciudad de origen inválida: mínimo 3 letras.";
         return null;
     };
 

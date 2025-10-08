@@ -4,96 +4,96 @@ import React, { useState, useRef, useEffect } from "react";
 // Lista de ciudades argentinas principales con sus provincias
 const ARGENTINE_CITIES = [
   // Buenos Aires
-  "Buenos Aires, BA", "La Plata, BA", "Mar del Plata, BA", "Quilmes, BA", "Lomas de Zamora, BA",
-  "Banfield, BA", "Avellaneda, BA", "San Isidro, BA", "Vicente López, BA", "Tigre, BA",
-  "San Miguel, BA", "Moreno, BA", "Pilar, BA", "Escobar, BA", "Zárate, BA",
-  
+  "Buenos Aires, Argentina", "La Plata, Buenos Aires", "Mar del Plata, Buenos Aires", "Quilmes, Buenos Aires", "Lomas de Zamora, Buenos Aires",
+  "Banfield, Buenos Aires", "Avellaneda, Buenos Aires", "San Isidro, Buenos Aires", "Vicente López, Buenos Aires", "Tigre, Buenos Aires",
+  "San Miguel, Buenos Aires", "Moreno, Buenos Aires", "Pilar, Buenos Aires", "Escobar, Buenos Aires", "Zárate, Buenos Aires",
+
   // Córdoba
-  "Córdoba, CBA", "Villa Carlos Paz, CBA", "Río Cuarto, CBA", "Villa María, CBA", "San Francisco, CBA",
-  "Cosquín, CBA", "La Falda, CBA", "Jesús María, CBA", "Villa General Belgrano, CBA", "Unquillo, CBA",
-  
+  "Córdoba, Argentina", "Villa Carlos Paz, Córdoba", "Río Cuarto, Córdoba", "Villa María, Córdoba", "San Francisco, Córdoba",
+  "Cosquín, Córdoba", "La Falda, Córdoba", "Jesús María, Córdoba", "Villa General Belgrano, Córdoba", "Unquillo, Córdoba",
+
   // Santa Fe
-  "Rosario, SF", "Santa Fe, SF", "Villa Gobernador Gálvez, SF", "Rafaela, SF", "Reconquista, SF",
-  "Venado Tuerto, SF", "Santo Tomé, SF", "San Lorenzo, SF", "Pérez, SF", "Funes, SF",
-  
+  "Rosario, Santa Fe", "Santa Fe, Argentina", "Villa Gobernador Gálvez, Santa Fe", "Rafaela, Santa Fe", "Reconquista, Santa Fe",
+  "Venado Tuerto, Santa Fe", "Santo Tomé, Santa Fe", "San Lorenzo, Santa Fe", "Pérez, Santa Fe", "Funes, Santa Fe",
+
   // Mendoza
-  "Mendoza, MZA", "Godoy Cruz, MZA", "Las Heras, MZA", "San Rafael, MZA", "Luján de Cuyo, MZA",
-  "Maipú, MZA", "Rivadavia, MZA", "Guaymallén, MZA", "Tunuyán, MZA", "San Martín, MZA",
-  
+  "Mendoza, Argentina", "Godoy Cruz, Mendoza", "Las Heras, Mendoza", "San Rafael, Mendoza", "Luján de Cuyo, Mendoza",
+  "Maipú, Mendoza", "Rivadavia, Mendoza", "Guaymallén, Mendoza", "Tunuyán, Mendoza", "San Martín, Mendoza",
+
   // Tucumán
-  "San Miguel de Tucumán, TUC", "Yerba Buena, TUC", "Tafí Viejo, TUC", "Banda del Río Salí, TUC",
-  "Alderetes, TUC", "Concepción, TUC", "Monteros, TUC", "Aguilares, TUC",
-  
+  "San Miguel de Tucumán, Tucumán", "Yerba Buena, Tucumán", "Tafí Viejo, Tucumán", "Banda del Río Salí, Tucumán",
+  "Alderetes, Tucumán", "Concepción, Tucumán", "Monteros, Tucumán", "Aguilares, Tucumán",
+
   // Entre Ríos
-  "Paraná, ER", "Concordia, ER", "Gualeguaychú, ER", "Concepción del Uruguay, ER", "Villaguay, ER",
-  "Gualeguay, ER", "Colón, ER", "Federación, ER",
-  
+  "Paraná, Entre Ríos", "Concordia, Entre Ríos", "Gualeguaychú, Entre Ríos", "Concepción del Uruguay, Entre Ríos", "Villaguay, Entre Ríos",
+  "Gualeguay, Entre Ríos", "Colón, Entre Ríos", "Federación, Entre Ríos",
+
   // Salta
-  "Salta, SAL", "San Ramón de la Nueva Orán, SAL", "Tartagal, SAL", "Metán, SAL", "Rosario de Lerma, SAL",
-  "Cafayate, SAL", "Cerrillos, SAL", "Chicoana, SAL",
-  
+  "Salta, Argentina", "San Ramón de la Nueva Orán, Salta", "Tartagal, Salta", "Metán, Salta", "Rosario de Lerma, Salta",
+  "Cafayate, Salta", "Cerrillos, Salta", "Chicoana, Salta",
+
   // Misiones
-  "Posadas, MIS", "Eldorado, MIS", "Oberá, MIS", "San Vicente, MIS", "Puerto Iguazú, MIS",
-  "Apóstoles, MIS", "Leandro N. Alem, MIS", "Aristóbulo del Valle, MIS",
-  
+  "Posadas, Misiones", "Eldorado, Misiones", "Oberá, Misiones", "San Vicente, Misiones", "Puerto Iguazú, Misiones",
+  "Apóstoles, Misiones", "Leandro N. Alem, Misiones", "Aristóbulo del Valle, Misiones",
+
   // Chaco
-  "Resistencia, CHA", "Barranqueras, CHA", "Villa Ángela, CHA", "Charata, CHA", "Presidencia Roque Sáenz Peña, CHA",
-  "General San Martín, CHA", "Machagai, CHA", "Quitilipi, CHA",
-  
+  "Resistencia, Chaco", "Barranqueras, Chaco", "Villa Ángela, Chaco", "Charata, Chaco", "Presidencia Roque Sáenz Peña, Chaco",
+  "General San Martín, Chaco", "Machagai, Chaco", "Quitilipi, Chaco",
+
   // Corrientes
-  "Corrientes, COR", "Goya, COR", "Mercedes, COR", "Paso de los Libres, COR", "Curuzú Cuatiá, COR",
-  "Monte Caseros, COR", "Esquina, COR", "Santo Tomé, COR",
-  
+  "Corrientes, Argentina", "Goya, Corrientes", "Mercedes, Corrientes", "Paso de los Libres, Corrientes", "Curuzú Cuatiá, Corrientes",
+  "Monte Caseros, Corrientes", "Esquina, Corrientes", "Santo Tomé, Corrientes",
+
   // Santiago del Estero
-  "Santiago del Estero, SGO", "La Banda, SGO", "Añatuya, SGO", "Termas de Río Hondo, SGO", "Frías, SGO",
-  "Loreto, SGO", "Suncho Corral, SGO", "Quimilí, SGO",
-  
+  "Santiago del Estero, Argentina", "La Banda, Santiago del Estero", "Añatuya, Santiago del Estero", "Termas de Río Hondo, Santiago del Estero", "Frías, Santiago del Estero",
+  "Loreto, Santiago del Estero", "Suncho Corral, Santiago del Estero", "Quimilí, Santiago del Estero",
+
   // San Juan
-  "San Juan, SJ", "Pocito, SJ", "Rivadavia, SJ", "Chimbas, SJ", "Caucete, SJ",
-  "Rawson, SJ", "Albardón, SJ", "Zonda, SJ",
-  
+  "San Juan, Argentina", "Pocito, San Juan", "Rivadavia, San Juan", "Chimbas, San Juan", "Caucete, San Juan",
+  "Rawson, San Juan", "Albardón, San Juan", "Zonda, San Juan",
+
   // Jujuy
-  "San Salvador de Jujuy, JUJ", "Palpalá, JUJ", "San Pedro de Jujuy, JUJ", "Perico, JUJ", "Libertador General San Martín, JUJ",
-  "Fraile Pintado, JUJ", "El Carmen, JUJ", "Humahuaca, JUJ",
-  
+  "San Salvador de Jujuy, Jujuy", "Palpalá, Jujuy", "San Pedro de Jujuy, Jujuy", "Perico, Jujuy", "Libertador General San Martín, Jujuy",
+  "Fraile Pintado, Jujuy", "El Carmen, Jujuy", "Humahuaca, Jujuy",
+
   // Río Negro
-  "Bariloche, RN", "General Roca, RN", "Cipolletti, RN", "Viedma, RN", "San Antonio Oeste, RN",
-  "Villa Regina, RN", "Choele Choel, RN", "Allen, RN",
-  
+  "Bariloche, Río Negro", "General Roca, Río Negro", "Cipolletti, Río Negro", "Viedma, Río Negro", "San Antonio Oeste, Río Negro",
+  "Villa Regina, Río Negro", "Choele Choel, Río Negro", "Allen, Río Negro",
+
   // Neuquén
-  "Neuquén, NEU", "Cutral Có, NEU", "Plottier, NEU", "Centenario, NEU", "San Martín de los Andes, NEU",
-  "Zapala, NEU", "Rincón de los Sauces, NEU", "Junín de los Andes, NEU",
-  
+  "Neuquén, Argentina", "Cutral Có, Neuquén", "Plottier, Neuquén", "Centenario, Neuquén", "San Martín de los Andes, Neuquén",
+  "Zapala, Neuquén", "Rincón de los Sauces, Neuquén", "Junín de los Andes, Neuquén",
+
   // Chubut
-  "Comodoro Rivadavia, CHU", "Rawson, CHU", "Trelew, CHU", "Puerto Madryn, CHU", "Esquel, CHU",
-  "Sarmiento, CHU", "Gaiman, CHU", "Dolavon, CHU",
-  
+  "Comodoro Rivadavia, Chubut", "Rawson, Chubut", "Trelew, Chubut", "Puerto Madryn, Chubut", "Esquel, Chubut",
+  "Sarmiento, Chubut", "Gaiman, Chubut", "Dolavon, Chubut",
+
   // Formosa
-  "Formosa, FSA", "Clorinda, FSA", "Pirané, FSA", "Las Lomitas, FSA", "Ingeniero Juárez, FSA",
-  "Comandante Fontana, FSA", "Villa Escolar, FSA", "Laguna Blanca, FSA",
-  
+  "Formosa, Argentina", "Clorinda, Formosa", "Pirané, Formosa", "Las Lomitas, Formosa", "Ingeniero Juárez, Formosa",
+  "Comandante Fontana, Formosa", "Villa Escolar, Formosa", "Laguna Blanca, Formosa",
+
   // San Luis
-  "San Luis, SL", "Villa Mercedes, SL", "Merlo, SL", "Justo Daract, SL", "La Toma, SL",
-  "Concarán, SL", "Naschel, SL", "Quines, SL",
-  
+  "San Luis, Argentina", "Villa Mercedes, San Luis", "Merlo, San Luis", "Justo Daract, San Luis", "La Toma, San Luis",
+  "Concarán, San Luis", "Naschel, San Luis", "Quines, San Luis",
+
   // Catamarca
-  "San Fernando del Valle de Catamarca, CAT", "Valle Viejo, CAT", "Fray Mamerto Esquiú, CAT", "Paclín, CAT",
-  "Ambato, CAT", "Ancasti, CAT", "Andalgalá, CAT", "Antofagasta de la Sierra, CAT",
-  
+  "San Fernando del Valle de Catamarca, Catamarca", "Valle Viejo, Catamarca", "Fray Mamerto Esquiú, Catamarca", "Paclín, Catamarca",
+  "Ambato, Catamarca", "Ancasti, Catamarca", "Andalgalá, Catamarca", "Antofagasta de la Sierra, Catamarca",
+
   // La Rioja
-  "La Rioja, LR", "Chilecito, LR", "Arauco, LR", "Castro Barros, LR", "Chamical, LR",
-  "Coronel Felipe Varela, LR", "Famatina, LR", "General Ángel V. Peñaloza, LR",
-  
+  "La Rioja, Argentina", "Chilecito, La Rioja", "Arauco, La Rioja", "Castro Barros, La Rioja", "Chamical, La Rioja",
+  "Coronel Felipe Varela, La Rioja", "Famatina, La Rioja", "General Ángel V. Peñaloza, La Rioja",
+
   // Santa Cruz
-  "Río Gallegos, SC", "Caleta Olivia, SC", "El Calafate, SC", "Puerto Deseado, SC", "Pico Truncado, SC",
-  "Las Heras, SC", "Perito Moreno, SC", "Los Antiguos, SC",
-  
+  "Río Gallegos, Santa Cruz", "Caleta Olivia, Santa Cruz", "El Calafate, Santa Cruz", "Puerto Deseado, Santa Cruz", "Pico Truncado, Santa Cruz",
+  "Las Heras, Santa Cruz", "Perito Moreno, Santa Cruz", "Los Antiguos, Santa Cruz",
+
   // Tierra del Fuego
-  "Ushuaia, TF", "Río Grande, TF", "Tolhuin, TF",
-  
+  "Ushuaia, Tierra del Fuego", "Río Grande, Tierra del Fuego", "Tolhuin, Tierra del Fuego",
+
   // La Pampa
-  "Santa Rosa, LP", "General Pico, LP", "Toay, LP", "Realicó, LP", "Macachín, LP",
-  "General Acha, LP", "Guatraché, LP", "Victorica, LP",
+  "Santa Rosa, La Pampa", "General Pico, La Pampa", "Toay, La Pampa", "Realicó, La Pampa", "Macachín, La Pampa",
+  "General Acha, La Pampa", "Guatraché, La Pampa", "Victorica, La Pampa",
 ];
 
 interface CityAutocompleteProps {
@@ -108,7 +108,7 @@ interface CityAutocompleteProps {
 export default function CityAutocomplete({
   value,
   onChange,
-  placeholder = "Ej. Córdoba, AR",
+  placeholder = "Ej. Córdoba, Argentina",
   className = "",
   inputMode = "text",
   maxLength = 80,
