@@ -1,8 +1,10 @@
 "use client";
-
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
   return (
     <nav style={{
       display: "flex",
@@ -22,9 +24,11 @@ export default function Navbar() {
         <Link href="/" style={{ color: "white", textDecoration: "none" }}>
           Home
         </Link>
-        <Link href="/admin" style={{ color: "white", textDecoration: "none" }}>
-          Panel de Administración
-        </Link>
+        {isAdminRoute && (
+          <Link href="/admin" style={{ color: "white", textDecoration: "none" }}>
+            Panel de Administración
+          </Link>
+        )}
         <Link href="/login" style={{ color: "white", textDecoration: "none" }}>
           Ingresar
         </Link>
