@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
                         <p className="text-xs uppercase tracking-wide text-neutral-400 mb-3">Secciones</p>
                         <ul className="space-y-1">
-                            <li><Link href="/admin/reservas" className="block rounded-xl px-3 py-2 hover:bg-neutral-800">Reservas pendientes</Link></li>
+                            <li><Link href="/admin/reservas" className="block rounded-xl px-3 py-2 hover:bg-neutral-800">Reservas</Link></li>
                             <li><Link href="/admin/eventos" className="block rounded-xl px-3 py-2 hover:bg-neutral-800">Agregar evento</Link></li>
                             <li><Link href="/admin/calendario" className="block rounded-xl px-3 py-2 hover:bg-neutral-800">Calendario</Link></li>
                         </ul>

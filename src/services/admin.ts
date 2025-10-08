@@ -43,7 +43,10 @@ type BackendReservation = {
     createdAt: string;
 };
 
-export async function fetchReservations(status: AdminStatus = "PENDING"): Promise<import("@/types/admin").AdminReservation[]> {
+export async function fetchReservations(
+    status: AdminStatus = "PENDING",
+    date?: string
+): Promise<import("@/types/admin").AdminReservation[]> {
     if (MOCK) {
         await new Promise(r => setTimeout(r, 300));
         const base: import("@/types/admin").AdminReservation[] = [
@@ -51,14 +54,33 @@ export async function fetchReservations(status: AdminStatus = "PENDING"): Promis
             { id: "r2", createdAt: new Date().toISOString(), reservationDate: new Date(Date.now() + 2 * 86400000).toISOString(), circuito: "B", tipoVisitante: "INSTITUCION_EDUCATIVA", nombre: "Colegio Norte", personas: 25, status: "CONFIRMED" },
             { id: "r3", createdAt: new Date().toISOString(), reservationDate: new Date(Date.now() + 3 * 86400000).toISOString(), circuito: "C", tipoVisitante: "PARTICULAR", nombre: "Luis", personas: 2, status: "CANCELLED" },
         ];
-        return status === "ALL" ? base : base.filter(r => r.status === status);
+        let filtered = status === "ALL" ? base : base.filter(r => r.status === status);
+        if (date) {
+            filtered = filtered.filter(r => r.reservationDate === date);
+        }
+        return filtered;
     }
-    const qs = status && status !== "ALL" ? `?status=${status}` : "";
+
+    // Construir query params
+    const params = new URLSearchParams();
+    if (status && status !== "ALL") {
+        params.append("status", status);
+    }
+    if (date) {
+        console.log("Buscando reservas para la fecha:", date);
+        params.append("date", date);
+    }
+    const qs = params.toString() ? `?${params.toString()}` : "";
+
+    console.log("Petición al backend:", `${API_URL}/api/admin/reservations${qs}`);
+
     const res = await fetch(`${API_URL}/api/admin/reservations${qs}`, {
         cache: "no-store",
         headers: getAuthHeaders()
     });
     const backendData = await handle<BackendReservation[]>(res);
+
+    console.log(`Reservas recibidas del backend: ${backendData.length}`, backendData.map(r => r.visitDate));
 
     // Mapear del formato backend al formato frontend
     return backendData.map(r => ({

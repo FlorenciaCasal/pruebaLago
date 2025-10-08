@@ -30,19 +30,33 @@ export default function ReservasPage() {
   const [actionId, setActionId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
+  const [searchDate, setSearchDate] = React.useState<string>("");
+  const [searchName, setSearchName] = React.useState<string>("");
 
   const load = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const d = await fetchReservations(status);
-      setData(d);
+      // Pasar la fecha al backend si está presente
+      const d = await fetchReservations(status, searchDate || undefined);
+
+      // Filtrar por nombre en el frontend (ya que el backend no lo soporta)
+      let filtered = d;
+      if (searchName) {
+        const query = searchName.toLowerCase();
+        filtered = d.filter(r => {
+          const fullName = `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase();
+          return fullName.includes(query);
+        });
+      }
+
+      setData(filtered);
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
-  }, [status]);
+  }, [status, searchDate, searchName]);
 
   React.useEffect(() => { load(); }, [load]);
 
@@ -55,7 +69,7 @@ export default function ReservasPage() {
       setSuccessMsg("Reserva confirmada exitosamente");
       // Actualizar la reserva en el estado local
       setData(prev => prev.map(r => r.id === id ? { ...r, status: "CONFIRMED" } : r));
-      // Si no estamos en "ALL", remover de la lista
+      // Si no estamos en "ALL", remover de la lista después de 1 segundo
       if (status !== "ALL") {
         setTimeout(() => setData(prev => prev.filter(r => r.id !== id)), 1000);
       }
@@ -75,7 +89,7 @@ export default function ReservasPage() {
       setSuccessMsg("Reserva cancelada exitosamente");
       // Actualizar la reserva en el estado local
       setData(prev => prev.map(r => r.id === id ? { ...r, status: "CANCELLED" } : r));
-      // Si no estamos en "ALL", remover de la lista
+      // Si no estamos en "ALL", remover de la lista después de 1 segundo
       if (status !== "ALL") {
         setTimeout(() => setData(prev => prev.filter(r => r.id !== id)), 1000);
       }
@@ -125,13 +139,56 @@ export default function ReservasPage() {
         </div>
       </div>
 
+      {/* Búsqueda */}
+      <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm text-neutral-400 mb-2">Buscar por fecha de visita</label>
+            <input
+              type="date"
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white focus:border-neutral-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-neutral-400 mb-2">Buscar por nombre</label>
+            <input
+              type="text"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              placeholder="Nombre o apellido..."
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchDate("");
+                setSearchName("");
+              }}
+              className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+        {(searchDate || searchName) && (
+          <div className="mt-3 text-sm text-neutral-400">
+            {data.length} reserva{data.length !== 1 ? 's' : ''} encontrada{data.length !== 1 ? 's' : ''}
+          </div>
+        )}
+      </div>
+
       {/* Tabla */}
       {loading ? (
         <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-6">Cargando...</div>
-      ) : error ? (
-        <div className="rounded-xl border border-red-800 bg-red-950/40 p-4 text-red-300">{error}</div>
       ) : data.length === 0 ? (
-        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-6">No hay reservas.</div>
+        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-6">
+          {(searchDate || searchName)
+            ? "No se encontraron reservas con los filtros aplicados."
+            : "No hay reservas."}
+        </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-neutral-800">
           <table className="min-w-full text-sm">
@@ -150,7 +207,7 @@ export default function ReservasPage() {
             <tbody className="divide-y divide-neutral-800">
               {data.map(r => (
                 <tr key={r.id} className="[&>td]:px-4 [&>td]:py-3">
-                  <td>{new Date(r.reservationDate).toLocaleString()}</td>
+                  <td>{new Date(r.reservationDate + 'T00:00:00').toLocaleDateString('es-AR')}</td>
                   <td>{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
                   <td>{r.personas ?? "-"}</td>
                   <td>{r.tipoVisitante ?? "-"}</td>
