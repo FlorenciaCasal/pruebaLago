@@ -160,15 +160,18 @@ export default function ReservasPage() {
           {/* Tabla desktop (md+) sin overflow */}
           <div className="hidden lg:block rounded-2xl border border-neutral-800 overflow-hidden">
             <table className="w-full table-fixed text-xs md:text-sm">
+              {/* Orden y anchos de columnas: 0 Fecha, 1 Nombre, 2 Personas, ... */}
               <colgroup>
-                <col className="w-[130px] xl:w-[160px]" /> {/* Fecha reserva */}
-                <col />                                     {/* Nombre */}
-                <col className="w-[70px]" />                {/* Personas */}
-                <col className="w-[150px]" />               {/* Tipo */}
-                <col className="hidden xl:table-column w-[80px]" />  {/* Circuito */}
-                <col className="w-[110px]" />               {/* Estado */}
-                <col className="hidden xl:table-cell w-[160px]" /> {/* Creada */}
-                <col className="w-[170px] xl:w-[200px]" />  {/* Acciones */}
+                {[
+                  "w-[130px] xl:w-[160px]",          // Fecha
+                  undefined,                         // Nombre (toma el resto)
+                  "w-[70px]",                        // Personas
+                  "w-[150px]",                       // Tipo
+                  "hidden xl:table-column w-[80px]", // Circuito
+                  "w-[110px]",                       // Estado
+                  "hidden xl:table-column w-[160px]",// Creada
+                  "w-[170px] xl:w-[200px]",          // Acciones
+                ].map((cls, i) => <col key={i} className={cls ?? undefined} />)}
               </colgroup>
 
               <thead className="bg-neutral-950/80">
