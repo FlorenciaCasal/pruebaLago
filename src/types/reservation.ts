@@ -30,3 +30,19 @@ export type ReservationFormData = {
   tmpNombreApe?: string;
   tmpDni?: string;
 };
+
+export type BackendReservationDTO = {
+  id: string;
+  createdAt?: string;     // algunos endpoints te lo dan así
+  created_at?: string;    // otros con snake_case
+  visitDate?: string;
+  visit_date?: string;
+  circuit: "A" | "B" | "C" | "D";
+  visitorType: "INDIVIDUAL" | "EDUCATIONAL_INSTITUTION";
+  institutionName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  adults14Plus?: number | null;
+  minors?: number | null;
+  status: "PENDING" | "CONFIRMED" | "CANCELLED";
+};

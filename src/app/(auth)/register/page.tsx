@@ -2,17 +2,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { object, string, boolean, InferType, ref as yupRef } from "yup";
+import { object, InferType, ref as yupRef } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Página de Registro (Next.js App Router) – estilo oscuro + Tailwind
-// Ruta sugerida: app/(auth)/register/page.tsx
-// ──────────────────────────────────────────────────────────────────────────────
-
-// Regex Unicode para nombres propios: letras (con tildes), espacios, apóstrofes, puntos y guiones
-// - Requiere flag "u" para \p{L} y \p{M}
 
 export const NAME_RE = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '’-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
 export const LETTERS_LEN = (s: string) => s.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "").length;
