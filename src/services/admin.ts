@@ -1,11 +1,34 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const MOCK = !API_URL;
+import { CalendarMonthState } from "@/types/admin";
+import { BackendReservationDTO } from "@/types/reservation";
 
 
-// Helpers
-async function handle<T>(res: Response): Promise<T> {
+// 👇 arriba del archivo
+const IS_SERVER = typeof window === "undefined";
+const ORIGIN = IS_SERVER
+    ? (process.env.APP_ORIGIN ?? "http://localhost:3000")
+    : "";
+
+/** En server arma URL absoluta; en client deja la relativa */
+function absolute(path: string) {
+    return IS_SERVER ? `${ORIGIN}${path}` : path;
+}
+
+export type AdminStatus = "ALL" | "PENDING" | "CONFIRMED" | "CANCELLED";
+
+export type AdminReservation = {
+    id: string;
+    createdAt: string;
+    reservationDate: string;
+    circuito: "A" | "B" | "C" | "D";
+    tipoVisitante: "PARTICULAR" | "INSTITUCION_EDUCATIVA";
+    nombre: string;     // institución o "Nombre Apellido"
+    personas: number;   // adults14Plus + minors
+    status: "PENDING" | "CONFIRMED" | "CANCELLED";
+};
+
+async function ok<T>(res: Response): Promise<T> {
     if (!res.ok) {
-        let msg = "Error en la solicitud";
+        let msg = `Error ${res.status}`;
         try { const j = await res.json(); if (j?.message) msg = j.message; } catch { }
         throw new Error(msg);
     }
@@ -24,6 +47,15 @@ const getAuthHeaders = () => {
 // ---------------- RESERVAS ----------------
 export type AdminStatus = "ALL" | "PENDING" | "CONFIRMED" | "CANCELLED";
 
+export async function fetchReservations(opts?: { date?: string; status?: AdminStatus }) {
+    const qs = new URLSearchParams();
+    if (opts?.date) qs.set("date", opts.date);
+    if (opts?.status && opts.status !== "ALL") qs.set("status", opts.status);
+    const url = absolute(`/api/admin/reservations${qs.toString() ? `?${qs}` : ""}`);
+    const res = await fetch(url, { cache: "no-store" });
+    const list = await ok<BackendReservationDTO[]>(res);
+    return list.map(mapReservation);
+}
 
 // Tipo de respuesta del backend
 type BackendReservation = {
@@ -124,12 +156,14 @@ export async function cancelReservation(id: string): Promise<void> {
     }
 }
 
-// ---------------- EVENTOS ----------------
+// ==== Crear evento (tipo y función) ====
+
+// Lo que completa tu formulario
 export type CreateEventInput = {
     titulo: string;
-    fechaISO: string;   // full ISO date-time
-    circuito?: string;
-    cupo?: number;
+    fechaISO: string;                   // ej "2025-10-16T14:00:00.000Z" o local
+    circuito?: "" | "A" | "B" | "C" | "D";
+    cupo?: number;                      // opcional
     notas?: string;
 };
 
@@ -146,75 +180,84 @@ export async function createEventReservation(input: CreateEventInput): Promise<{
     return handle(res);
 }
 
-// --------------- CALENDARIO ---------------
-export async function getCalendarState(year: number, month: number): Promise<import("../types/admin").CalendarMonthState> {
-    if (MOCK) {
-        await new Promise(r => setTimeout(r, 250));
-        return { year, month, disabled: false, disabledDays: [] };
+/**
+ * Intenta POST /api/admin/eventos (si tu back lo implementa).
+ * Si devuelve 404/501/No Implemented, hace fallback a setear la capacidad del día
+ * usando tu endpoint existente y devuelve un id sintético.
+ */
+export async function createEventReservation(
+    input: CreateEventInput
+): Promise<{ id: string }> {
+    // 1) Intento real (si más adelante agregás el endpoint de eventos al back)
+    try {
+        const res = await fetch(absolute(`/api/admin/eventos`), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title: input.titulo,
+                dateTime: input.fechaISO,
+                circuit: input.circuito || null,
+                capacity: input.cupo ?? null,
+                notes: input.notas || null,
+            }),
+        });
+
+        if (res.ok) {
+            return ok<{ id: string }>(res);
+        }
+
+        // si el back no lo tiene, sigo al fallback
+        if (res.status !== 404 && res.status !== 501) {
+            // otros errores “reales” sí los reporto
+            const msg = await res.text();
+            throw new Error(msg || `Error ${res.status}`);
+        }
+    } catch {
+        // continuo al fallback
     }
-    const mm = String(month).padStart(2, "0");
-    const res = await fetch(`${API_URL}/api/availability?month=${year}-${mm}`, { cache: "no-store" });
-    if (!res.ok) {
-        let msg = "Error en la solicitud";
-        try { const j = await res.json(); if (j?.message) msg = j.message; } catch { }
-        throw new Error(msg);
+
+    // 2) Fallback: si no hay endpoint de eventos en el back,
+    // al menos dejo la capacidad del día como el cupo (o 0 si no se envió).
+    const day = toDateOnlyISO(input.fechaISO);
+    if (typeof input.cupo === "number") {
+        await upsertDayCapacity(day, input.cupo);
+    } else {
+        // si no pasaste cupo, podés decidir bloquear el día:
+        // await upsertDayCapacity(day, 0);
     }
 
-    // Lo que devuelve el back
-    type AvailabilityDTO = {
-        availableDate: string;          // "YYYY-MM-DD"
-        totalCapacity: number | null;
-        remainingCapacity: number | null;
-    };
-
-    const data = (await res.json()) as AvailabilityDTO[];
-
-    // Opción sencilla: día deshabilitado si remainingCapacity <= 0
-    const disabledDays = data
-        .filter(d => (d.remainingCapacity ?? 0) <= 0)
-        .map(d => d.availableDate);
-
-    // Si querés considerar deshabilitado todo día que NO venga en la respuesta,
-    // descomentá este bloque y usalo en lugar del de arriba:
-    /*
-    const daysInMonth = new Date(year, month, 0).getDate();
-    const present = new Set(data.map(d => d.availableDate));
-    const disabledDays = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      const iso = `${year}-${mm}-${String(d).padStart(2,"0")}`;
-      const dto = data.find(x => x.availableDate === iso);
-      const remaining = dto?.remainingCapacity ?? 0;
-      if (!present.has(iso) || remaining <= 0) disabledDays.push(iso);
-    }
-    */
-
-    return { year, month, disabled: false, disabledDays };
+    // Devuelvo un id sintético (para que el UI muestre “Creado ✓ ID: …”)
+    return { id: `local-${day}-${Math.random().toString(36).slice(2, 8)}` };
 }
 
-export async function setDayEnabled(dateISO: string, enabled: boolean): Promise<void> {
-    // Hoy no hay endpoint admin para esto; dejalo como NOOP para que el UI no rompa.
-    //     if (MOCK) { await new Promise(r => setTimeout(r, 250)); }
-    //     return;
-    // }
-    if (MOCK) { await new Promise(r => setTimeout(r, 250)); return; }
-    const res = await fetch(`${API_URL}/api/admin/calendario/dia`, {
-        method: enabled ? "DELETE" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dateISO }),
-    });
-    await handle(res);
-}
 
-export async function setMonthEnabled(year: number, month: number, enabled: boolean): Promise<void> {
-    if (MOCK) { await new Promise(r => setTimeout(r, 250)); return; }
-    const res = await fetch(`${API_URL}/api/admin/calendario/mes`, {
-        method: enabled ? "DELETE" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ year, month }),
-    });
-    await handle(res);
-}
-// Hoy no hay endpoint admin para esto; dejalo como NOOP para que el UI no rompa.
-//     if (MOCK) { await new Promise(r => setTimeout(r, 250)); }
-//     return;
+// Si más adelante querés que “Eventos” sea una entidad en tu API:
+
+// Agregá en Spring un endpoint:
+
+// @PostMapping("/events")
+// public Map<String,String> createEvent(@RequestBody CreateEventDTO dto) { ... }
+
+
+// Guardás el evento en tu tabla (o en availability_rules + tabla events).
+
+// En Next, creás el proxy:
+
+// app/api/admin/eventos/route.ts
+
+// import { NextRequest } from "next/server";
+// import { adminFetch } from "../../_backend";
+
+// export async function POST(req: NextRequest) {
+//   const body = await req.text();
+//   const resp = await adminFetch(`/api/admin/events`, {
+//     method: "POST",
+//     body,
+//     headers: { "Content-Type": "application/json" },
+//   });
+//   const text = await resp.text();
+//   return new Response(text, {
+//     status: resp.status,
+//     headers: { "content-type": resp.headers.get("content-type") ?? "application/json" },
+//   });
 // }

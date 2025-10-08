@@ -19,6 +19,27 @@ function toISO(d: Date) {
     return `${y}-${m}-${day}`;
 }
 
+// --- fetch disponibilidad de un mes ---
+type DayDTO = {
+    availableDate: string;              // "YYYY-MM-DD"
+    totalCapacity: number | null;
+    remainingCapacity: number | null;
+};
+
+async function fetchDisabledForMonth(year: number, month: number): Promise<Set<string>> {
+    const mm = String(month).padStart(2, '0');
+    const res = await fetch(`/api/admin/availability-proxy?month=${year}-${mm}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('No se pudo cargar disponibilidad');
+
+    const data: DayDTO[] = await res.json();
+    // Deshabilitamos si no hay cupo total o no queda cupo
+    const disabled = data
+        .filter(d => (d.totalCapacity ?? 0) <= 0 || (d.remainingCapacity ?? 0) <= 0)
+        .map(d => d.availableDate);
+
+    return new Set(disabled);
+}
+
 export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
     const [isMobile, setIsMobile] = useState(false);
     const [month, setMonth] = useState(new Date());
@@ -32,6 +53,10 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
         const [y, m, d] = iso.split('-').map(Number);
         return new Date(y, m - 1, d);
     }
+    // días deshabilitados combinados (de todos los meses visibles)
+    const [disabledSet, setDisabledSet] = useState<Set<string>>(new Set());
+    const [loading, setLoading] = useState<boolean>(false);
+
     const selectedDate = selectedISO ? fromISODateLocal(selectedISO) : undefined;
 
     useEffect(() => {
@@ -41,29 +66,53 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
         return () => window.removeEventListener('resize', check);
     }, []);
 
+    // Cargar disponibilidad para los meses visibles
+    useEffect(() => {
+        const months: Date[] = isMobile
+            ? Array.from({ length: monthsToShow }, (_, i) => addMonths(new Date(), i))
+            : [month, addMonths(month, 1)]; // desktop: mes actual y siguiente
+
+        setLoading(true);
+        Promise.all(
+            months.map(d => fetchDisabledForMonth(d.getFullYear(), d.getMonth() + 1))
+        )
+            .then(list => {
+                const merged = new Set<string>();
+                for (const s of list) for (const iso of s) merged.add(iso);
+                setDisabledSet(merged);
+            })
+            .finally(() => setLoading(false));
+    }, [isMobile, monthsToShow, month]);
+
     const handleSelect = (date: Date | undefined) => {
-        if (date) {
-            // normalizar a medianoche local antes de guardar
-            const normalized = new Date(date);
-            normalized.setHours(0, 0, 0, 0);
-            onSelectISO(toISO(normalized));
-        }
+        if (!date) return;
+        const normalized = new Date(date);
+        normalized.setHours(0, 0, 0, 0);
+        const iso = toISO(normalized);
+        // si el día está deshabilitado, no dejamos seleccionar
+        if (disabledSet.has(iso)) return;
+        onSelectISO(iso);
     };
 
     const goPrevious = () => {
         const prev = subMonths(month, 1);
         if (!isBefore(prev, startOfMonth(new Date()))) setMonth(prev);
     };
+
     const goNext = () => setMonth(addMonths(month, 1));
+
     const isPrevDisabled = isBefore(subMonths(month, 1), startOfMonth(new Date()));
+
+    // matcher función para react-day-picker
+    const isDisabledMatcher = (d: Date) => disabledSet.has(toISO(d));
 
     return (
         <div className="flex justify-center">
             <div
                 className={`
-        bg-black rounded-xl w-full 
-        ${isMobile ? 'px-4 overflow-y-scroll h-[80vh] [&_.rdp-weekday]:hidden' : 'p-4 flex items-center justify-center gap-1 overflow-x-hidden'} 
-      `}
+          bg-black rounded-xl w-full 
+          ${isMobile ? 'px-4 overflow-y-scroll h-[80vh] [&_.rdp-weekday]:hidden' : 'p-4 flex items-center justify-center gap-1 overflow-x-hidden'}
+        `}
             >
                 {isMobile ? (
                     <>
@@ -82,7 +131,8 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
                                         locale={es}
                                         disabled={[
                                             { before: new Date() },
-                                            { dayOfWeek: [0, 6] }, // deshabilitar fines de semana
+                                            { dayOfWeek: [0, 6] }, // fds
+                                            isDisabledMatcher,      // 👈 cupo 0 desde backend
                                         ]}
                                     />
                                 </div>
@@ -90,10 +140,11 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
                         })}
                         <div className="flex justify-center w-full mt-4">
                             <button
-                                onClick={() => setMonthsToShow((prev) => prev + 3)}
+                                onClick={() => setMonthsToShow(prev => prev + 3)}
                                 className="px-4 pt-2 pb-4 w-full max-w-xs rounded-lg cursor-pointer bg-white text-gray-900 hover:opacity-90 transition"
+                                disabled={loading}
                             >
-                                Cargar más fechas
+                                {loading ? 'Cargando…' : 'Cargar más fechas'}
                             </button>
                         </div>
                     </>
@@ -123,6 +174,7 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
                             disabled={[
                                 { before: new Date() },
                                 { dayOfWeek: [0, 6] },
+                                isDisabledMatcher,        // 👈 cupo 0 desde backend
                             ]}
                         />
 

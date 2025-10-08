@@ -1,13 +1,62 @@
-import type { ReservationFormData } from "@/types/reservation";
+import type { ReservationFormData, ComoNosConociste } from "@/types/reservation";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const MOCK_SUBMIT = !API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
-export async function submitReservation(data: ReservationFormData & { reservationDate: string; totalPersonas: number; }): Promise<void> {
-  if (MOCK_SUBMIT) {
-    await new Promise((r) => setTimeout(r, 700));
-    return;
+function mapVisitorType(t?: ReservationFormData["tipoVisitante"]) {
+  return t === "INSTITUCION_EDUCATIVA" ? "EDUCATIONAL_INSTITUTION" : "INDIVIDUAL";
+}
+
+function mapHowHeard(v?: ComoNosConociste) {
+  switch (v) {
+    case "redes": return "SOCIAL";
+    case "recomendacion": return "RECOMMENDATION";
+    case "sitio": return "WEBSITE";
+    case "publicidad": return "ADS";
+    default: return "OTHER";
   }
+}
+
+export async function submitReservation(data: ReservationFormData): Promise<{ id: string; status: string }> {
+  const adultos = Number(data.adultos ?? 0);
+  const ninos = Number(data.ninos ?? 0);
+  const bebes = Number(data.bebes ?? 0);
+  const isSchool = data.tipoVisitante === "INSTITUCION_EDUCATIVA";
+  const originLocation = (isSchool ? data.institucionLocalidad : data.origenVisita)?.trim() ?? "";
+
+  if (!data.fechaISO) throw new Error("Falta la fecha de la reserva (fechaISO)");
+
+  // 👇 elegir origen de los campos de RESPONSABLE según el tipo
+  const firstName = (isSchool ? data.responsableNombre : data.nombre)?.trim() ?? "";
+  const lastName = (isSchool ? data.responsableApellido : data.apellido)?.trim() ?? "";
+  const dni = (isSchool ? data.responsableDni : data.dni)?.trim() ?? "";
+  const phone = (isSchool ? data.institucionTelefono : data.telefono)?.trim() ?? "";
+  const email = (isSchool ? data.institucionEmail : data.correo)?.trim() ?? "";
+
+  // Front -> Backend (CreateReservationRequest)
+  const payload = {
+    visitDate: data.fechaISO,                 // YYYY-MM-DD
+    firstName,
+    lastName,
+    dni,
+    phone,
+    email,
+
+    circuit: "A",                                     // mientras no elijas circuitos en el UI
+    visitorType: mapVisitorType(data.tipoVisitante),
+
+    institutionName: isSchool ? (data.institucion ?? null) : null,
+    institutionStudents: isSchool ? (adultos + ninos + bebes) : null,
+
+    adults14Plus: adultos,
+    minors: ninos + bebes,
+    reducedMobility: Number(data.movilidadReducida ?? 0),
+    allergies: (data.alergias ?? "no") === "si",
+
+    comment: data.comentarios ?? "—",
+    originLocation,
+    howHeard: mapHowHeard(data.comoNosConociste),
+    acceptedPolicies: !!data.aceptaReglas,
+  };
 
   // Mapear datos del frontend al formato del backend
   const backendData = {
@@ -39,13 +88,21 @@ export async function submitReservation(data: ReservationFormData & { reservatio
   });
 
   if (!res.ok) {
-    let msg = "Error creando reserva";
+    let msg = `Error HTTP ${res.status}`;
     try {
       const j = await res.json();
       if (j?.message) msg = j.message;
-    } catch {}
+    } catch { }
     throw new Error(msg);
   }
+  return res.json();
+}
+
+// (Opcional) para corroborar que se guardó:
+export async function getReservation(id: string) {
+  const res = await fetch(`${API_URL}/api/reservations/${id}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Error obteniendo reserva ${id}`);
+  return res.json();
 }
 
 // Función para mapear ComoNosConociste al enum del backend

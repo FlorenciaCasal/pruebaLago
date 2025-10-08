@@ -5,10 +5,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Página de Registro (Next.js App Router) – estilo oscuro + Tailwind
-// Ruta sugerida: app/(auth)/register/page.tsx
-// ──────────────────────────────────────────────────────────────────────────────
 
 // Regex Unicode para nombres propios: letras (con tildes), espacios, apóstrofes, puntos y guiones
 // - Requiere flag "u" para \p{L} y \p{M}
