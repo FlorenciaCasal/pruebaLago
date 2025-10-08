@@ -22,9 +22,9 @@ export default function Navbar() {
         <Link href="/" style={{ color: "white", textDecoration: "none" }}>
           Home
         </Link>
-        {/* <Link href="/admin" style={{ color: "white", textDecoration: "none" }}>
-          Panel Admin
-        </Link> */}
+        <Link href="/admin" style={{ color: "white", textDecoration: "none" }}>
+          Panel de Administración
+        </Link>
         <Link href="/login" style={{ color: "white", textDecoration: "none" }}>
           Ingresar
         </Link>
