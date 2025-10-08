@@ -3,9 +3,10 @@ import { adminFetch } from "@/app/api/_backend";
 
 export async function POST(
     _req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const res = await adminFetch(`/api/admin/reservations/${params.id}/cancel`, { method: "POST" });
+    const { id } = await params;
+    const res = await adminFetch(`/api/admin/reservations/${id}/cancel`, { method: "POST" });
     const body = await res.text();
     return new Response(body, {
         status: res.status,
