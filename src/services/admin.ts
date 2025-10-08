@@ -140,7 +140,7 @@ export async function createEventReservation(input: CreateEventInput): Promise<{
     }
     const res = await fetch(`${API_URL}/api/admin/eventos`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(input),
     });
     return handle(res);
