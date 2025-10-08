@@ -35,20 +35,17 @@ async function ok<T>(res: Response): Promise<T> {
     return res.json() as Promise<T>;
 }
 
-function mapReservation(r: BackendReservationDTO): AdminReservation {
-    const createdAt = r.createdAt ?? r.created_at ?? "";
-    const reservationDate = r.visitDate ?? r.visit_date ?? "";
+// Headers por defecto para peticiones autenticadas
+const getAuthHeaders = () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     return {
-        id: r.id,
-        createdAt,
-        reservationDate,
-        circuito: r.circuit,
-        tipoVisitante: r.visitorType === "EDUCATIONAL_INSTITUTION" ? "INSTITUCION_EDUCATIVA" : "PARTICULAR",
-        nombre: r.institutionName || `${r.firstName ?? ""} ${r.lastName ?? ""}`.trim(),
-        personas: (r.adults14Plus ?? 0) + (r.minors ?? 0),
-        status: r.status,
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Content-Type': 'application/json'
     };
-}
+};
+
+// ---------------- RESERVAS ----------------
+export type AdminStatus = "ALL" | "PENDING" | "CONFIRMED" | "CANCELLED";
 
 export async function fetchReservations(opts?: { date?: string; status?: AdminStatus }) {
     const qs = new URLSearchParams();
@@ -60,99 +57,103 @@ export async function fetchReservations(opts?: { date?: string; status?: AdminSt
     return list.map(mapReservation);
 }
 
-export async function confirmReservation(id: string) {
-    const res = await fetch(absolute(`/api/admin/reservations/${id}/confirm`), { method: "POST" });
-    if (!res.ok) throw new Error("No se pudo confirmar");
-}
+// Tipo de respuesta del backend
+type BackendReservation = {
+    id: string;
+    visitDate: string;
+    firstName: string;
+    lastName: string;
+    adults18Plus: number;
+    children2To17: number;
+    babiesLessThan2: number;
+    email: string;
+    phone: string;
+    circuit: string;
+    visitorType: string;
+    originLocation: string;
+    status: string;
+    createdAt: string;
+};
 
-export async function cancelReservation(id: string) {
-    const res = await fetch(absolute(`/api/admin/reservations/${id}/cancel`), { method: "POST" });
-    if (!res.ok) throw new Error("No se pudo cancelar");
-}
+export async function fetchReservations(
+    status: AdminStatus = "PENDING",
+    date?: string
+): Promise<import("@/types/admin").AdminReservation[]> {
+    if (MOCK) {
+        await new Promise(r => setTimeout(r, 300));
+        const base: import("@/types/admin").AdminReservation[] = [
+            { id: "r1", createdAt: new Date().toISOString(), reservationDate: new Date(Date.now() + 86400000).toISOString(), circuito: "A", tipoVisitante: "PARTICULAR", nombre: "Ana", personas: 3, status: "PENDING" },
+            { id: "r2", createdAt: new Date().toISOString(), reservationDate: new Date(Date.now() + 2 * 86400000).toISOString(), circuito: "B", tipoVisitante: "INSTITUCION_EDUCATIVA", nombre: "Colegio Norte", personas: 25, status: "CONFIRMED" },
+            { id: "r3", createdAt: new Date().toISOString(), reservationDate: new Date(Date.now() + 3 * 86400000).toISOString(), circuito: "C", tipoVisitante: "PARTICULAR", nombre: "Luis", personas: 2, status: "CANCELLED" },
+        ];
+        let filtered = status === "ALL" ? base : base.filter(r => r.status === status);
+        if (date) {
+            filtered = filtered.filter(r => r.reservationDate === date);
+        }
+        return filtered;
+    }
 
+    // Construir query params
+    const params = new URLSearchParams();
+    if (status && status !== "ALL") {
+        params.append("status", status);
+    }
+    if (date) {
+        console.log("Buscando reservas para la fecha:", date);
+        params.append("date", date);
+    }
+    const qs = params.toString() ? `?${params.toString()}` : "";
 
-// Obtiene el estado del mes desde el endpoint público /api/availability?month=YYYY-MM
-export async function getCalendarState(year: number, month: number): Promise<CalendarMonthState> {
-    const mm = String(month).padStart(2, "0");
-    const res = await fetch(`/api/admin/availability-proxy?month=${year}-${mm}`, { cache: "no-store" });
-    // ↑ Si ya tenés un proxy directo, usalo. Si no, podés llamar a NEXT_PUBLIC_API_URL + /api/availability
-    if (!res.ok) throw new Error("No se pudo cargar el mes");
+    console.log("Petición al backend:", `${API_URL}/api/admin/reservations${qs}`);
 
-    // respuesta del back (ejemplo)
-    type AvailabilityDTO = { availableDate: string; totalCapacity: number | null; remainingCapacity: number | null; };
-    const data: AvailabilityDTO[] = await res.json();
-
-    // Día se considera "deshabilitado" si totalCapacity === 0
-    const disabledDays = data.filter(d => (d.totalCapacity ?? 0) <= 0).map(d => d.availableDate);
-
-    return { year, month, disabled: false, disabledDays } as const;
-}
-
-// Upsert real: PUT /api/admin/availability/{date}  con { capacity }
-export async function upsertDayCapacity(dateISO: string, capacity: number) {
-    const res = await fetch(`/api/admin/availability/${dateISO}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ capacity }),
+    const res = await fetch(`${API_URL}/api/admin/reservations${qs}`, {
+        cache: "no-store",
+        headers: getAuthHeaders()
     });
-    if (!res.ok) throw new Error("No se pudo guardar la capacidad");
+    const backendData = await handle<BackendReservation[]>(res);
+
+    console.log(`Reservas recibidas del backend: ${backendData.length}`, backendData.map(r => r.visitDate));
+
+    // Mapear del formato backend al formato frontend
+    return backendData.map(r => ({
+        id: r.id,
+        createdAt: r.createdAt,
+        reservationDate: r.visitDate,
+        circuito: r.circuit,
+        tipoVisitante: r.visitorType === "EDUCATIONAL_INSTITUTION" ? "INSTITUCION_EDUCATIVA" as const : "PARTICULAR" as const,
+        nombre: r.firstName,
+        apellido: r.lastName,
+        telefono: r.phone,
+        correo: r.email,
+        personas: r.adults18Plus + r.children2To17 + r.babiesLessThan2,
+        status: r.status as "PENDING" | "CONFIRMED" | "CANCELLED"
+    }));
 }
 
-export async function downloadCsv(params: { date: string; status?: "PENDING" | "CONFIRMED" | "CANCELLED"; visitorType?: "INDIVIDUAL" | "EDUCATIONAL_INSTITUTION"; mask?: boolean }) {
-    const qs = new URLSearchParams({ date: params.date });
-    if (params.status) qs.set("status", params.status);
-    if (params.visitorType) qs.set("visitorType", params.visitorType);
-    if (params.mask) qs.set("mask", "true");
-
-    const res = await fetch(`/api/admin/reservations/export?${qs}`, { cache: "no-store" });
-    if (!res.ok) throw new Error("No se pudo exportar CSV");
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `reservas_${params.date}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-function todayISO(): string {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-}
-
-/** Resumen para el dashboard: totales, hoy, pendientes */
-export async function getAdminSummary(): Promise<{ total: number; today: number; pending: number }> {
-    const tISO = todayISO();
-
-    const [allRes, todayRes, pendingRes] = await Promise.all([
-        fetch(absolute(`/api/admin/reservations`), { cache: "no-store" }),
-        fetch(absolute(`/api/admin/reservations?date=${tISO}`), { cache: "no-store" }),
-        fetch(absolute(`/api/admin/reservations?status=PENDING`), { cache: "no-store" }),
-    ]);
-
-    const all = await ok<BackendReservationDTO[]>(allRes);
-    const today = await ok<BackendReservationDTO[]>(todayRes);
-    const pending = await ok<BackendReservationDTO[]>(pendingRes);
-
-    return { total: all.length, today: today.length, pending: pending.length };
-}
-
-/** Últimas N reservas ordenadas por creación (o visita si no viniera createdAt) */
-export async function fetchRecentReservations(limit = 10) {
-    const res = await fetch(absolute(`/api/admin/reservations`), { cache: "no-store" });
-    const list = await ok<BackendReservationDTO[]>(res);
-    const mapped = list.map(mapReservation);
-
-    mapped.sort((a, b) => {
-        const aKey = a.createdAt ?? a.reservationDate;
-        const bKey = b.createdAt ?? b.reservationDate;
-        return (bKey || "").localeCompare(aKey || "");
+export async function confirmReservation(id: string): Promise<void> {
+    if (MOCK) { await new Promise(r => setTimeout(r, 200)); return; }
+    const res = await fetch(`${API_URL}/api/admin/reservations/${id}/confirm`, {
+        method: "POST",
+        headers: getAuthHeaders()
     });
+    if (!res.ok) {
+        let msg = "Error confirmando reserva";
+        try { const j = await res.json(); if (j?.message) msg = j.message; } catch { }
+        throw new Error(msg);
+    }
+}
 
-    return mapped.slice(0, limit);
+export async function cancelReservation(id: string): Promise<void> {
+    if (MOCK) { await new Promise(r => setTimeout(r, 200)); return; }
+    const res = await fetch(`${API_URL}/api/admin/reservations/${id}/cancel`, {
+        method: "POST",
+        headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+        let msg = "Error cancelando reserva";
+        try { const j = await res.json(); if (j?.message) msg = j.message; } catch { }
+        throw new Error(msg);
+    }
 }
 
 // ==== Crear evento (tipo y función) ====
@@ -166,10 +167,17 @@ export type CreateEventInput = {
     notas?: string;
 };
 
-// Normalizador de fecha (solo parte de YYYY-MM-DD)
-function toDateOnlyISO(iso: string): string {
-    // si viene "2025-10-16T14:00:00Z" -> "2025-10-16"
-    return iso.slice(0, 10);
+export async function createEventReservation(input: CreateEventInput): Promise<{ id: string }> {
+    if (MOCK) {
+        await new Promise(r => setTimeout(r, 500));
+        return { id: "evt_" + Math.random().toString(36).slice(2, 8) };
+    }
+    const res = await fetch(`${API_URL}/api/admin/eventos`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(input),
+    });
+    return handle(res);
 }
 
 /**

@@ -67,12 +67,18 @@ export default function ListadoStep({
           placeholder="Nombre y apellido"
           className={inputBase}
           disabled={!canAddMore}
+          maxLength={120}
         />
         <input
-          {...register("tmpDni")}
-          placeholder="DNI"
+          {...register("tmpDni", {
+            setValueAs: v => String(v ?? "").replace(/\D+/g, "").slice(0, 8),
+          })}
+          placeholder="DNI (8 dígitos)"
           className={inputBase}
           disabled={!canAddMore}
+          inputMode="numeric"
+          pattern="^[0-9]{8}$"
+          maxLength={8}
         />
          <div className="flex justify-end">
         <button
@@ -98,7 +104,13 @@ export default function ListadoStep({
           Agregar
         </button>
         </div>
-        {!canAddMore && (
+        {!canAddMore && totalEsperado === 0 && tipo === "PARTICULAR" && (
+          <p className="text-xs text-white/70 mt-2">
+            No necesitás cargar acompañantes porque reservaste para 1 persona (vos mismo).
+            Si querés agregar acompañantes, volvé al paso anterior y aumentá el número de Adultos/Niños/Bebés.
+          </p>
+        )}
+        {!canAddMore && totalEsperado > 0 && (
           <p className="text-xs text-white/70 mt-2">
             Ya cargaste el total esperado ({totalEsperado}). Para agregar más,
             aumentá Adultos/Niños/Bebés en el paso anterior.
@@ -167,11 +179,15 @@ export default function ListadoStep({
                     {editing ? (
                       <input
                         className={inputBase}
-                        placeholder="DNI"
+                        placeholder="DNI (8 dígitos)"
                         value={dni}
-                        onChange={(e) =>
-                          setValue(`personas.${i}.dni`, e.target.value, { shouldDirty: true })
-                        }
+                        onChange={(e) => {
+                          const cleaned = e.target.value.replace(/\D+/g, "").slice(0, 8);
+                          setValue(`personas.${i}.dni`, cleaned, { shouldDirty: true });
+                        }}
+                        inputMode="numeric"
+                        pattern="^[0-9]{8}$"
+                        maxLength={8}
                       />
                     ) : (
                       dni
