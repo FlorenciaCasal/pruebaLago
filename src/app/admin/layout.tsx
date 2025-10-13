@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 import React from "react";
 import Link from "next/link";
-import { getUser } from "@/services/auth";
+// import { getUser } from "@/services/auth";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     // const user = getUser();
