@@ -19,8 +19,9 @@ const TABS: { key: AdminStatus; label: string }[] = [
   { key: "CONFIRMED", label: "Confirmadas" },
   { key: "CANCELLED", label: "Canceladas" },
 ];
-const fmtDT = (iso: string) =>
-  new Date(iso).toLocaleString(undefined, { hour12: false });
+
+// const fmtDT = (iso: string) =>
+//   new Date(iso).toLocaleString(undefined, { hour12: false });
 
 export default function ReservasPage() {
   const [status, setStatus] = React.useState<AdminStatus>("ALL");

@@ -31,7 +31,7 @@ const schema = yup
 export default function LoginPage() {
   const [showPwd, setShowPwd] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const router = useRouter();
+  // const router = useRouter();
 
   const {
     register,
