@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { createEventReservation, type CreateEventInput } from "../../../services/admin";
+import { createEventReservation, type CreateEventInput, localInputToUtcZ, utcZToLocalInput } from "../../../services/admin";
 
 function getErrorMessage(err: unknown): string {
     if (err instanceof Error) return err.message;
@@ -26,6 +26,7 @@ export default function AgregarEventoPage() {
         setSubmitting(true);
         setResultId(null);
         try {
+            if (!form.fechaISO) throw new Error("Seleccioná fecha y hora");
             const res = await createEventReservation(form);
             setResultId(res.id);
             setForm({ titulo: "", fechaISO: "", circuito: "", cupo: undefined, notas: "" });
@@ -53,11 +54,15 @@ export default function AgregarEventoPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label className="block text-sm text-neutral-300 mb-1">Fecha y hora (ISO)</label>
+                        <label className="block text-sm text-neutral-300 mb-1">Fecha y hora</label>
                         <input
                             type="datetime-local"
-                            value={form.fechaISO ? new Date(form.fechaISO).toISOString().slice(0, 16) : ""}
-                            onChange={e => setForm(v => ({ ...v, fechaISO: new Date(e.target.value).toISOString() }))}
+                            // value={form.fechaISO ? new Date(form.fechaISO).toISOString().slice(0, 16) : ""}
+                            value={utcZToLocalInput(form.fechaISO)}                                        // mostrar en local
+                            // onChange={e => setForm(v => ({ ...v, fechaISO: new Date(e.target.value).toISOString() }))}
+                            onChange={e =>
+                                setForm(v => ({ ...v, fechaISO: localInputToUtcZ(e.target.value) }))        // guardar en UTC Z
+                            }
                             className="w-full rounded-lg bg-neutral-900 border border-neutral-700 px-3 py-2"
                             required
                         />

@@ -1,38 +1,17 @@
-"use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+// src/components/Navbar.tsx
+import NavbarClient from "./NavbarClient";
+import { cookies } from "next/headers";
 
-export default function Navbar() {
-  const pathname = usePathname();
-  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
-  return (
-    <nav style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      padding: "1rem 2rem",
-      backgroundColor: "#1a1a1a",
-      color: "white"
-    }}>
-      {/* Logo o título */}
-      <div style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-        Reserva Natural Lago Escondido
-      </div>
+export default async function Navbar() {
+    const cookieStore = await cookies();           // 👈 await
+    const isLogged = !!cookieStore.get("auth_token");
+    // const isAdmin = cookieStore.get("admin_perm")?.value === "1"; // ← cookie que setea el login
+    const adminCookie = cookieStore.get("admin_perm")?.value;
+    const isAdmin = adminCookie === "1";
 
-      {/* Links */}
-      <div style={{ display: "flex", gap: "1rem" }}>
-        <Link href="/" style={{ color: "white", textDecoration: "none" }}>
-          Home
-        </Link>
-        {isAdminRoute && (
-          <Link href="/admin" style={{ color: "white", textDecoration: "none" }}>
-            Panel de Administración
-          </Link>
-        )}
-        <Link href="/login" style={{ color: "white", textDecoration: "none" }}>
-          Ingresar
-        </Link>
-      </div>
-    </nav>
-  );
+    // (Opcional para depurar)
+    console.log("[Navbar]", { isLogged, adminCookie, all: cookieStore.getAll().map(c => c.name) });
+
+    return <NavbarClient isLogged={isLogged} isAdmin={isAdmin} />;
 }
+

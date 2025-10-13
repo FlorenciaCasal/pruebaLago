@@ -56,7 +56,7 @@ export default function RegisterForm({
         setValue,
         adultos,
         ninos,
-        bebes,
+        bebes, totalPersonas,
         control,
         validateConociste,
         reset,
@@ -94,10 +94,10 @@ export default function RegisterForm({
     // 5) cuando cambia el tipo, volvemos al paso 0 (esto ya lo tenías)
     useEffect(() => { setCurrentStep(0); }, [tipo]);
 
-    const totalWizard = (adultos ?? 0) + (ninos ?? 0) + (bebes ?? 0);
+    // const totalWizard = (adultos ?? 0) + (ninos ?? 0) + (bebes ?? 0);
     const totalEsperado = tipo === "INSTITUCION_EDUCATIVA"
-        ? totalWizard
-        : Math.max(0, totalWizard - 1);
+        ? totalPersonas
+        : Math.max(0, totalPersonas - 1);
 
     type StepType = "contacto" | "institucion" | "listado" | "salud" | "conociste" | "submit";
 
@@ -112,14 +112,17 @@ export default function RegisterForm({
                 { label: "Revisión y envío", type: "submit" as const },
             ] as const;
         }
+        // PARTICULAR
         return [
             { label: "Datos de la persona que hace la reserva", type: "contacto" as const },
-            { label: "Acompañantes", type: "listado" as const },
+            // 👇 omitimos “listado” cuando no corresponde
+            //  { label: "Acompañantes", type: "listado" as const },
+            ...(totalEsperado === 0 ? [] : [{ label: "Acompañantes", type: "listado" as const }]),
             { label: "Datos de salud o movilidad", type: "salud" as const },
             { label: "Encuesta rápida", type: "conociste" as const },
             { label: "Revisión y envío", type: "submit" as const },
         ] as const;
-    }, [tipo]);
+    }, [tipo, totalEsperado]);
 
     // Validaciones (idénticas a tu versión)
     const validateContacto = () => {
@@ -362,7 +365,7 @@ export default function RegisterForm({
 
             await submitReservation({
                 ...data,
-                totalPersonas: totalWizard,
+                totalPersonas,
                 reservationDate: data.fechaISO!,
             });
 
@@ -421,7 +424,7 @@ export default function RegisterForm({
                                 register={register}
                                 watch={watch}
                                 setValue={setValue}
-                                totalPersonas={(adultos ?? 0) + (ninos ?? 0) + (bebes ?? 0)}
+                                totalPersonas={totalPersonas}
                                 uxError={uxError}
                             />
                         )}

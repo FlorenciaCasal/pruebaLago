@@ -8,8 +8,8 @@ function StatusBadge({ s }: { s: "PENDING" | "CONFIRMED" | "CANCELLED" }) {
     s === "CONFIRMED"
       ? "bg-green-900/30 text-green-300 border-green-700/60"
       : s === "CANCELLED"
-      ? "bg-red-900/30 text-red-300 border-red-700/60"
-      : "bg-yellow-900/30 text-yellow-300 border-yellow-700/60";
+        ? "bg-red-900/30 text-red-300 border-red-700/60"
+        : "bg-yellow-900/30 text-yellow-300 border-yellow-700/60";
   return (
     <span className={`px-2 py-0.5 text-xs rounded-full border ${cls}`}>
       {s === "PENDING" ? "Pendiente" : s === "CONFIRMED" ? "Confirmada" : "Cancelada"}
@@ -37,7 +37,7 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
           <div className="text-neutral-400 text-sm">Visitas Totales</div>
-          <div className="text-3xl font-semibold mt-1">{summary.total}</div>
+          <div className="text-3xl font-semibold mt-1">{summary.all}</div>
         </div>
         <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
           <div className="text-neutral-400 text-sm">Visitas de Hoy</div>
@@ -85,6 +85,8 @@ export default async function AdminDashboard() {
                   <td className="px-4 py-2">{fmt(r.createdAt)}</td>
                   <td className="px-4 py-2">{r.personas}</td>
                   <td className="px-4 py-2"><StatusBadge s={r.status} /></td>
+
+                  {/* Aca deberiamos traer todos los datos, alergias, movilidad reducida, comentarios, o hacer una nueva page a la cual ir cuando clickeamos en ver/detalle
                   <td className="px-4 py-2">
                     <Link
                       href="/admin/reservas"
@@ -92,7 +94,8 @@ export default async function AdminDashboard() {
                     >
                       Ver
                     </Link>
-                  </td>
+                  </td> */}
+
                 </tr>
               ))}
               {recent.length === 0 && (

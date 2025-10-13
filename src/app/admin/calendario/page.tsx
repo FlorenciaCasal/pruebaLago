@@ -190,28 +190,28 @@ import React from "react";
 import { getCalendarState, setDayEnabled, setMonthEnabled, fetchReservations } from "@/services/admin";
 import type { CalendarMonthState, AdminReservation } from "@/types/admin";
 
-const DEFAULT_CAPACITY =
-  Number(process.env.NEXT_PUBLIC_DEFAULT_CAPACITY ?? 30); // mismo que app.defaultCapacity
+// const DEFAULT_CAPACITY =
+//   Number(process.env.NEXT_PUBLIC_DEFAULT_CAPACITY ?? 30); // mismo que app.defaultCapacity
 
 function ym(d: Date) {
-  return { y: d.getFullYear(), m: d.getMonth() + 1 };
+    return { y: d.getFullYear(), m: d.getMonth() + 1 };
 }
 
 function getErrorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message;
-  try { const j = err as { message?: string }; if (j?.message) return j.message; } catch {}
-  return "Ocurrió un error";
+    if (err instanceof Error) return err.message;
+    try { const j = err as { message?: string }; if (j?.message) return j.message; } catch { }
+    return "Ocurrió un error";
 }
 
-function allDateISOsOfMonth(y: number, m: number): string[] {
-  const last = new Date(y, m, 0).getDate();
-  const mm = String(m).padStart(2, "0");
-  const out: string[] = [];
-  for (let d = 1; d <= last; d++) {
-    out.push(`${y}-${mm}-${String(d).padStart(2, "0")}`);
-  }
-  return out;
-}
+// function allDateISOsOfMonth(y: number, m: number): string[] {
+//     const last = new Date(y, m, 0).getDate();
+//     const mm = String(m).padStart(2, "0");
+//     const out: string[] = [];
+//     for (let d = 1; d <= last; d++) {
+//         out.push(`${y}-${mm}-${String(d).padStart(2, "0")}`);
+//     }
+//     return out;
+// }
 
 export default function CalendarioAdminPage() {
     const today = new Date();
@@ -267,12 +267,32 @@ export default function CalendarioAdminPage() {
         }
     };
 
+    const allDateISOsOfMonth = (yy: number, mm: number) => {
+        const last = new Date(yy, mm, 0).getDate(); // mm 1..12
+        const pad = (n: number) => String(n).padStart(2, "0");
+        const arr: string[] = [];
+        for (let d = 1; d <= last; d++) arr.push(`${yy}-${pad(mm)}-${pad(d)}`);
+        return arr;
+    };
+
     const toggleMonth = async (): Promise<void> => {
         if (!state) return;
         setBusy(true);
         try {
             await setMonthEnabled(state.year, state.month, state.disabled);
-            setState(prev => (prev ? { ...prev, disabled: !prev.disabled } : prev));
+            const allDays = allDateISOsOfMonth(state.year, state.month);
+
+            setState(prev =>
+                prev
+                    ? {
+                        ...prev,
+                        // si antes estaba habilitado -> ahora deshabilitado (llenamos todos)
+                        // si antes estaba deshabilitado -> ahora habilitado (vaciamos todos)
+                        disabled: !prev.disabled,
+                        disabledDays: prev.disabled ? [] : allDays,
+                    }
+                    : prev
+            );
         } catch (e: unknown) {
             alert(getErrorMessage(e));
         } finally {
@@ -370,7 +390,7 @@ export default function CalendarioAdminPage() {
                     </div>
 
                     <div className="grid grid-cols-7 gap-2 rounded-2xl border border-neutral-800 p-4 bg-neutral-950">
-                        {["Do","Lu","Ma","Mi","Ju","Vi","Sa"].map(h => (
+                        {["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"].map(h => (
                             <div key={h} className="text-center text-neutral-400 text-xs">
                                 {h}
                             </div>
@@ -378,7 +398,7 @@ export default function CalendarioAdminPage() {
                         {buildDays.map((d, i) => {
                             if (!d) return <div key={i} />;
                             const dateISO = d.toISOString().slice(0, 10);
-                            const disabled = state.disabled || state.disabledDays.includes(dateISO);
+                            const disabled = state.disabledDays.includes(dateISO);
                             const reservationCount = getReservationsForDay(dateISO);
                             const isSelected = selectedDay === dateISO;
                             return (
@@ -401,8 +421,8 @@ export default function CalendarioAdminPage() {
                                         (isSelected
                                             ? "border-blue-500 bg-blue-900/40 text-blue-100 ring-2 ring-blue-500"
                                             : disabled
-                                            ? "border-red-900 bg-red-950/40 text-red-300"
-                                            : "border-neutral-800 bg-neutral-900 text-neutral-100")
+                                                ? "border-red-900 bg-red-950/40 text-red-300"
+                                                : "border-neutral-800 bg-neutral-900 text-neutral-100")
                                     }
                                     title={`${dateISO} - ${reservationCount} reserva${reservationCount !== 1 ? 's' : ''} confirmada${reservationCount !== 1 ? 's' : ''}\nClick izquierdo: ${reservationCount > 0 ? 'Ver reservas' : 'Habilitar/Deshabilitar'}\nClick derecho: Habilitar/Deshabilitar`}
                                 >
@@ -472,9 +492,7 @@ export default function CalendarioAdminPage() {
                 </div>
             )}
         </div>
-      )}
-    </div>
-  );
+    )
 }
 
 

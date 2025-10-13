@@ -28,21 +28,25 @@ export type ReservationFormData = {
   responsableApellido?: string;
   responsableDni?: string;
   tmpNombreApe?: string;
-  tmpDni?: string;
+  tmpDni?: string;reservationDate?: string;  // opcional, derivada de fechaISO
+  totalPersonas?: number;    // opcional, adultos+ninos+bebes
 };
 
+
+// Tipo de respuesta del backend
 export type BackendReservationDTO = {
   id: string;
-  createdAt?: string;     // algunos endpoints te lo dan así
-  created_at?: string;    // otros con snake_case
-  visitDate?: string;
-  visit_date?: string;
-  circuit: "A" | "B" | "C" | "D";
-  visitorType: "INDIVIDUAL" | "EDUCATIONAL_INSTITUTION";
-  institutionName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  adults14Plus?: number | null;
-  minors?: number | null;
-  status: "PENDING" | "CONFIRMED" | "CANCELLED";
+  visitDate: string;
+  firstName: string;
+  lastName: string;
+  adults18Plus: number;
+  children2To17: number;
+  babiesLessThan2: number;
+  email: string;
+  phone: string;
+  circuit: string;
+  visitorType: string;
+  originLocation: string;
+  status: string;
+  createdAt: string;
 };

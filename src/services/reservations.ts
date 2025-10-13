@@ -33,51 +33,56 @@ export async function submitReservation(data: ReservationFormData): Promise<{ id
   const email = (isSchool ? data.institucionEmail : data.correo)?.trim() ?? "";
 
   // Front -> Backend (CreateReservationRequest)
-  const payload = {
+  // const payload = {
+  //   visitDate: data.fechaISO,                 // YYYY-MM-DD
+  //   firstName,
+  //   lastName,
+  //   dni,
+  //   phone,
+  //   email,
+
+  //   circuit: "A",                                     // mientras no elijas circuitos en el UI
+  //   visitorType: mapVisitorType(data.tipoVisitante),
+
+  //   institutionName: isSchool ? (data.institucion ?? null) : null,
+  //   institutionStudents: isSchool ? (adultos + ninos + bebes) : null,
+
+  //   adults14Plus: adultos,
+  //   minors: ninos + bebes,
+  //   reducedMobility: Number(data.movilidadReducida ?? 0),
+  //   allergies: (data.alergias ?? "no") === "si",
+
+  //   comment: data.comentarios ?? "—",
+  //   originLocation,
+  //   howHeard: mapHowHeard(data.comoNosConociste),
+  //   acceptedPolicies: !!data.aceptaReglas,
+  // };
+
+  // Mapear datos del frontend al formato del backend
+  const backendData = {
+    // visitDate: data.reservationDate,
+    // firstName: data.nombre || "",
+    // lastName: data.apellido || "",
     visitDate: data.fechaISO,                 // YYYY-MM-DD
     firstName,
     lastName,
     dni,
     phone,
     email,
-
-    circuit: "A",                                     // mientras no elijas circuitos en el UI
+    circuit: "A", // Por defecto circuito A
     visitorType: mapVisitorType(data.tipoVisitante),
-
+    // institutionName: data.institucion || null,
+    // institutionStudents: data.tipoVisitante === "INSTITUCION_EDUCATIVA" ? (data.adultos + data.ninos + data.bebes) : null,
     institutionName: isSchool ? (data.institucion ?? null) : null,
     institutionStudents: isSchool ? (adultos + ninos + bebes) : null,
-
-    adults14Plus: adultos,
-    minors: ninos + bebes,
-    reducedMobility: Number(data.movilidadReducida ?? 0),
-    allergies: (data.alergias ?? "no") === "si",
-
-    comment: data.comentarios ?? "—",
-    originLocation,
-    howHeard: mapHowHeard(data.comoNosConociste),
-    acceptedPolicies: !!data.aceptaReglas,
-  };
-
-  // Mapear datos del frontend al formato del backend
-  const backendData = {
-    visitDate: data.reservationDate,
-    firstName: data.nombre || "",
-    lastName: data.apellido || "",
-    dni: data.dni || "",
-    phone: data.telefono || "",
-    email: data.correo || "",
-    circuit: "A" as const, // Por defecto circuito A
-    visitorType: data.tipoVisitante === "INSTITUCION_EDUCATIVA" ? "EDUCATIONAL_INSTITUTION" : "INDIVIDUAL",
-    institutionName: data.institucion || null,
-    institutionStudents: data.tipoVisitante === "INSTITUCION_EDUCATIVA" ? (data.adultos + data.ninos + data.bebes) : null,
     adults18Plus: data.adultos,
     children2To17: data.ninos,
     babiesLessThan2: data.bebes,
     reducedMobility: data.movilidadReducida || 0,
     allergies: data.alergias === "si" ? 1 : 0,
     comment: data.comentarios || "",
-    originLocation: data.origenVisita || "",
-    howHeard: mapComoNosConociste(data.comoNosConociste),
+    originLocation,
+    howHeard: mapHowHeard(data.comoNosConociste),
     acceptedPolicies: data.aceptaReglas
   };
 
@@ -106,13 +111,13 @@ export async function getReservation(id: string) {
 }
 
 // Función para mapear ComoNosConociste al enum del backend
-function mapComoNosConociste(como?: string): string {
-  const mapping: Record<string, string> = {
-    "redes": "SOCIAL",
-    "recomendacion": "RECOMMENDATION", 
-    "sitio": "WEBSITE",
-    "publicidad": "ADS",
-    "otro": "OTHER"
-  };
-  return mapping[como || ""] || "OTHER";
-}
+// function mapComoNosConociste(como?: string): string {
+//   const mapping: Record<string, string> = {
+//     "redes": "SOCIAL",
+//     "recomendacion": "RECOMMENDATION",
+//     "sitio": "WEBSITE",
+//     "publicidad": "ADS",
+//     "otro": "OTHER"
+//   };
+//   return mapping[como || ""] || "OTHER";
+// }

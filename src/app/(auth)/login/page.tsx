@@ -5,17 +5,13 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { login, saveAuth } from "@/services/auth";
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Página de Login (Next.js App Router) – estilo oscuro + Tailwind
-// Ruta sugerida: app/(auth)/login/page.tsx
-// ──────────────────────────────────────────────────────────────────────────────
+
 
 type FormValues = {
   email: string;
   password: string;
-//   remember?: boolean;
+  //   remember?: boolean;
 };
 
 const schema = yup
@@ -36,7 +32,7 @@ export default function LoginPage() {
   const [showPwd, setShowPwd] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
-  
+
   const {
     register,
     handleSubmit,
@@ -46,17 +42,28 @@ export default function LoginPage() {
   const onSubmit = async (data: FormValues) => {
     try {
       setErrorMsg("");
-      // Llamar al servicio de login
-      const response = await login({
-        email: data.email,
-        password: data.password,
+      const resp = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, password: data.password }),
+        credentials: "include",
       });
+      if (!resp.ok) {
+        const e = await resp.json().catch(() => ({}));
+        throw new Error(e.message || "Credenciales inválidas");
+      }
+      // // cookie quedó seteada por el route; listo
+      // router.push("/admin");
+      if (resp.redirected) {
+        // server devolvió 303 → seguí esa URL
+        window.location.href = resp.url;
+        return;
+      }
 
-      // Guardar autenticación
-      saveAuth(response);
-
-      // Redirigir al admin
-      router.push("/admin");
+      // Fallback (si por algo no vino redirect)
+      const rawNext = new URLSearchParams(window.location.search).get("next") || "/admin";
+      const next = rawNext.startsWith("/") ? rawNext : `/${rawNext}`;  // 👈
+      window.location.replace(next);
     } catch (error) {
       console.error("Error en login:", error);
       setErrorMsg(error instanceof Error ? error.message : "Error al iniciar sesión");
@@ -114,8 +121,10 @@ export default function LoginPage() {
                 </label>
                 <button
                   type="button"
+                  tabIndex={-1}                    // ← fuera del orden de TAB
+                  onMouseDown={(e) => e.preventDefault()} // ← no roba foco al clickear
                   onClick={() => setShowPwd((v) => !v)}
-                  className="text-xs text-neutral-400 hover:text-neutral-200"
+                  className="text-xs text-neutral-400 hover:text-neutral-200 select-none"
                   aria-label={showPwd ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPwd ? "Ocultar" : "Mostrar"}

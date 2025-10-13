@@ -104,12 +104,12 @@ export default function ListadoStep({
           Agregar
         </button>
         </div>
-        {!canAddMore && totalEsperado === 0 && tipo === "PARTICULAR" && (
+        {/* {!canAddMore && totalEsperado === 0 && tipo === "PARTICULAR" && (
           <p className="text-xs text-white/70 mt-2">
             No necesitás cargar acompañantes porque reservaste para 1 persona (vos mismo).
             Si querés agregar acompañantes, volvé al paso anterior y aumentá el número de Adultos/Niños/Bebés.
           </p>
-        )}
+        )} */}
         {!canAddMore && totalEsperado > 0 && (
           <p className="text-xs text-white/70 mt-2">
             Ya cargaste el total esperado ({totalEsperado}). Para agregar más,

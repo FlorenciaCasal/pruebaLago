@@ -7,7 +7,7 @@ export type DayDTO = {
 
 export async function getDisabledDays(year: number, month: number): Promise<Set<string>> {
   const mm = String(month).padStart(2, "0");
-  const res = await fetch(`/api/admin/availability-proxy?month=${year}-${mm}`, { cache: "no-store" });
+  const res = await fetch(`/api/availability-proxy?month=${year}-${mm}`, { cache: "no-store" });
   if (!res.ok) throw new Error("No se pudo cargar disponibilidad");
   const data: DayDTO[] = await res.json();
 

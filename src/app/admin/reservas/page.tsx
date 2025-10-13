@@ -23,7 +23,7 @@ const fmtDT = (iso: string) =>
   new Date(iso).toLocaleString(undefined, { hour12: false });
 
 export default function ReservasPage() {
-  const [status, setStatus] = React.useState<AdminStatus>("PENDING");
+  const [status, setStatus] = React.useState<AdminStatus>("ALL");
   const [data, setData] = React.useState<AdminReservation[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [actionId, setActionId] = React.useState<string | null>(null);
@@ -206,16 +206,19 @@ export default function ReservasPage() {
                 <th className="text-right">Acciones</th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-neutral-800">
               {data.map(r => (
                 <tr key={r.id} className="[&>td]:px-4 [&>td]:py-3">
-                  <td>{new Date(r.reservationDate + 'T00:00:00').toLocaleDateString('es-AR')}</td>
+                  <td>{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</td>
                   <td>{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
                   <td>{r.personas ?? "-"}</td>
                   <td>{r.tipoVisitante ?? "-"}</td>
                   <td>{r.circuito ?? "-"}</td>
                   <td>{r.status}</td>
-                  <td className="text-neutral-400">{new Date(r.createdAt).toLocaleString()}</td>
+                  <td className="text-neutral-400">
+                    {new Date(r.createdAt).toLocaleString(undefined, { hour12: false })}
+                  </td>
                   <td className="text-right space-x-2">
                     {r.status !== "CONFIRMED" && r.status !== "CANCELLED" && (
                       <button
@@ -237,46 +240,11 @@ export default function ReservasPage() {
                     )}
                   </td>
                 </tr>
-              </thead>
-
-              <tbody className="divide-y divide-neutral-800">
-                {data.map(r => (
-                  <tr key={r.id} className="[&>td]:px-2 md:[&>td]:px-3 [&>td]:py-2">
-                    <td className="whitespace-nowrap">{new Date(r.reservationDate).toLocaleString(undefined, { hour12: false })}</td>
-                    <td className="truncate">{r.nombre || "-"}</td>
-                    <td className="whitespace-nowrap">{r.personas ?? "-"}</td>
-                    <td className="truncate">{r.tipoVisitante ?? "-"}</td>
-                    <td className="hidden xl:table-cell whitespace-nowrap">{r.circuito ?? "-"}</td>
-                    <td className="whitespace-nowrap">{r.status}</td>
-                    <td className="hidden xl:table-cell whitespace-nowrap text-neutral-400">
-                      {new Date(r.createdAt).toLocaleString(undefined, { hour12: false })}
-                    </td>
-                    <td className="text-right">
-                      <div className="inline-flex items-center justify-end gap-2 whitespace-nowrap">
-                        <button
-                          onClick={() => onConfirm(r.id)}
-                          disabled={actionId === r.id}
-                          className="rounded-lg bg-green-600/90 px-3 py-1.5 text-white hover:bg-green-600 disabled:opacity-60"
-                        >
-                          {actionId === r.id ? "..." : "Confirmar"}
-                        </button>
-                        <button
-                          onClick={() => onCancel(r.id)}
-                          disabled={actionId === r.id}
-                          className="rounded-lg bg-red-600/90 px-3 py-1.5 text-white hover:bg-red-600 disabled:opacity-60"
-                        >
-                          {actionId === r.id ? "..." : "Cancelar"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
 }
-
