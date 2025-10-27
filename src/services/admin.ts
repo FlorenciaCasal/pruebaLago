@@ -284,3 +284,40 @@ export async function createEventReservation(
     }
     return res.json();
 }
+
+
+export type BookingFlags = { individualEnabled: boolean; schoolEnabled: boolean };
+
+// PÚBLICO (sitio)
+export async function getPublicBookingFlags(): Promise<BookingFlags> {
+    const r = await fetch("/api/booking-flags", { cache: "no-store" });
+    if (!r.ok) throw new Error("No se pudo leer flags");
+    // const j = await r.json(); // { enabled: boolean }
+    // return {
+    //     individualEnabled: true,    // hoy siempre habilitado (no hay endpoint)
+    //     schoolEnabled: !!j.enabled, // mapeo desde el back
+    // };
+    return r.json();
+}
+
+
+// ADMIN (panel)
+export async function getAdminBookingFlags(): Promise<BookingFlags> {
+    const r = await fetch("/api/admin/booking-flags", { cache: "no-store" });
+    if (!r.ok) throw new Error("No se pudo leer flags (admin)");
+    const j = await r.json(); // { enabled: boolean }
+    return {
+        individualEnabled: true,
+        schoolEnabled: !!j.enabled,
+    };
+}
+
+export async function setAdminBookingFlags(f: BookingFlags): Promise<void> {
+    // ⚠️ el back espera { enabled: boolean }
+    const r = await fetch("/api/admin/booking-flags", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !!f.schoolEnabled }),
+    });
+    if (!r.ok) throw new Error("No se pudo guardar flags");
+}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CalendarPicker from "@/components/CalendarPicker";
@@ -11,10 +11,10 @@ import { schema, type WizardStepData } from "./schema";
 // import { CIRCUITS } from "./constants";
 import { formatVisitorsFromForm } from "./utils";
 // import type { CircuitoKey } from "../../types/reservation"
+import { getPublicBookingFlags, type BookingFlags } from "@/services/admin";
+import { useToast } from "@/components/ui/Toast";
 
 
-// 🚦 disponibilidad actual (cámbialo a false cuando vuelvan los cupos)
-const SCHOOL_BOOKINGS_BLOCKED = false;
 
 // ⭐ Payload legacy que tu page.tsx necesita
 type LegacyOnCompletePayload = {
@@ -45,6 +45,16 @@ export default function ReservationWizard({
   });
 
   const [open, setOpen] = useState<Panel>(null);
+  const [flags, setFlags] = useState<BookingFlags | null>(null);
+  const toast = useToast();
+  const { resetField, /* ... */ } = useForm<WizardStepData>({ /* ... */ });
+
+  // cargar flags del backend
+  useEffect(() => {
+    getPublicBookingFlags()
+      .then(setFlags)
+      .catch(() => setFlags({ individualEnabled: true, schoolEnabled: true })); // fallback permisivo
+  }, []);
 
   const tipoVisitante = watch("tipoVisitante");
   // const circuito = watch("circuito");           // CircuitoKey | string
@@ -52,10 +62,31 @@ export default function ReservationWizard({
   const adultos = watch("adultos");
   const ninos = watch("ninos");
   const bebes = watch("bebes");
+  const loadingFlags = flags === null;
+  const schoolOff = flags ? !flags.schoolEnabled : true;
   const isSchool = tipoVisitante === "INSTITUCION_EDUCATIVA";
-  const isSchoolSoldOut = isSchool && SCHOOL_BOOKINGS_BLOCKED;
+  const isSchoolSoldOut = isSchool && schoolOff;
   // válido si hay al menos 1 adulto (misma regla que Yup)
   const visitorsValid = adultos >= 1;
+
+  // Bloqueo provisorio si aún no cargaron flags y el usuario marcó escuela
+  useEffect(() => {
+    if (!flags && tipoVisitante === "INSTITUCION_EDUCATIVA") {
+      resetField("tipoVisitante");
+      resetField("fechaISO");
+      toast(" En este momento no tenemos disponibilidad para instituciones educativas.")
+    }
+  }, [flags, tipoVisitante, resetField, toast]);
+
+  // Bloqueo definitivo si flags dicen que escuela está deshabilitada
+  useEffect(() => {
+    if (flags && schoolOff && isSchool) {
+      resetField("tipoVisitante");
+      resetField("fechaISO");
+      // toast("Por ahora no se aceptan reservas para instituciones educativas.");
+      toast(" En este momento no tenemos disponibilidad para instituciones educativas.")
+    }
+  }, [flags, schoolOff, isSchool, resetField, toast]);
 
   // const circuitoInfo = useMemo(
   //   () => CIRCUITS.find((c) => c.key === (circuito as CircuitoKey)),
@@ -64,6 +95,11 @@ export default function ReservationWizard({
 
   // ⭐ Mapeo al payload legacy que tu page.tsx usa
   const onSubmit = (data: WizardStepData) => {
+    // guard adicional por si el usuario forzó algo con el DOM
+    if (data.tipoVisitante === "INSTITUCION_EDUCATIVA" && schoolOff) {
+      toast("Por el momento no se aceptan reservas para instituciones educativas.");
+      return;                       // ✅ aborta el submit sí o sí
+    }
     onComplete?.({
       visitorType: data.tipoVisitante,
       // circuitId: String(data.circuito),
@@ -77,17 +113,21 @@ export default function ReservationWizard({
   };
 
   return (
-    <div className="mx-auto max-w-3xl p-6 text-white">
-      <h1 className="text-2xl font-semibold mb-4">Reserva tu visita</h1>
+    // <div className="mx-auto max-w-3xl p-6 text-black">
+    <div className="text-neutral-900">
+      {/* <h1 className="text-2xl font-semibold mb-4">Reserva tu visita</h1> */}
 
       {/* Steps */}
       {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">  paso el cols a 3 porque saque circuito */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"> */}
+      <div className="grid grid-cols-1 gap-3">
         <Step
           label="Tipo de visitante"
           value={tipoVisitante ? (tipoVisitante === "PARTICULAR" ? "Particular" : "Institución educativa") : undefined}
           onClick={() => setOpen("TYPE")}
           error={!!errors.tipoVisitante}
+          // className="rounded-xl border border-emerald-200/60 bg-white text-neutral-900 shadow-sm hover:border-emerald-400 hover:shadow"
+          className="w-full rounded-xl border border-emerald-300 bg-transparent text-neutral-900 hover:border-emerald-500 hover:bg-emerald-50/40 transition"
         />
         {/* <Step
           label="Circuito"
@@ -103,24 +143,26 @@ export default function ReservationWizard({
           // disabled={!circuito}
           disabled={!tipoVisitante || isSchoolSoldOut}
           error={!!errors.fechaISO}
+          // className="rounded-xl border border-emerald-200/60 bg-white text-neutral-900 shadow-sm hover:border-emerald-400 hover:shadow disabled:opacity-60"
+          className="w-full rounded-xl border border-emerald-300 bg-transparent text-neutral-900 hover:border-emerald-500 hover:bg-emerald-50/40 transition"
         />
         <Step
           label="Visitantes"
           value={formatVisitorsFromForm({ adultos, ninos, bebes })}
           onClick={() => setOpen("VISITORS")}
           disabled={!fechaISO}
+          // className="rounded-xl border border-emerald-200/60 bg-white text-neutral-900 shadow-sm hover:border-emerald-400 hover:shadow disabled:opacity-60"
+          className="w-full rounded-xl border border-emerald-300 bg-transparent text-neutral-900 hover:border-emerald-500 hover:bg-emerald-50/40 transition"
         />
       </div>
-      {isSchoolSoldOut && (
+      {/* aviso arriba del flujo si escuela está bloqueada */}
+      {/* {isSchoolSoldOut && (
         <div
-          className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 text-red-200 px-4 py-3"
-          role="status"
-          aria-live="polite"
-        >
-          <strong>Reservas escolares agotadas.</strong><br />
-          Lo sentimos, nos quedamos sin disponibilidad.
+          className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 text-red-200 px-4 py-3">
+          <strong>Reservas para instituciones educativas</strong><br />
+          Temporalmente no disponibles.
         </div>
-      )}
+      )} */}
 
 
       {/* Panel: Tipo */}
@@ -128,6 +170,7 @@ export default function ReservationWizard({
         <OptionButton
           title="Particular"
           subtitle="Reserva individual, familia o amigos."
+          imageSrc="/img/particular.png"
           onSelect={() => {
             setValue("tipoVisitante", "PARTICULAR", { shouldValidate: true });
             setOpen(null);
@@ -135,8 +178,16 @@ export default function ReservationWizard({
         />
         <OptionButton
           title="Institución educativa"
-          subtitle="Escuelas, universidades o grupos educativos."
+          subtitle={schoolOff ? "Temporalmente no disponible" : "Escuelas, universidades o grupos educativos."}
+          imageSrc="/img/escuela.png"
+          disabled={loadingFlags || schoolOff}
+          onDisabledClick={() => toast("En este momento no tenemos disponibilidad para instituciones educativas.")}
           onSelect={() => {
+            if (schoolOff) {              // 🚫 guard extra por si se intenta forzar
+              // toast("Por ahora no se aceptan reservas para instituciones educativas.");
+              toast(" En este momento no tenemos disponibilidad para instituciones educativas.")
+              return;
+            }
             setValue("tipoVisitante", "INSTITUCION_EDUCATIVA", { shouldValidate: true });
             setOpen(null);
           }}
@@ -188,7 +239,7 @@ export default function ReservationWizard({
       </SidePanel> */}
 
       {/* Panel: Fecha */}
-      <SidePanel open={open === "DATE"} title="Elegí una fecha" onClose={() => setOpen(null)}>
+      <SidePanel open={open === "DATE"} title="Elegí una fecha" onClose={() => setOpen(null)} size="lg">
         <div className="space-y-3">
           <CalendarPicker
             selectedISO={typeof fechaISO === "string" ? fechaISO : undefined}
@@ -197,7 +248,8 @@ export default function ReservationWizard({
               setOpen(null);
             }}
           />
-          <p className="text-sm text-white/70">
+          {/* <p className="text-sm text-white/70"> */}
+          <p className="text-sm text-neutral-600">
             {fechaISO ? `Fecha seleccionada: ${fechaISO}` : "Elegí un día del calendario"}
           </p>
         </div>
@@ -230,7 +282,7 @@ export default function ReservationWizard({
         </div>
 
         <div className="flex justify-end pt-3">
-          <button type="button" className="rounded-md bg-white w-full text-gray-900 px-4 py-2 disabled:opacity-40"
+          <button type="button" className="rounded-md bg-white border border-emerald-600 w-full text-emerald-600 px-4 py-2 disabled:opacity-40"
             disabled={!visitorsValid} onClick={async () => {
               const ok = await trigger(["adultos", "ninos", "bebes"]); // sincroniza errors/isValid
               if (!ok) return;
@@ -247,7 +299,10 @@ export default function ReservationWizard({
         <div className="text-sm text-red-300 space-x-3">
 
         </div>
-        <button className="rounded-md bg-white w-full px-5 py-2 text-gray-900 disabled:opacity-40" disabled={!isValid || isSchoolSoldOut}>
+        {/* <button className="rounded-md bg-white w-full px-5 py-2 text-gray-900 disabled:opacity-40" */}
+        <button
+          className="w-full rounded-lg bg-emerald-600 text-white px-5 py-3 font-medium hover:bg-emerald-700 disabled:opacity-40"
+          disabled={!isValid || isSchoolSoldOut}>
           Continuar
         </button>
       </form>

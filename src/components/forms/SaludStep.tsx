@@ -36,7 +36,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
   }
 
   return (
-    <div className="space-y-6 rounded-xl bg-white/5 border border-white/10 p-4">
+    <div className="space-y-6 rounded-xl bg-white/5 border border-gray-800 p-4">
       {uxError && (
         <div className="rounded-md bg-red-600/20 border border-red-600 px-3 py-2 text-sm text-red-200">
           {uxError}
@@ -52,7 +52,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
               <input
                 type="radio"
                 // className="accent-white"
-                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
+                className="accent-gray-800 w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={movSiNo === "si"}
                 onChange={() => {
                   setValue("movilidadReducidaSiNo", "si", { shouldDirty: true });
@@ -65,7 +65,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
               <input
                 type="radio"
                 // className="accent-white"
-                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
+                className="accent-gray-800 w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={movSiNo === "no"}
                 onChange={() => {
                   setValue("movilidadReducidaSiNo", "no", { shouldDirty: true });
@@ -78,7 +78,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
 
           {movSiNo === "si" && (
             <div className="flex items-center gap-2 md:ml-auto">
-              <label className="text-sm text-white/80">¿Cuántas?</label>
+              <label className="text-sm text-black">¿Cuántas?</label>
               <input
                 type="number"
                 min={1}
@@ -108,7 +108,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
               <input
                 type="radio"
                 // className="accent-white"
-                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
+                className="accent-gray-800 w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={alergias === "si"}
                 onChange={() => {
                   setValue("alergias", "si", { shouldDirty: true });
@@ -121,7 +121,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
               <input
                 type="radio"
                 // className="accent-white"
-                className="accent-white w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
+                className="accent-gray-800 w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
                 checked={alergias === "no"}
                 onChange={() => {
                   setValue("alergias", "no", { shouldDirty: true });
@@ -134,7 +134,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
 
           {alergias === "si" && (
             <div className="flex items-center gap-2 md:ml-auto">
-              <label className="text-sm text-white/80">¿Cuántas?</label>
+              <label className="text-sm text-black">¿Cuántas?</label>
               <input
                 type="number"
                 min={1}
@@ -161,7 +161,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
         <textarea
           {...register("comentarios")}
           rows={4}
-          className="w-full rounded-md border border-white/20 bg-white/5 p-2 text-white"
+          className="w-full rounded-md border border-emerald-600 bg-white/5 p-2 text-black"
           placeholder={comentariosPlaceholder}
         />
       </section>

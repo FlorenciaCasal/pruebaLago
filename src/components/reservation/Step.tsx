@@ -12,6 +12,7 @@ export function Step({
   onClick: () => void;
   disabled?: boolean;
   error?: boolean;
+  className?: string;
 }) {
   return (
     <button
@@ -20,7 +21,7 @@ export function Step({
       disabled={disabled}
       className={[
         "flex w-full items-center justify-between rounded-lg border p-3 text-left transition",
-        "bg-white/5 border-white/20 hover:bg-white/10",
+        "bg-white border-emerald-400 hover:bg-white/10",
         disabled ? "opacity-50 cursor-not-allowed" : "",
         error ? "border-red-400" : "",
       ].join(" ")}

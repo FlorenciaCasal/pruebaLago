@@ -27,7 +27,6 @@ export const listadoSchemaExact = (n: number) =>
             if (!arr) return false;
             const seen = new Set<string>();
             for (const it of arr) {
-                // const d = String((it as any)?.dni ?? "");
                 const d = it?.dni ?? "";
                 if (!d) return false;
                 if (seen.has(d)) return false;

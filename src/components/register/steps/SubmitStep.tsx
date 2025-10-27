@@ -26,8 +26,8 @@ export default function SubmitStep({
             )}
 
             <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
-                    <div className="text-sm text-white/60 mb-2">Reserva</div>
+                <div className="rounded-xl bg-white/5 border border-emerald-600 p-4">
+                    <div className="text-sm text-black mb-2">Reserva</div>
                     <div className="space-y-1 text-sm">
                         <div><b>Tipo:</b> {tipo === "INSTITUCION_EDUCATIVA" ? "Institución educativa" : "Particular"}</div>
                         <div><b>Fecha:</b> {watch("fechaISO") || "—"}</div>
@@ -35,8 +35,8 @@ export default function SubmitStep({
                     </div>
                 </div>
 
-                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
-                    <div className="text-sm text-white/60 mb-2">{tipo === "INSTITUCION_EDUCATIVA" ? "Institución" : "Contacto"}</div>
+                <div className="rounded-xl bg-white/5 border border-emerald-600 p-4">
+                    <div className="text-sm text-black mb-2">{tipo === "INSTITUCION_EDUCATIVA" ? "Institución" : "Contacto"}</div>
                     {tipo === "INSTITUCION_EDUCATIVA" ? (
                         <div className="space-y-1 text-sm">
                             <div><b>Institución:</b> {watch("institucion") || "—"}</div>

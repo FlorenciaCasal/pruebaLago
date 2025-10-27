@@ -7,7 +7,7 @@ import { useEffect } from "react";
 export function useReservationForm(options?: UseFormProps<ReservationFormData>) {
   const form = useForm<ReservationFormData>({
     mode: "onChange",
-    ...options,
+    // ...options,
     defaultValues: {
       // datos de contacto (si los seguís usando)
       nombre: "", apellido: "", dni: "", telefono: "", correo: "", origenVisita: "",
@@ -39,7 +39,11 @@ export function useReservationForm(options?: UseFormProps<ReservationFormData>) 
 
       // inputs auxiliares de UI
       tmpNombreApe: "", tmpDni: "",
+
+      // 👇 permite sobrescribir desde afuera
+      ...(options?.defaultValues ?? {}),
     },
+    ...options,
   });
 
   const w = form.watch;

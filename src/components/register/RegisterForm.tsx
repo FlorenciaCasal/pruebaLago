@@ -49,6 +49,15 @@ export default function RegisterForm({
     const [uxError, setUxError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
+    // arriba de RegisterForm, ANTES de llamar a useReservationForm:
+    const toNum = (v: string | null, min = 0) => {
+        const n = Number(v);
+        return Number.isFinite(n) ? Math.max(min, n) : undefined;
+    };
+    const qsAdults = toNum(searchParams.get("adults"), 1);
+    const qsKids = toNum(searchParams.get("kids"), 0);
+    const qsBabies = toNum(searchParams.get("babies"), 0);
+
     const {
         register,
         handleSubmit,
@@ -56,11 +65,18 @@ export default function RegisterForm({
         setValue,
         adultos,
         ninos,
-        bebes, totalPersonas,
+        bebes,
+        totalPersonas,
         control,
         validateConociste,
         reset,
-    } = useReservationForm();
+    } = useReservationForm({
+        defaultValues: {
+            adultos: qsAdults ?? 1,
+            ninos: qsKids ?? 0,
+            bebes: qsBabies ?? 0,
+        },
+    });
 
     const { fields, append, remove } = useFieldArray({ name: "personas", control });
 
@@ -91,13 +107,51 @@ export default function RegisterForm({
             ? (tipoForm as Visitante)
             : (initialTipo ?? tipoFromQS ?? null);
     }, [tipoForm, initialTipo, tipoFromQS]);
-    // 5) cuando cambia el tipo, volvemos al paso 0 (esto ya lo tenías)
+
+    // 5) cuando cambia el tipo, volvemos al paso 0 
     useEffect(() => { setCurrentStep(0); }, [tipo]);
 
+
+
+    // Prefill de adultos/niños/bebés desde el query string (una sola vez)
+    // useEffect(() => {
+    //     if (!seeded) return; // esperá a haber seteado tipoVisitante
+
+    //     const toNum = (v: string | null) => {
+    //         const n = Number(v);
+    //         return Number.isFinite(n) ? n : undefined;
+    //     };
+
+    //     const qsAdults = toNum(searchParams.get("adults"));
+    //     const qsKids = toNum(searchParams.get("kids"));
+    //     const qsBabies = toNum(searchParams.get("babies"));
+
+    //     // Leemos los valores actuales del form
+    //     const curAdults = watch("adultos");
+    //     const curKids = watch("ninos");
+    //     const curBabies = watch("bebes");
+
+    //     // Sólo sembrar si siguen en su default inicial (1, 0, 0)
+    //     if (curAdults === 1 && qsAdults !== undefined) {
+    //         setValue("adultos", Math.max(1, qsAdults), { shouldDirty: true });
+    //     }
+    //     if (curKids === 0 && qsKids !== undefined) {
+    //         setValue("ninos", Math.max(0, qsKids), { shouldDirty: true });
+    //     }
+    //     if (curBabies === 0 && qsBabies !== undefined) {
+    //         setValue("bebes", Math.max(0, qsBabies), { shouldDirty: true });
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [seeded, searchParams, setValue]);
+
+
     // const totalWizard = (adultos ?? 0) + (ninos ?? 0) + (bebes ?? 0);
-    const totalEsperado = tipo === "INSTITUCION_EDUCATIVA"
-        ? totalPersonas
-        : Math.max(0, totalPersonas - 1);
+    // const totalEsperado = tipo === "INSTITUCION_EDUCATIVA"
+    //     ? totalPersonas
+    //     : Math.max(0, totalPersonas - 1);
+    const tp = Number(totalPersonas ?? 0);
+    const totalEsperado = tipo === "INSTITUCION_EDUCATIVA" ? tp : Math.max(0, tp - 1);
+
 
     type StepType = "contacto" | "institucion" | "listado" | "salud" | "conociste" | "submit";
 
@@ -123,6 +177,10 @@ export default function RegisterForm({
             { label: "Revisión y envío", type: "submit" as const },
         ] as const;
     }, [tipo, totalEsperado]);
+
+    useEffect(() => {
+        setCurrentStep(s => Math.min(s, steps.length - 1));
+    }, [steps.length]);
 
     // Validaciones (idénticas a tu versión)
     const validateContacto = () => {
@@ -274,7 +332,7 @@ export default function RegisterForm({
 
 
     const guardedNext = async () => {
-        const t = steps[currentStep].type as StepType;
+        const t = step.type as StepType;
         if (t === "contacto") {
             const msg = await validateContactoWithYup();
             if (msg) { setUxError(msg); return; }
@@ -342,7 +400,12 @@ export default function RegisterForm({
     }, [tipo, setValue]);
 
 
-    // Submit idéntico
+    type AppError = Error & { code?: string };
+    function isAppError(e: unknown): e is AppError {
+        return typeof e === "object" && e !== null && "message" in e;
+    }
+
+    // Submit 
     const onSubmit = async (data: ReservationFormData) => {
         const contactoErr = tipo === "INSTITUCION_EDUCATIVA" ? null : await validateContactoWithYup();
         const institErr = tipo === "INSTITUCION_EDUCATIVA" ? await validateInstitucionWithYup() : null;
@@ -371,16 +434,27 @@ export default function RegisterForm({
 
             reset();
             setSuccessMsg("¡Reserva realizada con éxito!");
-        } catch (err) {
-            setServerError(err instanceof Error ? err.message : "Error inesperado");
+        } catch (e: unknown) {
+            const err = isAppError(e) ? e : new Error("Error desconocido");
+            // si tu `submitReservation` setea err.code = "DUPLICATE_DNI_DATE"
+            if ((err as AppError).code === "DUPLICATE_DNI_DATE" || /DNI.+fecha/i.test(err.message ?? "")) {
+                const msg = "Ya existe una reserva para ese DNI en esa fecha.";
+                setServerError(msg);
+                return;
+            }
+            // Fallback para otros errores (400/403/etc.)
+            setServerError(err.message || "Error inesperado");
         } finally {
             setSubmitting(false);
         }
     };
 
+    const safeIndex = Math.min(currentStep, steps.length - 1);
+    const step = steps[safeIndex];
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-900">
-            <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-3xl text-left px-4 sm:px-6 py-10 text-white overflow-x-hidden">
+        <div className="flex items-center justify-center min-h-screen bg-transparent">
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-3xl text-left px-4 sm:px-6 py-10 text-black overflow-x-hidden">
                 {serverError && (
                     <div className="mb-4 rounded-lg bg-red-600/20 border border-red-600 px-3 py-2 text-sm">
                         {serverError}
@@ -395,13 +469,14 @@ export default function RegisterForm({
                         exit={{ x: -100, opacity: 0 }}
                         transition={{ duration: 0.35 }}
                     >
-                        <StepHeader index={currentStep + 1} title={steps[currentStep].label} />
+                        {/* <StepHeader index={currentStep + 1} title={steps[currentStep].label} /> */}
+                        <StepHeader index={safeIndex + 1} title={step.label} />
 
-                        {steps[currentStep].type === "contacto" && (
+                        {step.type === "contacto" && (
                             <ContactoStep register={register} watch={watch} setValue={setValue} uxError={uxError} />
                         )}
 
-                        {steps[currentStep].type === "listado" && (
+                        {step.type === "listado" && (
                             <ListadoStep
                                 fields={fields}
                                 register={register}
@@ -415,11 +490,11 @@ export default function RegisterForm({
                             />
                         )}
 
-                        {steps[currentStep].type === "institucion" && tipo === "INSTITUCION_EDUCATIVA" && (
+                        {step.type === "institucion" && tipo === "INSTITUCION_EDUCATIVA" && (
                             <InstitucionStep register={register} uxError={uxError} />
                         )}
 
-                        {steps[currentStep].type === "salud" && (
+                        {step.type === "salud" && (
                             <SaludStep
                                 register={register}
                                 watch={watch}
@@ -429,7 +504,7 @@ export default function RegisterForm({
                             />
                         )}
 
-                        {steps[currentStep].type === "conociste" && (
+                        {step.type === "conociste" && (
                             <ConocisteStep
                                 register={register}
                                 watch={watch}
@@ -438,7 +513,7 @@ export default function RegisterForm({
                             />
                         )}
 
-                        {steps[currentStep].type === "submit" && (
+                        {step.type === "submit" && (
                             <SubmitStep
                                 tipo={tipo ?? null}
                                 adultos={adultos}
@@ -463,17 +538,17 @@ export default function RegisterForm({
                                     if (currentStep === 0) onCancel?.();
                                     else prevStep();
                                 }}
-                                className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border border-white/80 text-white hover:bg-white hover:text-gray-900 transition cursor-pointer"
+                                className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border border-emerald-600 text-emerald-600 hover:bg-white hover:text-gray-900 transition cursor-pointer"
                             >
                                 Volver
                             </button>
 
                             <div className="ml-auto">
-                                {steps[currentStep].type === "submit" ? (
+                                {step.type === "submit" ? (
                                     <button
                                         type="submit"
                                         disabled={submitting || !aceptaReglas}
-                                        className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-gray-900 hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
+                                        className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-emerald-600 text-white hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
                                     >
                                         Enviar
                                     </button>
@@ -481,7 +556,7 @@ export default function RegisterForm({
                                     <button
                                         type="button"
                                         onClick={guardedNext}
-                                        className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-gray-900 hover:opacity-90 transition cursor-pointer"
+                                        className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-emerald-600 hover:opacity-90 transition cursor-pointer"
                                     >
                                         Continuar
                                     </button>

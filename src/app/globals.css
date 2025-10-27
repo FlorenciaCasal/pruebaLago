@@ -108,3 +108,11 @@ button { cursor: pointer; }
 
   }
 }
+
+/* Mostrar spinners en inputs number (modo claro y oscuro) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1; /* visibilidad forzada */
+  filter: invert(0); /* 0 = negro, 1 = blanco, ajustalo según el tema */
+}
+

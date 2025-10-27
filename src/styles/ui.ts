@@ -1,6 +1,7 @@
-export const lineColor = "border-white/80";
-export const textMain = "text-white";
-export const textSoft = "text-white/70";
+// export const lineColor = "border-white/80";
+export const lineColor = "border-black";
+export const textMain = "text-black";
+export const textSoft = "text-gray-700";
 
 export const inputBase =
     `w-full bg-transparent ${textMain} placeholder:${textSoft}
@@ -26,7 +27,7 @@ export const radioHidden = `sr-only peer`; // accesible y usable con peer
 export const radioCard = `
   flex items-center gap-3 cursor-pointer select-none
   border border-white rounded-md px-2 py-2
-  bg-gray-400/20 text-white
+  bg-white text-black
   hover:bg-gray-400/30
   peer-checked:bg-gray-400 peer-checked:text-gray-900
   transition
@@ -42,6 +43,8 @@ export const radioBadge = `
   peer-focus-visible:ring-2 peer-focus-visible:ring-white/60
 `;
 
+// export const checkboxBox =
+//     `mt-0.5 w-4 h-4 cursor-pointer appearance-none border ${lineColor} rounded-sm
+//    checked:bg-white checked:shadow-[inset_0_0_0_2px_rgba(17,24,39,1)]`;
 export const checkboxBox =
-    `mt-0.5 w-4 h-4 cursor-pointer appearance-none border ${lineColor} rounded-sm
-   checked:bg-white checked:shadow-[inset_0_0_0_2px_rgba(17,24,39,1)]`;
+  "mt-0.5 h-4 w-4 cursor-pointer accent-emerald-600";

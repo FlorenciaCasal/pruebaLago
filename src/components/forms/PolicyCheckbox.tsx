@@ -14,7 +14,7 @@ export default function PolicyCheckbox({
       />
       <span>
         Acepto las{" "}
-        <a href={href} className="underline hover:opacity-90 text-white">
+        <a href={href} className="underline hover:opacity-90 text-gray-700">
           políticas de visita
         </a>{" "}
         (derecho de admisión y manejo de datos).

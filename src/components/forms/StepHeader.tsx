@@ -5,7 +5,7 @@ export default function StepHeader({ index, title }: { index: number; title: str
     return (
         <div className="flex items-center gap-2 mb-6">
             {/* número de step */}
-            <span className="text-sm mr-[-4px] sm:text-base font-normal text-white/80">
+            <span className="text-sm mr-[-4px] sm:text-base font-normal text-black">
                 {index}
             </span>
             <ArrowRight className="w-4 h-4 sm:w-5 h-5 pr-1" />

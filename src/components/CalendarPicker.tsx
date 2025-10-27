@@ -110,7 +110,7 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
         <div className="flex justify-center">
             <div
                 className={`
-          bg-black rounded-xl w-full 
+          bg-white rounded-xl w-[80vw] 
           ${isMobile ? 'px-4 overflow-y-scroll h-[80vh] [&_.rdp-weekday]:hidden' : 'p-4 flex items-center justify-center gap-1 overflow-x-hidden'}
         `}
             >
@@ -119,7 +119,7 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
                         {Array.from({ length: monthsToShow }, (_, i) => {
                             const thisMonth = addMonths(new Date(), i);
                             return (
-                                <div key={i} className="flex bg-black justify-center relative max-w-full sm:max-w-md">
+                                <div key={i} className="flex bg-white justify-center relative max-w-full sm:max-w-md">
                                     <DayPicker
                                         className="custom-daypicker"
                                         mode="single"
@@ -141,7 +141,7 @@ export default function CalendarPicker({ selectedISO, onSelectISO }: Props) {
                         <div className="flex justify-center w-full mt-4">
                             <button
                                 onClick={() => setMonthsToShow(prev => prev + 3)}
-                                className="px-4 pt-2 pb-4 w-full max-w-xs rounded-lg cursor-pointer bg-white text-gray-900 hover:opacity-90 transition"
+                                className="px-4 pt-2 pb-16 w-full max-w-xs rounded-lg cursor-pointer bg-white text-gray-900 hover:opacity-90 transition"
                                 disabled={loading}
                             >
                                 {loading ? 'Cargando…' : 'Cargar más fechas'}

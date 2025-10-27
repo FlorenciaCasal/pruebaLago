@@ -12,7 +12,7 @@ export function CounterRow({
   onChange: (n: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-white/20 p-3 bg-white/5">
+    <div className="flex items-center justify-between rounded-lg border border-gray-800 p-3 mb-2 bg-white/5">
       <div>
         <div className="font-medium">{title}</div>
         <div className="text-xs text-white/70">{subtitle}</div>

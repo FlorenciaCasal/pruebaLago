@@ -40,7 +40,7 @@ export default function ConocisteStep({ register, watch, setValue, uxError }: Pr
 
       <button
         type="button"
-        className="w-full text-left rounded-lg border border-white/20 bg-white/5 px-3 py-2 hover:bg-white/10 transition flex items-center justify-between"
+        className="w-full text-left rounded-lg border border-gray-800 bg-white/5 px-3 py-2 hover:bg-white/10 transition flex items-center justify-between"
         onClick={() => setOpen(o => !o)}
       >
         <span>{label}</span>
