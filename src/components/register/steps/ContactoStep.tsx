@@ -76,7 +76,7 @@ export default function ContactoStep({
                         inputMode="numeric"
                         pattern="^[0-9]{10}$"
                         maxLength={10}
-                        placeholder="3512345678"
+                        placeholder=" Ej. 3512345678"
                         autoComplete="tel"
                     />
                 </div>
@@ -85,7 +85,7 @@ export default function ContactoStep({
                     <CityAutocomplete
                         value={watch("origenVisita") || ""}
                         onChange={(value) => setValue("origenVisita", value.trim(), { shouldDirty: true })}
-                        placeholder="Ej. Córdoba, Argentina"
+                        // placeholder="Ej. Córdoba, Argentina"
                         className={inputBase}
                         inputMode="text"
                         maxLength={80}

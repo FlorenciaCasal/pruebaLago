@@ -15,7 +15,7 @@ export function CounterRow({
     <div className="flex items-center justify-between rounded-lg border border-gray-800 p-3 mb-2 bg-white/5">
       <div>
         <div className="font-medium">{title}</div>
-        <div className="text-xs text-white/70">{subtitle}</div>
+        <div className="text-xs text-gray-700">{subtitle}</div>
       </div>
       <div className="flex items-center gap-3">
         <button type="button" onClick={() => onChange(value - 1)} className="rounded border border-white/30 px-2 py-1 hover:bg-white/10">

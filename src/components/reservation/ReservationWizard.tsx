@@ -115,7 +115,7 @@ export default function ReservationWizard({
   return (
     // <div className="mx-auto max-w-3xl p-6 text-black">
     <div className="text-neutral-900">
-      {/* <h1 className="text-2xl font-semibold mb-4">Reserva tu visita</h1> */}
+      <h1 className="text-2xl text-center font-semibold text-neutral-900 mb-4">Reserva tu visita</h1>
 
       {/* Steps */}
       {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">  paso el cols a 3 porque saque circuito */}

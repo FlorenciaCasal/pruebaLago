@@ -1,10 +1,8 @@
 "use client";
-import { useRouter } from "next/navigation";
-
 // const UPDATED_AT = "Agosto 2025";
 
 export default function PoliticasDeVisitaPage() {
-    const router = useRouter();
+
     return (
         <main className="min-h-screen bg-gray-900 text-white">
             <div className="mx-auto max-w-3xl px-6 py-12">
@@ -168,13 +166,7 @@ export default function PoliticasDeVisitaPage() {
                 </section>
 
                 <footer className="border-t border-white/10 pt-6 flex items-center justify-between text-sm text-white/60">
-                    {/* botón volver */}
-                    <button
-                        onClick={() => router.back()}
-                        className="underline hover:opacity-90 cursor-pointer"
-                    >
-                        Volver
-                    </button>
+
 
                     <span>© {new Date().getFullYear()} Lago Escondido</span>
                 </footer>
