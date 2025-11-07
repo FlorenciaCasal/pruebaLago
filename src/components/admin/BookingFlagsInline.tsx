@@ -75,9 +75,9 @@ export default function BookingFlagsInline() {
     return (
         <div className="flex items-center gap-3">
             {/* “Particular” a modo informativo */}
-            <span className="text-xs text-neutral-400 hidden md:inline">
+            {/* <span className="text-xs text-neutral-400 hidden md:inline">
                 Particular: <span className="text-neutral-200">Habilitado</span>
-            </span>
+            </span> */}
 
             {/* Toggle de institución educativa */}
             <label className="flex items-center gap-2 select-none">

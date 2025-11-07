@@ -5,7 +5,7 @@ export default function LogoutButton() {
     return (
         <button
             onClick={doLogout}
-            className="rounded-md border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+            className="px-3 py-1.5 text-sm hover:text-[#8e8e8f]"
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
         >

@@ -116,3 +116,12 @@ input[type="number"]::-webkit-outer-spin-button {
   filter: invert(0); /* 0 = negro, 1 = blanco, ajustalo según el tema */
 }
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@media (max-width: 640px) {
+  .fade-edges-mobile {
+    mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
+  }
+}

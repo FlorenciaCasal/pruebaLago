@@ -128,21 +128,28 @@ export default function CalendarioAdminPage() {
     };
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Calendario</h2>
-                <div className="flex gap-2">
+        // <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
+            {/* <div className="flex items-center justify-between"> */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-lg md:text-xl font-semibold">Calendario</h2>
+                {/* <div className="flex gap-2"> */}
+                <div className="flex gap-2 items-center sm:ml-auto justify-between sm:justify-normal">
                     <button
                         onClick={() => {
                             const d = new Date(y, m - 2, 1);
                             setYM(ym(d));
                             void load(d.getFullYear(), d.getMonth() + 1);
                         }}
-                        className="rounded-lg border border-neutral-700 px-3 py-1.5 hover:bg-neutral-800"
+                        // className="rounded-lg border border-neutral-700 px-3 py-1.5 hover:bg-neutral-800"
+                        className="size-9 rounded-full border border-neutral-700 hover:bg-neutral-800 grid place-items-center"
                     >
                         ◀
                     </button>
-                    <div className="rounded-lg border border-neutral-700 px-3 py-1.5 bg-neutral-950">
+                    {/* <div className="rounded-lg border border-neutral-700 px-1.5 md:px-3 py-1.5 bg-neutral-950">
+                        {monthLabel}
+                    </div> */}
+                    <div className="max-w-[12rem] sm:max-w-none rounded-lg border border-neutral-700 px-2 md:px-3 py-1.5 bg-neutral-950 text-center capitalize truncate mx-auto sm:mx-0 text-sm md:text-base">
                         {monthLabel}
                     </div>
                     <button
@@ -151,7 +158,8 @@ export default function CalendarioAdminPage() {
                             setYM(ym(d));
                             void load(d.getFullYear(), d.getMonth() + 1);
                         }}
-                        className="rounded-lg border border-neutral-700 px-3 py-1.5 hover:bg-neutral-800"
+                        // className="rounded-lg border border-neutral-700 px-3 py-1.5 hover:bg-neutral-800"
+                        className="size-9 rounded-full border border-neutral-700 hover:bg-neutral-800 grid place-items-center"
                     >
                         ▶
                     </button>
@@ -165,21 +173,26 @@ export default function CalendarioAdminPage() {
             ) : (
                 <div className="space-y-4">
                     <div className="space-y-3">
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        {/* <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"> */}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             {/* Izquierda: botón rojo + texto */}
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => void toggleMonth()}
                                     disabled={busy}
-                                    className={
-                                        "rounded-lg px-4 py-2 text-white disabled:opacity-60 " +
-                                        (state.disabled ? "bg-green-600/90 hover:bg-green-600" : "bg-red-600/90 hover:bg-red-600")
-                                    }
+                                    // className={
+                                    //     "rounded-lg px-2 md:px-4 py-2 text-white disabled:opacity-60 " +
+                                    //     (state.disabled ? "bg-green-600/90 hover:bg-green-600" : "bg-red-600/90 hover:bg-red-600")
+                                    // }
+                                    className={"w-full rounded-lg px-3 md:px-4 py-2 text-white disabled:opacity-60 " + (state.disabled ? "bg-green-600/90 hover:bg-green-600" : "bg-red-600/90 hover:bg-red-600")}
                                 >
                                     {busy ? "..." : state.disabled ? "Habilitar mes completo" : "Deshabilitar mes completo"}
                                 </button>
-                                <span className="text-sm text-neutral-400">
+                                {/* <span className="text-sm text-neutral-400">
                                     Hacé clic en un día para alternar su estado.
+                                </span> */}
+                                <span className="text-xs sm:text-sm text-neutral-400 sm:ml-1">
+                                    Tocá un día para alternar su estado.
                                 </span>
                             </div>
 
@@ -188,7 +201,8 @@ export default function CalendarioAdminPage() {
                         </div>
 
                         {/* Leyenda */}
-                        <div className="flex items-center gap-4 text-sm">
+                        {/* <div className="flex items-center gap-4 text-sm"> */}
+                        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-4 text-xs sm:text-sm">
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 rounded bg-blue-600" />
                                 <span className="text-neutral-300">Número de reservas confirmadas</span>
@@ -199,9 +213,11 @@ export default function CalendarioAdminPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-7 gap-2 rounded-2xl border border-neutral-800 p-4 bg-neutral-950">
+                    {/* <div className="grid grid-cols-7 gap-2 rounded-2xl border border-neutral-800 p-4 bg-neutral-950"> */}
+                    <div className="grid grid-cols-7 gap-1 sm:gap-2 rounded-2xl border border-neutral-800 p-2 sm:p-4 bg-neutral-950">
                         {["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"].map(h => (
-                            <div key={h} className="text-center text-neutral-400 text-xs">
+                            // <div key={h} className="text-center text-neutral-400 text-xs">
+                            <div key={h} className="text-center text-neutral-400 text-[11px] sm:text-xs">
                                 {h}
                             </div>
                         ))}
@@ -226,8 +242,11 @@ export default function CalendarioAdminPage() {
                                         void toggleDay(dateISO);
                                     }}
                                     disabled={busy}
+                                    // className={
+                                    //     "aspect-square w-full rounded-lg border px-2 py-2 text-sm relative " +
                                     className={
-                                        "aspect-square w-full rounded-lg border px-2 py-2 text-sm relative " +
+                                        // en xs: más padding a la derecha para que no tape el número
+                                        "w-full rounded-lg border px-1.5 pr-6 py-1.5 text-xs sm:text-sm relative min-h-10 sm:min-h-0 aspect-square " +
                                         (isSelected
                                             ? "border-blue-500 bg-blue-900/40 text-blue-100 ring-2 ring-blue-500"
                                             : disabled
@@ -236,13 +255,20 @@ export default function CalendarioAdminPage() {
                                     }
                                     title={`${dateISO} - ${reservationCount} reserva${reservationCount !== 1 ? 's' : ''} confirmada${reservationCount !== 1 ? 's' : ''}\nClick izquierdo: ${reservationCount > 0 ? 'Ver reservas' : 'Habilitar/Deshabilitar'}\nClick derecho: Habilitar/Deshabilitar`}
                                 >
-                                    <div className="text-right font-medium">{d.getDate()}</div>
+                                    {/* <div className="text-right font-medium">{d.getDate()}</div> */}
+                                    {/* número del día en la esquina superior izquierda para alejarlo del badge */}
+                                    <div className="absolute left-1 top-1 font-medium leading-none">{d.getDate()}</div>
                                     {reservationCount > 0 && (
-                                        <div className="mt-1 text-xs text-center">
-                                            <span className="inline-block px-1.5 py-0.5 rounded bg-blue-600 text-white font-semibold">
-                                                {reservationCount}
-                                            </span>
-                                        </div>
+                                        // <div className="mt-1 text-xs text-center">
+                                        //     <span className="inline-block px-1.5 py-0.5 rounded bg-blue-600 text-white font-semibold">
+                                        //         {reservationCount}
+                                        //     </span>
+                                        // </div>
+                                        <span
+                                            className="absolute bottom-1 right-1 inline-flex items-center justify-center min-w-[14px] h-[14px] text-[9px] px-[2px] sm:min-w-5 sm:h-5 sm:text-xs sm:px-1 rounded bg-blue-600 text-white font-semibold"
+                                        >
+                                            {reservationCount}
+                                        </span>
                                     )}
                                 </button>
                             );
@@ -270,15 +296,18 @@ export default function CalendarioAdminPage() {
                             </div>
 
                             <div className="overflow-x-auto">
-                                <table className="min-w-full text-sm">
+                                {/* <table className="min-w-full text-sm"> */}
+                                <table className="min-w-full text-xs sm:text-sm">
                                     <thead className="bg-white/5">
                                         <tr className="[&>th]:px-4 [&>th]:py-2 [&>th]:text-left text-neutral-400">
                                             <th>Nombre</th>
                                             <th>Personas</th>
                                             <th>Tipo</th>
                                             <th>Circuito</th>
-                                            <th>Email</th>
-                                            <th>Teléfono</th>
+                                            {/* <th>Email</th>
+                                            <th>Teléfono</th> */}
+                                            <th className="hidden md:table-cell">Email</th>
+                                            <th className="hidden md:table-cell">Teléfono</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-neutral-800">
@@ -290,8 +319,10 @@ export default function CalendarioAdminPage() {
                                                     <td>{r.personas ?? "-"}</td>
                                                     <td>{r.tipoVisitante ?? "-"}</td>
                                                     <td>{r.circuito ?? "-"}</td>
-                                                    <td className="text-neutral-400">{r.correo ?? "-"}</td>
-                                                    <td className="text-neutral-400">{r.telefono ?? "-"}</td>
+                                                    {/* <td className="text-neutral-400">{r.correo ?? "-"}</td>
+                                                    <td className="text-neutral-400">{r.telefono ?? "-"}</td> */}
+                                                    <td className="text-neutral-400 hidden md:table-cell">{r.correo ?? "-"}</td>
+                                                    <td className="text-neutral-400 hidden md:table-cell">{r.telefono ?? "-"}</td>
                                                 </tr>
                                             ))}
                                     </tbody>

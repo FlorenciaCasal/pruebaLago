@@ -32,6 +32,10 @@ export default function ReservasPage() {
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
   const [searchDate, setSearchDate] = React.useState<string>("");
   const [searchName, setSearchName] = React.useState<string>("");
+  const tabsRef = React.useRef<HTMLDivElement>(null);
+  const [pageCount, setPageCount] = React.useState(0);
+  const [activePage, setActivePage] = React.useState(0);
+
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -100,6 +104,46 @@ export default function ReservasPage() {
     }
   };
 
+  React.useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+
+    const updatePages = () => {
+      if (!el) return;
+      const totalWidth = el.scrollWidth;
+      const visibleWidth = el.clientWidth;
+      const count = Math.ceil(totalWidth / visibleWidth);
+      setPageCount(count);
+    };
+
+    const handleScroll = () => {
+      if (!el) return;
+      const ratio = el.scrollLeft / (el.scrollWidth - el.clientWidth);
+      const currentPage = Math.round(ratio * (pageCount - 1));
+      setActivePage(currentPage);
+    };
+
+    updatePages();
+    handleScroll();
+
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    const ro = new ResizeObserver(updatePages);
+    ro.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      ro.disconnect();
+    };
+  }, [pageCount]);
+
+  function goToPage(i: number) {
+    const el = tabsRef.current;
+    if (!el) return;
+    const viewport = el.clientWidth;           // ancho visible
+    const targetLeft = Math.min(i * viewport, el.scrollWidth - viewport);
+    el.scrollTo({ left: targetLeft, behavior: "smooth" });
+  }
+
   return (
     <div className="space-y-4 w-full overflow-x-hidden">
       {/* Mensajes de éxito y error */}
@@ -119,42 +163,77 @@ export default function ReservasPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2">
+      {/* <div className="flex flex-wrap gap-2"> */}
+      <div
+        ref={tabsRef}
+        className="flex gap-1 overflow-x-auto no-scrollbar -mx-1 px-1 snap-x snap-mandatory sm:flex-wrap fade-edges-mobile [touch-action:pan-x]"
+      >
         {TABS.map(t => (
           <button
             key={t.key}
             onClick={() => setStatus(t.key)}
             className={
-              "rounded-xl border px-3 py-1.5 text-sm " +
+              "rounded-xl border px-3 py-1.5 text-sm shrink-0 snap-start " +
               (status === t.key
                 ? "border-neutral-500 bg-neutral-800 text-white"
-                : "border-neutral-800 bg-neutral-950 text-neutral-300 hover:bg-neutral-900")
+                : "border-neutral-800 bg-neutral-950 text-neutral-300 hover:text-[#8e8e8f]")
             }
           >
             {t.label}
           </button>
         ))}
-        {/* <div className="ml-auto"> */}
-        <div className="ms-auto">
-          <button
+
+        <div className="ms-auto shrink-0">
+          {/* <button
             onClick={load}
-            className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+            // className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+            className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 snap-end"
           >
             Refrescar
+          </button> */}
+          <button
+            onClick={load}
+            className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 snap-end inline-flex items-center gap-2"
+          >
+            <span className="hidden xs:inline">Refrescar</span>
+            <svg className="xs:hidden w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 6v3l4-4-4-4v3a8 8 0 1 0 8 8h-2a6 6 0 1 1-6-6z" />
+            </svg>
           </button>
         </div>
       </div>
 
+      {/* Indicadores tipo carrusel (solo si hay overflow y en mobile) */}
+      {pageCount > 1 && (
+        <div className="flex justify-center gap-1 mt-1 sm:hidden" role="tablist" aria-label="Secciones visibles">
+          {Array.from({ length: pageCount }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => goToPage(i)}
+              role="tab"
+              aria-selected={i === activePage}
+              className={
+                "h-1.5 w-1.5 rounded-full will-change-transform transition-all duration-200 " +
+                (i === activePage ? "bg-neutral-200 scale-110" : "bg-neutral-600/50 scale-90")
+              }
+              aria-label={`Ir a grupo ${i + 1} de ${pageCount}`}
+            />
+          ))}
+        </div>
+      )}
+
+
       {/* Búsqueda */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-3 sm:p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="min-w-0">
-            <label className="block text-sm text-neutral-400 mb-2">Buscar por fecha de visita</label>
+            <label className="block text-sm text-white mb-2">Buscar por fecha de visita</label>
             <input
               type="date"
               value={searchDate}
               onChange={(e) => setSearchDate(e.target.value)}
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white focus:border-neutral-500 focus:outline-none"
+              className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black focus:border-neutral-500 focus:outline-none"
             />
           </div>
           <div className="min-w-0">
@@ -164,7 +243,7 @@ export default function ReservasPage() {
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
               placeholder="Nombre o apellido..."
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
+              className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
             />
           </div>
           <div className="flex items-end">
@@ -207,12 +286,12 @@ export default function ReservasPage() {
                   <div><dt className="text-neutral-400">Estado</dt><dd>{r.status}</dd></div>
                   <div className="col-span-2"><dt className="text-neutral-400">Creada</dt><dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd></div>
                 </dl>
-                <div className="mt-3 flex justify-end gap-2">
+                <div className="mt-3 flex justify-center sm:justify-end gap-4">
                   {r.status !== "CONFIRMED" && r.status !== "CANCELLED" && (
                     <button
                       onClick={() => onConfirm(r.id)}
                       disabled={actionId === r.id}
-                      className="inline-flex w-28 items-center justify-center rounded-lg bg-green-600/90 px-3 py-1.5 text-white hover:bg-green-600 disabled:opacity-60"
+                      className="inline-flex w-28 items-center justify-center rounded-lg bg-green-600/90 px-3 py-2 text-white hover:bg-green-600 disabled:opacity-60"
                     >
                       {actionId === r.id ? "..." : "Confirmar"}
                     </button>
@@ -233,7 +312,7 @@ export default function ReservasPage() {
 
           {/* En md+ : tabla (ya no debería generar scroll del body) */}
           <div className="hidden lg:block">
-            <div className="rounded-2xl border border-neutral-800">
+            <div className="rounded-2xl border border-gray-800">
               <div className="overflow-x-hidden"> {/* mantenemos sin scroll del body */}
                 <table className="w-full text-[13px] table-auto">
                   <thead className="bg-neutral-950/80">
