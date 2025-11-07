@@ -11,6 +11,7 @@ export type AdminReservation = {
     personas?: number;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
     notas?: string;
+    dni?: string; // Agregado recientemente para hacer busqueda por dni
 };
 
 export type CalendarMonthState = {

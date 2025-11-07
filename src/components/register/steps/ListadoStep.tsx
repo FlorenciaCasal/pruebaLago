@@ -85,7 +85,7 @@ export default function ListadoStep({
         <div className="flex justify-end">
           <button
             type="button"
-            className={`rounded-md bg-white text-gray-900 px-4 py-2 ${!canAddMore ? "opacity-50 cursor-not-allowed" : ""
+            className={`rounded-md border border-gray-900 hover:bg-gray-100 bg-white text-gray-900 px-4 py-2 ${!canAddMore ? "opacity-50 cursor-not-allowed" : ""
               }`}
             onClick={() => {
               if (!canAddMore) return; // 👈 no permitir sobrepasar
@@ -116,7 +116,7 @@ export default function ListadoStep({
         {!canAddMore && totalEsperado > 0 && (
           <p className="text-xs text-gray-900 mt-2">
             Ya cargaste el total esperado ({totalEsperado}).
-             {/* Para agregar más,
+            {/* Para agregar más,
             aumentá Adultos/Niños/Bebés en el paso anterior. */}
           </p>
         )}
@@ -127,10 +127,10 @@ export default function ListadoStep({
         <table className="w-full text-sm">
           <thead className="bg-white/10">
             <tr>
-              <th className="text-center px-3 py-2">#</th>
-              <th className="text-center px-3 py-2">Nombre y apellido</th>
-              <th className="text-center px-3 py-2">DNI</th>
-              <th className="text-center px-3 py-2">Acciones</th>
+              <th className="text-center px-1 md:px-3 py-2">#</th>
+              <th className="text-center px-1 md:px-3 py-2">Nombre y apellido</th>
+              <th className="text-center px-1 md:px-3 py-2">DNI</th>
+              <th className="text-center px-1 md:px-3 py-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -150,10 +150,10 @@ export default function ListadoStep({
 
               return (
                 <tr key={f.id ?? i} className="border-t border-gray-900">
-                  <td className="px-3 py-2 text-center">{i + 1}</td>
+                  <td className="px-1 md:px-3 py-2 text-center">{i + 1}</td>
 
                   {/* Nombre y apellido */}
-                  <td className="px-3 py-2 text-center">
+                  <td className="px-1 md:px-3 py-2 text-center">
                     {editing ? (
                       <div className="grid sm:grid-cols-2 gap-2">
                         <input
@@ -179,7 +179,7 @@ export default function ListadoStep({
                   </td>
 
                   {/* DNI */}
-                  <td className="px-3 py-2 text-center">
+                  <td className="px-1 md:px-3 py-2 text-center">
                     {editing ? (
                       <input
                         className={inputBase}
@@ -199,14 +199,14 @@ export default function ListadoStep({
                   </td>
 
                   {/* Acciones */}
-                  <td className="px-3 py-2">
-                    <div className="flex items-center justify-center gap-2">
+                  <td className="px-1 md:px-3 py-1 md:py-2">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
                       {editing ? (
                         <>
                           <button
                             type="button"
                             onClick={saveEdit}
-                            className="rounded p-2 border border-gray-900 hover:bg-gray-700"
+                            className="rounded p-2 border border-gray-900 hover:bg-gray-400"
                             aria-label="Guardar"
                             title="Guardar"
                           >
@@ -215,7 +215,7 @@ export default function ListadoStep({
                           <button
                             type="button"
                             onClick={cancelEdit}
-                            className="rounded p-2 border border-gray-900 hover:bg-gray-700"
+                            className="rounded p-2 border border-gray-900 hover:bg-gray-400"
                             aria-label="Cancelar"
                             title="Cancelar"
                           >
@@ -227,7 +227,7 @@ export default function ListadoStep({
                           <button
                             type="button"
                             onClick={() => startEdit(i)}
-                            className="rounded p-2 border border-gray-900 hover:bg-gray-700"
+                            className="rounded p-2 border border-gray-900 hover:bg-gray-400"
                             aria-label="Editar"
                             title="Editar"
                           >
@@ -238,7 +238,7 @@ export default function ListadoStep({
                             onClick={() => {
                               if (confirm("¿Quitar este registro?")) remove(i);
                             }}
-                            className="rounded p-2 border border-gray-900 hover:bg-gray-700 text-red-300"
+                            className="rounded p-2 border border-gray-900 hover:bg-gray-400 text-red-500"
                             aria-label="Eliminar"
                             title="Eliminar"
                           >

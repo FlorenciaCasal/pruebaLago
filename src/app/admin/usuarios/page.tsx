@@ -74,7 +74,7 @@ export default function AdminUsersPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-semibold">Usuarios</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold">Usuarios</h1>
 
             {/* Crear usuario admin */}
             <form onSubmit={onCreate} className="rounded-xl border border-neutral-800 bg-neutral-950 p-4 space-y-3">

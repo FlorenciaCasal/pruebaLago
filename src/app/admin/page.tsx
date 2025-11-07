@@ -31,21 +31,21 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Panel de Administración</h1>
+      <h1 className="text-xl sm:text-2xl font-semibold">Panel de Administración</h1>
 
       {/* Tarjetas */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4">
+        <div className="flex justify-between items-center sm:block rounded-xl border border-neutral-800 bg-neutral-950 py-2 px-4 sm:p-4">
           <div className="text-neutral-400 text-sm">Visitas Totales</div>
-          <div className="text-3xl font-semibold mt-1">{summary.all}</div>
+          <div className="text-2xl md:text-3xl font-semibold sm:mt-1">{summary.all}</div>
         </div>
-        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+        <div className="flex justify-between items-center sm:block rounded-xl border border-neutral-800 bg-neutral-950 py-2 px-4 sm:p-4">
           <div className="text-neutral-400 text-sm">Visitas de Hoy</div>
-          <div className="text-3xl font-semibold mt-1">{summary.today}</div>
+          <div className="text-2xl md:text-3xl font-semibold mt-1">{summary.today}</div>
         </div>
-        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+        <div className="flex justify-between items-center sm:block rounded-xl border border-neutral-800 bg-neutral-950 py-2 px-4 sm:p-4">
           <div className="text-neutral-400 text-sm">Visitas Pendientes</div>
-          <div className="text-3xl font-semibold mt-1">{summary.pending}</div>
+          <div className="text-2xl md:text-3xl font-semibold mt-1">{summary.pending}</div>
         </div>
       </div>
 

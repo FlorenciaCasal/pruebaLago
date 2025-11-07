@@ -196,19 +196,6 @@ export default function RegisterForm({
     return null;
   };
 
-  // const validateListado = () => {
-  //   if (fields.length !== totalEsperado) {
-  //     return `Debés cargar ${totalEsperado} visitante${totalEsperado === 1 ? "" : "s"}.`;
-  //   }
-  //   const falta = fields.findIndex((_, i) => {
-  //     const n = (watch(`personas.${i}.nombre`) ?? "").trim();
-  //     const a = (watch(`personas.${i}.apellido`) ?? "").trim();
-  //     const d = (watch(`personas.${i}.dni`) ?? "").trim();
-  //     return !n || !a || !d;
-  //   });
-  //   return falta >= 0 ? `Completá nombre, apellido y DNI del visitante ${falta + 1}.` : null;
-  // };
-
   const validateNecesidades = () => {
     const total = (adultos ?? 0) + (ninos ?? 0) + (bebes ?? 0);
     const mov = Number(watch("movilidadReducida") ?? 0);
@@ -399,8 +386,11 @@ export default function RegisterForm({
   // })();
 
   return (
-    <div className="flex items-center justify-center bg-transparent">
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-3xl text-left px-4 sm:px-6 py-10 text-black overflow-x-hidden">
+    // <div className="flex items-center justify-center bg-transparent">
+    <div className="flex flex-1 min-h-0 items-stretch bg-transparent">
+      <form onSubmit={handleSubmit(onSubmit)} 
+      className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-black overflow-x-hidden"
+      >
         {serverError && (
           <div className="mb-4 rounded-lg bg-red-600/20 border border-red-600 px-3 py-2 text-sm">
             {serverError}

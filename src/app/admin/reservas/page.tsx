@@ -35,6 +35,10 @@ export default function ReservasPage() {
   const tabsRef = React.useRef<HTMLDivElement>(null);
   const [pageCount, setPageCount] = React.useState(0);
   const [activePage, setActivePage] = React.useState(0);
+  const [showFilters, setShowFilters] = React.useState(false);
+  const [searchDni, setSearchDni] = React.useState<string>(""); // nuevo
+
+  const activeCount = [searchDate, searchName, searchDni].filter(Boolean).length;
 
 
   const load = React.useCallback(async () => {
@@ -44,14 +48,13 @@ export default function ReservasPage() {
       // Pasar la fecha al backend si está presente
       const d = await fetchReservations(status, searchDate || undefined);
 
-      // Filtrar por nombre en el frontend (ya que el backend no lo soporta)
       let filtered = d;
       if (searchName) {
-        const query = searchName.toLowerCase();
-        filtered = d.filter(r => {
-          const fullName = `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase();
-          return fullName.includes(query);
-        });
+        const q = searchName.toLowerCase();
+        filtered = filtered.filter(r => `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase().includes(q));
+      }
+      if (searchDni) {
+        filtered = filtered.filter(r => (r.dni ?? "").includes(searchDni));
       }
 
       setData(filtered);
@@ -60,7 +63,9 @@ export default function ReservasPage() {
     } finally {
       setLoading(false);
     }
-  }, [status, searchDate, searchName]);
+  }, [status, searchDate, searchName, searchDni]);
+
+
 
   React.useEffect(() => { load(); }, [load]);
 
@@ -184,13 +189,6 @@ export default function ReservasPage() {
         ))}
 
         <div className="ms-auto shrink-0">
-          {/* <button
-            onClick={load}
-            // className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
-            className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 snap-end"
-          >
-            Refrescar
-          </button> */}
           <button
             onClick={load}
             className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 snap-end inline-flex items-center gap-2"
@@ -223,21 +221,81 @@ export default function ReservasPage() {
         </div>
       )}
 
+      {/* Toolbar de filtros (solo mobile) */}
+      <div className="flex items-center justify-between sm:hidden">
+        <button
+          onClick={() => setShowFilters(v => !v)}
+          className="rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-1.5 text-sm"
+        >
+          {showFilters
+            ? `Filtros${activeCount ? ` (${activeCount})` : ""}`
+            : `Filtros${activeCount ? ` (${activeCount})` : ""}`}
+        </button>
+      </div>
 
-      {/* Búsqueda */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-3 sm:p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Chips activos (mobile) */}
+      {
+        activeCount > 0 && (
+          <div className="sm:hidden mt-2 flex flex-wrap gap-2">
+            {/* {searchDate && (
+              <button
+                onClick={() => setSearchDate("")}
+                className="inline-flex items-center gap-1 rounded-full bg-neutral-800 px-2.5 py-1 text-xs"
+              >
+                Fecha: {new Date(searchDate).toLocaleDateString("es-AR")} <span>×</span>
+              </button>
+            )} */}
+            {searchDate && (
+              <button
+                onClick={() => setSearchDate("")}
+                className="inline-flex items-center gap-1 rounded-full bg-neutral-800 px-2.5 py-1 text-xs"
+              >
+                Fecha: {searchDate.split("-").reverse().join("/")} <span>×</span>
+              </button>
+            )}
+            {searchName && (
+              <button
+                onClick={() => setSearchName("")}
+                className="inline-flex items-center gap-1 rounded-full bg-neutral-800 px-2.5 py-1 text-xs"
+              >
+                Nombre: “{searchName}” <span>×</span>
+              </button>
+            )}
+            {searchDni && (
+              <button
+                onClick={() => setSearchDni("")}
+                className="inline-flex items-center gap-1 rounded-full bg-neutral-800 px-2.5 py-1 text-xs"
+              >
+                DNI: {searchDni} <span>×</span>
+              </button>
+            )}
+          </div>
+        )
+      }
+
+
+      <div
+        className={
+          // en mobile: esconder si está cerrado y no hay activos; en sm+ siempre visible
+          `rounded-2xl border border-neutral-800 bg-neutral-950 ${!showFilters ? "hidden sm:block" : "block"} p-3 sm:p-4`
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {/* Fecha */}
           <div className="min-w-0">
-            <label className="block text-sm text-white mb-2">Buscar por fecha de visita</label>
+            <label className="hidden sm:block text-sm text-neutral-300 mb-2">Buscar por fecha de visita</label>
             <input
               type="date"
               value={searchDate}
               onChange={(e) => setSearchDate(e.target.value)}
-              className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black focus:border-neutral-500 focus:outline-none"
+              placeholder="Fecha de visita"
+              className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
             />
           </div>
+
+          {/* Nombre */}
           <div className="min-w-0">
-            <label className="block text-sm text-neutral-400 mb-2">Buscar por nombre</label>
+            <label className="hidden sm:block text-sm text-neutral-300 mb-2">Buscar por nombre</label>
             <input
               type="text"
               value={searchName}
@@ -246,21 +304,57 @@ export default function ReservasPage() {
               className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
             />
           </div>
-          <div className="flex items-end">
-            <button
-              onClick={() => { setSearchDate(""); setSearchName(""); }}
-              className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
-            >
-              Limpiar filtros
-            </button>
+
+          {/* DNI — NUEVO */}
+          <div className="min-w-0">
+            <label className="hidden sm:block text-sm text-neutral-300 mb-2">Buscar por DNI</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={searchDni}
+              onChange={(e) => setSearchDni(e.target.value.replace(/\D+/g, "").slice(0, 10))}
+              placeholder="DNI"
+              className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
+            />
           </div>
         </div>
-        {(searchDate || searchName) && (
+
+        {/* acciones abajo a la derecha en sm+; centrado en mobile */}
+        {/* <div className="mt-3 flex justify-center sm:justify-end">
+          <button
+            onClick={() => { setSearchDate(""); setSearchName(""); setSearchDni(""); }}
+            className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
+          >
+            Limpiar filtros
+          </button>
+        </div> */}
+        <div className="mt-3 flex justify-center sm:justify-end gap-2">
+          <button
+            onClick={() => setShowFilters(false)}
+            className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
+          >
+            Ocultar filtros
+          </button>
+
+          <button
+            onClick={() => { setSearchDate(""); setSearchName(""); setSearchDni(""); }}
+            className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+
+
+        {(searchDate || searchName || searchDni) && (
           <div className="mt-3 text-sm text-neutral-400">
-            {data.length} reserva{data.length !== 1 ? 's' : ''} encontrada{data.length !== 1 ? 's' : ''}
+            {data.length} reserva{data.length !== 1 ? "s" : ""} encontrada{data.length !== 1 ? "s" : ""}
           </div>
         )}
       </div>
+
+
+
+
 
       {/* Lista responsive */}
       {loading ? (

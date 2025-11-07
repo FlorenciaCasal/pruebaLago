@@ -39,7 +39,7 @@ export default function AgregarEventoPage() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Agregar reserva de tipo evento</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold">Agregar evento</h2>
 
             <form onSubmit={onSubmit} className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 grid grid-cols-1 gap-4">
                 <div>

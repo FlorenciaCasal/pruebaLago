@@ -66,7 +66,10 @@ export default function ContactoStep({
 
             <div className="grid sm:grid-cols-2 gap-3">
                 <div>
-                    <label className="block mb-1">Teléfono (10 dígitos)</label>
+                    <label className="block mb-1">
+                        Teléfono{" "}
+                        <span className="text-sm text-neutral-600">(sin el 0 y sin el 15)</span>
+                    </label>
                     <input
                         {...register("telefono", {
                             setValueAs: v => String(v ?? "").replace(/\D+/g, "").slice(0, 10),
@@ -76,7 +79,7 @@ export default function ContactoStep({
                         inputMode="numeric"
                         pattern="^[0-9]{10}$"
                         maxLength={10}
-                        placeholder=" Ej. 3512345678"
+                        placeholder=" Ej. 2944123456"
                         autoComplete="tel"
                     />
                 </div>

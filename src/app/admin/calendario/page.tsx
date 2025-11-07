@@ -132,7 +132,7 @@ export default function CalendarioAdminPage() {
         <div className="space-y-3 md:space-y-4">
             {/* <div className="flex items-center justify-between"> */}
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-lg md:text-xl font-semibold">Calendario</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold">Calendario</h2>
                 {/* <div className="flex gap-2"> */}
                 <div className="flex gap-2 items-center sm:ml-auto justify-between sm:justify-normal">
                     <button

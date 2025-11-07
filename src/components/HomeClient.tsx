@@ -49,11 +49,13 @@ export default function HomePage() {
 
   return (
     // <main className="min-h-screen flex flex-col bg-gray-900 items-center justify-center overflow-x-hidden p-4">
-    <main className="bg-rose-50 overflow-x-hidden">
+    <main className="bg-rose-50 overflow-x-hidden flex-1 flex flex-col min-h-0 h-full">
       {/* HERO SPLIT */}
-      <section className="mx-auto grid grid-cols-1 lg:grid-cols-2">
+      {/* <section className="mx-auto grid grid-cols-1 lg:grid-cols-2"> */}
+      <section className="flex-1 flex flex-col h-full lg:flex-row items-stretch min-h-0">
         {/* Izquierda: imagen */}
-        <div className="relative h-[40vh] lg:h-[calc(100vh-64px)]">
+        {/* <div className="relative h-[40vh] lg:h-[calc(100vh-64px)]"> */}
+        <div className="relative flex-1 flex min-h-[40vh] lg:min-h-0 ">
           <Image
             src="/img/form.png"            // ⚠️ poné tu imagen real
             alt="Lago Escondido"
@@ -65,9 +67,11 @@ export default function HomePage() {
         </div>
 
         {/* Derecha: tarjeta clara */}
-        <div className="flex items-center justify-center pt-6 lg:pt-10">
+        {/* <div className="flex items-center justify-center pt-6 lg:pt-10"> */}
+        <div className="flex-1 flex items-center justify-center p-6 lg:p-8 min-h-0">
           {/* <div className="w-full max-w-md rounded-2xl bg-white border border-emerald-200/60 shadow-xl p-6 md:p-7"> */}
-          <div className=" w-[90vw] max-w-xl lg:max-w-md rounded-2xl md:p-6 ">
+          {/* <div className=" w-[90vw] max-w-xl lg:max-w-md rounded-2xl md:p-6 "> */}
+          <div className="w-[90vw] max-w-xl lg:max-w-md">
             {/* <h2 className="text-2xl text-center font-semibold text-neutral-900 mb-4">
               Reserva tu visita
             </h2> */}
