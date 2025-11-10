@@ -1,13 +1,47 @@
 @import "tailwindcss";
 
+/* ====== Paleta semántica ====== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base actual */
+  --background: #FAFAFA;
+  /* Fondo muy claro */
+  --foreground: #333333;
+  /* Texto principal */
+
+  /* Nombres para reusar */
+  /* Fondo muy claro */
+  --text-main: #333333;
+  /* Texto principal (gris oscuro) */
+  --heading: #00665A;
+  /* Encabezados y títulos (verde oscuro) */
+  --link: #009577;
+  /* Enlaces e índice (verde medio) */
+  --accent-earth: #7A6E5A;
+  /* Detalles importantes (tono tierra suave) */
+
 }
 
+/* Tailwind v4: publica las variables como tokens de color */
 @theme inline {
+  /* Mantiene compat de tus tokens actuales */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* Tokens semánticos */
+  --color-text: var(--text-main);
+  --color-heading: var(--heading);
+  --color-link: var(--link);
+  --color-accent: var(--accent-earth);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  /* Si usás “primario/secundario” en componentes */
+  --color-primary: var(--link);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--accent-earth);
+  --color-secondary-foreground: #ffffff;
+
+  /* Tipografías que ya tenías */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -16,6 +50,18 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    /* Podés mantener los mismos tonos de marca; acá los aclaro apenas para legibilidad en dark */
+    --surface-verylight: #111111;
+    --text-main: #ededed;
+    --heading: #33A596;
+    /* variante un poco más luminosa del verde oscuro */
+    --link: #33BFA8;
+    /* verde medio más visible en dark */
+    --accent-earth: #9A8E78;
+    /* tierra suavemente aclarado */
+    --muted: #1a1a1a;
+    --border: #2a2a2a;
   }
 }
 
@@ -73,7 +119,9 @@ body {
   text-transform: capitalize !important;
 }
 
-button { cursor: pointer; }
+button {
+  cursor: pointer;
+}
 
 @media (max-width: 767px) {
 
@@ -112,12 +160,20 @@ button { cursor: pointer; }
 /* Mostrar spinners en inputs number (modo claro y oscuro) */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  opacity: 1; /* visibilidad forzada */
-  filter: invert(0); /* 0 = negro, 1 = blanco, ajustalo según el tema */
+  opacity: 1;
+  /* visibilidad forzada */
+  filter: invert(0);
+  /* 0 = negro, 1 = blanco, ajustalo según el tema */
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 @media (max-width: 640px) {
   .fade-edges-mobile {

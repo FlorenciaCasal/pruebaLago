@@ -20,8 +20,37 @@ const TABS: { key: AdminStatus; label: string }[] = [
   { key: "CANCELLED", label: "Canceladas" },
 ];
 
-// const fmtDT = (iso: string) =>
-//   new Date(iso).toLocaleString(undefined, { hour12: false });
+
+const STATUS_ES: Record<Exclude<AdminStatus, "ALL">, string> = {
+  PENDING: "Pendiente",
+  CONFIRMED: "Confirmada",
+  CANCELLED: "Cancelada",
+};
+
+// por si llega en minúsculas/mixto:
+function statusToEs(s: string) {
+  const key = s.trim().toUpperCase() as keyof typeof STATUS_ES;
+  return STATUS_ES[key] ?? s; // fallback por si aparece otro valor
+}
+
+const TIPO_ES: Record<string, string> = {
+  PARTICULAR: "Particular",
+  INSTITUCION_EDUCATIVA: "Institución educativa",
+};
+
+// Fallback genérico por si mañana aparece otro valor:
+function tipoToEs(v?: string) {
+  if (!v) return "-";
+  const key = v.trim().toUpperCase();
+  if (TIPO_ES[key]) return TIPO_ES[key];
+  // genérico: "ALGO_MAS" -> "Algo mas"
+  return v
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\p{L}/gu, (ch) => ch.toUpperCase());
+}
+
+
 
 export default function ReservasPage() {
   const [status, setStatus] = React.useState<AdminStatus>("ALL");
@@ -375,9 +404,11 @@ export default function ReservasPage() {
                 <div className="text-base font-medium">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</div>
                 <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                   <div><dt className="text-neutral-400">Personas</dt><dd>{r.personas ?? "-"}</dd></div>
-                  <div><dt className="text-neutral-400">Tipo</dt><dd className="break-words">{r.tipoVisitante ?? "-"}</dd></div>
+                  <div><dt className="text-neutral-400">Tipo</dt><dd className="break-words">{tipoToEs(r.tipoVisitante)}</dd></div>
                   <div><dt className="text-neutral-400">Circuito</dt><dd>{r.circuito ?? "-"}</dd></div>
-                  <div><dt className="text-neutral-400">Estado</dt><dd>{r.status}</dd></div>
+                  {/* <div><dt className="text-neutral-400">Estado</dt><dd>{r.status}</dd></div> */}
+                  <div> <dt className="text-neutral-400">Estado</dt><dd>{statusToEs(r.status)}</dd></div>
+
                   <div className="col-span-2"><dt className="text-neutral-400">Creada</dt><dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd></div>
                 </dl>
                 <div className="mt-3 flex justify-center sm:justify-end gap-4">
@@ -433,9 +464,12 @@ export default function ReservasPage() {
                         </td>
                         <td className="truncate">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
                         <td className="whitespace-nowrap">{r.personas ?? "-"}</td>
-                        <td className="break-words">{r.tipoVisitante ?? "-"}</td>
+                       <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
+
                         <td className="whitespace-nowrap">{r.circuito ?? "-"}</td>
-                        <td className="whitespace-nowrap">{r.status}</td>
+                        {/* <td className="whitespace-nowrap">{r.status}</td> */}
+                        <td className="whitespace-nowrap">{statusToEs(r.status)}</td>
+
                         {/* 👇 Creada: OCULTA en lg, visible en xl (misma regla que el th) */}
                         <td className="text-neutral-400 whitespace-nowrap hidden xl:table-cell">
                           {new Date(r.createdAt).toLocaleDateString("es-AR")}
