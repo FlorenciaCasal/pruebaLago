@@ -8,7 +8,7 @@ import { submitReservation } from "@/services/reservations";
 import type { ReservationFormData } from "@/types/reservation";
 import { useFieldArray } from "react-hook-form";
 import SaludStep from "../forms/SaludStep";
-import ConocisteStep from "../forms/ConocisteStep";
+// import ConocisteStep from "../forms/ConocisteStep";
 import SuccessModal from "@/components/SuccessModal";
 import { POLICIES_URL } from "./constants";
 import { useRegisterPrefillFromQS } from "./hooks/useRegisterPrefillFromQS";
@@ -121,7 +121,7 @@ export default function RegisterForm({
         { label: "Datos de la institución y responsable", type: "institucion" as const },
         { label: "Listado de visitantes", type: "listado" as const },
         { label: "Datos de salud o movilidad", type: "salud" as const },
-        { label: "Encuesta rápida", type: "conociste" as const },
+        // { label: "Encuesta rápida", type: "conociste" as const },
         { label: "Revisión y envío", type: "submit" as const },
       ] as const;
     }
@@ -130,7 +130,7 @@ export default function RegisterForm({
       { label: "Datos de la persona que hace la reserva", type: "contacto" as const },
       ...(totalEsperado === 0 ? [] : [{ label: "Acompañantes", type: "listado" as const }]),
       { label: "Datos de salud o movilidad", type: "salud" as const },
-      { label: "Encuesta rápida", type: "conociste" as const },
+      // { label: "Encuesta rápida", type: "conociste" as const },
       { label: "Revisión y envío", type: "submit" as const },
     ] as const;
   }, [tipo, totalEsperado]);
@@ -440,14 +440,14 @@ export default function RegisterForm({
               />
             )}
 
-            {step.type === "conociste" && (
+            {/* {step.type === "conociste" && (
               <ConocisteStep
                 register={register}
                 watch={watch}
                 setValue={setValue}
                 uxError={uxError}
               />
-            )}
+            )} */}
 
             {step.type === "submit" && (
               <SubmitStep

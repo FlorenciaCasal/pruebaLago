@@ -31,21 +31,6 @@ async function fetchInternal(path: string, init: RequestInit = {}) {
 
 export type AdminStatus = "ALL" | "PENDING" | "CONFIRMED" | "CANCELLED";
 
-// export type AdminReservation = {
-//     id: string;
-//     createdAt: string;
-//     reservationDate: string;
-//     circuito: "A" | "B" | "C" | "D";
-//     tipoVisitante: "PARTICULAR" | "INSTITUCION_EDUCATIVA";
-//     nombre: string;     // institución o "Nombre Apellido"
-//     apellido?: string;
-//     telefono?: string;
-//     correo?: string;
-//     personas: number;   // adults14Plus + minors
-//     status: "PENDING" | "CONFIRMED" | "CANCELLED";
-// };
-
-
 // Helper de check
 async function ok<T>(res: Response): Promise<T> {
     if (!res.ok) {
@@ -60,16 +45,6 @@ async function ok<T>(res: Response): Promise<T> {
     return res.json() as Promise<T>;
 }
 
-// Headers por defecto para peticiones autenticadas 
-// Por ahora no se usa "getAuthHeaders"
-
-// const getAuthHeaders = () => {
-//     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-//     return {
-//         'Authorization': token ? `Bearer ${token}` : '',
-//         'Content-Type': 'application/json'
-//     };
-// };
 
 export async function fetchReservations(
     status: AdminStatus = "PENDING",
@@ -79,12 +54,9 @@ export async function fetchReservations(
     if (status && status !== "ALL") params.append("status", status);
     if (date) params.append("date", date);
     const qs = params.toString() ? `?${params}` : "";
-
     const res = await fetchInternal(`/api/admin/reservations${qs}`);
     const backendData = await ok<BackendReservationDTO[]>(res);
-
     console.log(`Reservas recibidas del backend: ${backendData.length}`, backendData.map(r => r.visitDate));
-
     // Mapear del formato backend al formato frontend
     return backendData.map((r) => ({
         id: r.id,
@@ -100,34 +72,15 @@ export async function fetchReservations(
         correo: r.email,
         personas: r.adults18Plus + r.children2To17 + r.babiesLessThan2,
         status: r.status as "PENDING" | "CONFIRMED" | "CANCELLED",
+        dni: (r.dni ?? "").replace(/\D+/g, ""), // <--- NUEVO (normalizado)
+        // FUTURO: incluir acompañantes normalizados
+        // companions: r.companions?.map(c => ({
+        //   nombre: c.nombre,
+        //   apellido: c.apellido,
+        //   dni: c.dni.replace(/\D+/g, "")
+        // })),
     }));
 }
-
-//     return backendData.map((r) => {
-//         const personas = r.adults18Plus + r.children2To17 + r.babiesLessThan2;
-
-//         const tipoVisitante =
-//             r.visitorType === "EDUCATIONAL_INSTITUTION"
-//                 ? "INSTITUCION_EDUCATIVA"
-//                 : r.visitorType === "EVENT"
-//                     ? "EVENTO"
-//                     : "PARTICULAR";
-
-//         return {
-//             id: r.id,
-//             createdAt: r.createdAt,
-//             reservationDate: r.visitDate,
-//             circuito: r.circuit as "A" | "B" | "C" | "D",
-//             tipoVisitante,
-//             nombre: r.firstName,
-//             apellido: r.lastName,
-//             telefono: r.phone,
-//             correo: r.email,
-//             personas,
-//             status: r.status as "PENDING" | "CONFIRMED" | "CANCELLED",
-//         } satisfies AdminReservation;
-//     });
-// }
 
 export async function confirmReservation(id: string): Promise<void> {
 
@@ -220,83 +173,12 @@ export async function fetchRecentReservations(limit = 10) {
         .slice(0, limit);
 }
 
-
-// Eventos
-
-export type CreateEventInput = {
-    titulo: string;
-    // Guardamos en el form como string UTC con 'Z', porque es lo que pide el back
-    // Ej: "2025-11-15T17:00:00.000Z"
-    fechaISO: string;
-    circuito?: string | null;
-    cupo?: number | undefined;
-    notas?: string | null;
-};
-
-// Helpers de fecha
-// v: "YYYY-MM-DDTHH:mm" (hora local)  ->  "YYYY-MM-DDTHH:mm:ss.sssZ" (UTC)
-export function localInputToUtcZ(v: string): string {
-    return v ? new Date(v).toISOString() : "";
-}
-
-// utcZ: "YYYY-MM-DDTHH:mm:ss.sssZ" -> "YYYY-MM-DDTHH:mm" (para <input type="datetime-local">)
-export function utcZToLocalInput(utcZ: string): string {
-    if (!utcZ) return "";
-    const d = new Date(utcZ); // ese instante
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const y = d.getFullYear();
-    const m = pad(d.getMonth() + 1);
-    const day = pad(d.getDate());
-    const hh = pad(d.getHours());
-    const mm = pad(d.getMinutes());
-    return `${y}-${m}-${day}T${hh}:${mm}`;
-}
-
-// Mapea a los nombres EXACTOS del backend
-function mapToCreateEventRequest(input: CreateEventInput) {
-    return {
-        titulo: input.titulo.trim(),
-        fechaISO: input.fechaISO,                     // ya en UTC con Z
-        circuito: input.circuito?.trim() || null,
-        cupo: input.cupo ?? null,
-        notas: input.notas?.trim() || null,
-    };
-}
-
-export async function createEventReservation(
-    input: CreateEventInput
-): Promise<{ id: string }> {
-    const payload = mapToCreateEventRequest(input);
-
-    const res = await fetch("/api/admin/eventos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-        let msg = `Error HTTP ${res.status}`;
-        try {
-            const j = await res.json();
-            if (j?.message) msg = j.message;
-        } catch { }
-        throw new Error(msg);
-    }
-    return res.json();
-}
-
-
 export type BookingFlags = { individualEnabled: boolean; schoolEnabled: boolean };
 
 // PÚBLICO (sitio)
 export async function getPublicBookingFlags(): Promise<BookingFlags> {
     const r = await fetch("/api/booking-flags", { cache: "no-store" });
     if (!r.ok) throw new Error("No se pudo leer flags");
-    // const j = await r.json(); // { enabled: boolean }
-    // return {
-    //     individualEnabled: true,    // hoy siempre habilitado (no hay endpoint)
-    //     schoolEnabled: !!j.enabled, // mapeo desde el back
-    // };
     return r.json();
 }
 

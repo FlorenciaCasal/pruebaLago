@@ -76,6 +76,7 @@ export default function ReservasPage() {
     try {
       // Pasar la fecha al backend si está presente
       const d = await fetchReservations(status, searchDate || undefined);
+      console.log("BACK->UI count:", d.length, "DNIs:", d.slice(0, 5).map(x => x.dni));
 
       let filtered = d;
       if (searchName) {
@@ -83,7 +84,16 @@ export default function ReservasPage() {
         filtered = filtered.filter(r => `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase().includes(q));
       }
       if (searchDni) {
-        filtered = filtered.filter(r => (r.dni ?? "").includes(searchDni));
+        const q = searchDni.replace(/\D+/g, "");
+        filtered = filtered.filter(r => {
+          const mainDni = (r.dni ?? "").replace(/\D+/g, "");
+          // FUTURO: incluir también los acompañantes
+          // const companionMatch = r.companions?.some(c =>
+          //   (c.dni ?? "").replace(/\D+/g, "").includes(q)
+          // );
+          // return mainDni.includes(q) || companionMatch;
+          return mainDni.includes(q);
+        });
       }
 
       setData(filtered);
@@ -222,7 +232,7 @@ export default function ReservasPage() {
             onClick={load}
             className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 snap-end inline-flex items-center gap-2"
           >
-            <span className="hidden xs:inline">Refrescar</span>
+            <span className="hidden sm:inline">Actualizar</span>
             <svg className="xs:hidden w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 6v3l4-4-4-4v3a8 8 0 1 0 8 8h-2a6 6 0 1 1-6-6z" />
             </svg>
@@ -266,14 +276,6 @@ export default function ReservasPage() {
       {
         activeCount > 0 && (
           <div className="sm:hidden mt-2 flex flex-wrap gap-2">
-            {/* {searchDate && (
-              <button
-                onClick={() => setSearchDate("")}
-                className="inline-flex items-center gap-1 rounded-full bg-neutral-800 px-2.5 py-1 text-xs"
-              >
-                Fecha: {new Date(searchDate).toLocaleDateString("es-AR")} <span>×</span>
-              </button>
-            )} */}
             {searchDate && (
               <button
                 onClick={() => setSearchDate("")}
@@ -349,14 +351,6 @@ export default function ReservasPage() {
         </div>
 
         {/* acciones abajo a la derecha en sm+; centrado en mobile */}
-        {/* <div className="mt-3 flex justify-center sm:justify-end">
-          <button
-            onClick={() => { setSearchDate(""); setSearchName(""); setSearchDni(""); }}
-            className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
-          >
-            Limpiar filtros
-          </button>
-        </div> */}
         <div className="mt-3 flex justify-center sm:justify-end gap-2">
           <button
             onClick={() => setShowFilters(false)}
@@ -373,7 +367,6 @@ export default function ReservasPage() {
           </button>
         </div>
 
-
         {(searchDate || searchName || searchDni) && (
           <div className="mt-3 text-sm text-neutral-400">
             {data.length} reserva{data.length !== 1 ? "s" : ""} encontrada{data.length !== 1 ? "s" : ""}
@@ -381,26 +374,27 @@ export default function ReservasPage() {
         )}
       </div>
 
-
-
-
-
       {/* Lista responsive */}
       {loading ? (
         <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">Cargando...</div>
       ) : data.length === 0 ? (
         <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
-          {(searchDate || searchName)
+          {(searchDate || searchName || searchDni)
             ? "No se encontraron reservas con los filtros aplicados."
             : "No hay reservas."}
         </div>
       ) : (
         <>
           {/* En pantallas chicas: cards, sin scroll horizontal */}
+
           <div className="lg:hidden space-y-3">
             {data.map(r => (
               <div key={r.id} className="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <div className="text-sm text-neutral-400">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div>
+                <div className="flex gap-1 text-neutral-400">
+                  <dt className="text-neutral-400">Creada: </dt>
+                  <dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd>
+                </div>
+                {/* <div className="text-sm text-neutral-400">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div> */}
                 <div className="text-base font-medium">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</div>
                 <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                   <div><dt className="text-neutral-400">Personas</dt><dd>{r.personas ?? "-"}</dd></div>
@@ -409,7 +403,8 @@ export default function ReservasPage() {
                   {/* <div><dt className="text-neutral-400">Estado</dt><dd>{r.status}</dd></div> */}
                   <div> <dt className="text-neutral-400">Estado</dt><dd>{statusToEs(r.status)}</dd></div>
 
-                  <div className="col-span-2"><dt className="text-neutral-400">Creada</dt><dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd></div>
+                  <div className="col-span-2"><dt className="text-neutral-400">Fecha de visita</dt> <div className="text-sm text-white">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div></div>
+                  {/* <div className="col-span-2"><dt className="text-neutral-400">Creada</dt><dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd></div> */}
                 </dl>
                 <div className="mt-3 flex justify-center sm:justify-end gap-4">
                   {r.status !== "CONFIRMED" && r.status !== "CANCELLED" && (
@@ -442,7 +437,7 @@ export default function ReservasPage() {
                 <table className="w-full text-[13px] table-auto">
                   <thead className="bg-neutral-950/80">
                     <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400">
-                      <th className="w-32">Fecha reserva</th>
+                      <th className="w-32">Fecha de visita</th>
                       <th className="w-44">Nombre</th>
                       <th className="w-20">Personas</th>
                       {/* Tipo puede crecer pero con límite y rompiendo palabras */}
@@ -464,7 +459,7 @@ export default function ReservasPage() {
                         </td>
                         <td className="truncate">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
                         <td className="whitespace-nowrap">{r.personas ?? "-"}</td>
-                       <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
+                        <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
 
                         <td className="whitespace-nowrap">{r.circuito ?? "-"}</td>
                         {/* <td className="whitespace-nowrap">{r.status}</td> */}
