@@ -53,6 +53,7 @@ export default function ListadoStep({
     setBackup(null);
     onListChanged?.();
   };
+  
 
   return (
     <div className="space-y-4">
@@ -137,7 +138,7 @@ export default function ListadoStep({
             {fields.length === 0 && (
               <tr>
                 <td className="px-3 py-3 text-gray-900 text-center" colSpan={4}>
-                  {tipo === "INSTITUCION_EDUCATIVA" ? "Sin visitantes cargados." : "Sin acompañantes aún."}
+                  {tipo === "INSTITUCION_EDUCATIVA" ? "Sin visitantes cargados." : "Sin visitantes cargados."}
                 </td>
               </tr>
             )}

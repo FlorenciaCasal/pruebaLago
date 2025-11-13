@@ -65,19 +65,25 @@ export default async function AdminDashboard() {
           <table className="min-w-full text-sm">
             <thead className="bg-neutral-900/60">
               <tr className="[&>th]:px-4 [&>th]:py-2 text-left text-neutral-400">
-                <th>Nombre</th>
+                <th>Nombre y apellido</th>
                 <th>Tipo</th>
-                <th>Fecha de visita</th>
+                <th>Visita</th>
                 <th>Creada</th>
-                <th>Personas</th>
+                <th>Pax</th>
                 <th>Estado</th>
+                {/*  Agregado */}
+                {/* <th className="hidden md:table-cell">Email</th>
+                <th className="hidden md:table-cell">Teléfono</th> */}
+                <th >Email</th>
+                <th >Teléfono</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {recent.map((r) => (
                 <tr key={r.id} className="border-t border-neutral-800">
-                  <td className="px-4 py-2">{r.nombre}</td>
+                  {/* <td className="px-4 py-2">{r.nombre}</td> */}
+                   <td className="px-4 py-2 truncate">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
                   <td className="px-4 py-2">
                     {r.tipoVisitante === "INSTITUCION_EDUCATIVA" ? "Institución" : "Particular"}
                   </td>
@@ -85,6 +91,8 @@ export default async function AdminDashboard() {
                   <td className="px-4 py-2">{fmt(r.createdAt)}</td>
                   <td className="px-4 py-2">{r.personas}</td>
                   <td className="px-4 py-2"><StatusBadge s={r.status} /></td>
+                  <td className="px-4 py-2">{r.correo ?? "-"}</td>
+                  <td className="px-4 py-2">{r.telefono ?? "-"}</td>
 
                   {/* Aca deberiamos traer todos los datos, alergias, movilidad reducida, comentarios, o hacer una nueva page a la cual ir cuando clickeamos en ver/detalle
                   <td className="px-4 py-2">

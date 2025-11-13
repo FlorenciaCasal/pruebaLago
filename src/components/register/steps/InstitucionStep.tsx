@@ -23,6 +23,14 @@ export default function InstitucionStep({
                 <input {...register("responsableApellido")} placeholder="Apellido (responsable)" className={inputBase} />
                 <input {...register("responsableDni")} placeholder="DNI (responsable)" className={inputBase} />
             </div>
+            <label className="flex items-center gap-2 mt-4">
+                <input
+                    type="checkbox"
+                    {...register("reservaAsiste")}
+                    defaultChecked
+                />
+                <span>¿La persona responsable también va a presenciar la visita?</span>
+            </label>
 
             {uxError && <p className="text-red-400 text-sm">{uxError}</p>}
         </div>

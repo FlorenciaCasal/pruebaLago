@@ -1,4 +1,4 @@
-import type { ReservationFormData, ComoNosConociste } from "@/types/reservation";
+import type { ReservationFormData } from "@/types/reservation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
@@ -15,15 +15,15 @@ function mapVisitorType(t?: ReservationFormData["tipoVisitante"]) {
   return t === "INSTITUCION_EDUCATIVA" ? "EDUCATIONAL_INSTITUTION" : "INDIVIDUAL";
 }
 
-function mapHowHeard(v?: ComoNosConociste) {
-  switch (v) {
-    case "redes": return "SOCIAL";
-    case "recomendacion": return "RECOMMENDATION";
-    case "sitio": return "WEBSITE";
-    case "publicidad": return "ADS";
-    default: return "OTHER";
-  }
-}
+// function mapHowHeard(v?: ComoNosConociste) {
+//   switch (v) {
+//     case "redes": return "SOCIAL";
+//     case "recomendacion": return "RECOMMENDATION";
+//     case "sitio": return "WEBSITE";
+//     case "publicidad": return "ADS";
+//     default: return "OTHER";
+//   }
+// }
 
 async function tryParseJson(res: Response): Promise<BackendError | null> {
   const ct = res.headers.get("content-type") ?? "";
@@ -49,6 +49,12 @@ export async function submitReservation(data: ReservationFormData): Promise<{ id
   const phone = (isSchool ? data.institucionTelefono : data.telefono)?.trim() ?? "";
   const email = (isSchool ? data.institucionEmail : data.correo)?.trim() ?? "";
 
+  const visitors = (data.visitantes ?? []).map(v => ({
+    firstName: v.nombre,
+    lastName: v.apellido,
+    dni: v.dni,
+  }));
+
 
   // Mapear datos del frontend al formato del backend
   const backendData = {
@@ -69,8 +75,9 @@ export async function submitReservation(data: ReservationFormData): Promise<{ id
     allergies: data.alergias === "si" ? 1 : 0,
     comment: data.comentarios || "",
     originLocation,
-    howHeard: mapHowHeard(data.comoNosConociste),
-    acceptedPolicies: data.aceptaReglas
+    howHeard: "OTHER",
+    acceptedPolicies: data.aceptaReglas,
+    visitors,
   };
 
   const res = await fetch(`/api/reservations`, {

@@ -1,3 +1,10 @@
+
+export type Companion = {
+    nombre: string;
+    apellido: string;
+    dni: string;
+};
+
 export type AdminReservation = {
     id: string;
     createdAt: string;          // ISO
@@ -13,7 +20,7 @@ export type AdminReservation = {
     notas?: string;
     dni?: string; // Agregado recientemente para hacer busqueda por dni
     //  entiendo que aca tambien hay que agregar este campo cuando esté implementado en el backend:
-    // companions?: { nombre: string; apellido: string; dni: string }[];
+     companions?: Companion[];
 };
 
 export type CalendarMonthState = {

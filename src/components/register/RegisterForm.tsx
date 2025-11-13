@@ -74,6 +74,7 @@ export default function RegisterForm({
       adultos: qsAdults ?? 1,
       ninos: qsKids ?? 0,
       bebes: qsBabies ?? 0,
+      reservaAsiste: true, // NUEVO
     },
   });
 
@@ -110,7 +111,11 @@ export default function RegisterForm({
   }, [tipoForm, initialTipo, tipoFromQS]);
 
   const tp = Number(totalPersonas ?? 0);
-  const totalEsperado = tipo === "INSTITUCION_EDUCATIVA" ? tp : Math.max(0, tp - 1);
+  // ANTES:
+  // const totalEsperado = tipo === "INSTITUCION_EDUCATIVA" ? tp : Math.max(0, tp - 1);  
+  // AHORA: SIEMPRE igual al total (porque los visitantes son todos los que van físicamente)
+  const totalEsperado = tp;
+  console.log("totalEsperado", totalEsperado)
 
   type StepType = "contacto" | "institucion" | "listado" | "salud" | "conociste" | "submit";
 
@@ -128,12 +133,14 @@ export default function RegisterForm({
     // PARTICULAR
     return [
       { label: "Datos de la persona que hace la reserva", type: "contacto" as const },
-      ...(totalEsperado === 0 ? [] : [{ label: "Acompañantes", type: "listado" as const }]),
+      // ...(totalEsperado === 0 ? [] : [{ label: "Acompañantes", type: "listado" as const }]),
+      // { label: "Visitantes", type: "listado" as const },
+      { label: "Listado de visitantes", type: "listado" as const },
       { label: "Datos de salud o movilidad", type: "salud" as const },
       // { label: "Encuesta rápida", type: "conociste" as const },
       { label: "Revisión y envío", type: "submit" as const },
     ] as const;
-  }, [tipo, totalEsperado]);
+  }, [tipo]);
 
   // ----- STEP: la fuente de verdad es la URL -----
   const rawStep = Number(searchParams.get("step"));
@@ -274,9 +281,60 @@ export default function RegisterForm({
     return e.message;
   };
 
+  const getResponsableParticular = () => {
+    const { nombre, apellido, dni } = getContactoValues();
+    return { nombre, apellido, dni };
+  };
+
+  const getResponsableInstitucion = () => {
+    const nombre = clean(watch("responsableNombre"));
+    const apellido = clean(watch("responsableApellido"));
+    const dni = clean(watch("responsableDni"));
+    return { nombre, apellido, dni };
+  };
+
+  const composeVisitantes = (): Array<{ nombre: string; apellido: string; dni: string }> => {
+    const base = getListadoValues();
+
+    // Si la persona que reserva NO asiste, simplemente devolvemos el listado tal cual
+    if (!watch("reservaAsiste")) {
+      return base;
+    }
+
+    // Si asiste, según el tipo de visitante tomamos el responsable de un lado u otro
+    const responsable =
+      tipo === "INSTITUCION_EDUCATIVA"
+        ? getResponsableInstitucion()
+        : getResponsableParticular();
+
+    // Pequeña defensa por si en algún flujo todavía no está seteado
+    if (!responsable.nombre && !responsable.apellido && !responsable.dni) {
+      return base;
+    }
+
+    // Opcional: evitar duplicados por DNI si lo agregaron también a mano en el listado
+    const seen = new Set<string>();
+    const all = [responsable, ...base];
+    return all.filter(p => {
+      const key = p.dni || `${p.nombre}-${p.apellido}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
+
+  // const validateListadoWithYup = async (n: number): Promise<string | null> => {
+  //   try {
+  //     await listadoSchemaExact(n).validate(getListadoValues(), { abortEarly: true });
+  //     return null;
+  //   } catch (e) {
+  //     return e instanceof Yup.ValidationError ? prettyArrayError(e) : "Revisá el listado.";
+  //   }
+  // };
   const validateListadoWithYup = async (n: number): Promise<string | null> => {
     try {
-      await listadoSchemaExact(n).validate(getListadoValues(), { abortEarly: true });
+      await listadoSchemaExact(n).validate(composeVisitantes(), { abortEarly: true });
       return null;
     } catch (e) {
       return e instanceof Yup.ValidationError ? prettyArrayError(e) : "Revisá el listado.";
@@ -362,6 +420,7 @@ export default function RegisterForm({
         ...data,
         totalPersonas,
         reservationDate: data.fechaISO!,
+        visitantes: composeVisitantes(),
       });
       reset();
       setSuccessMsg("¡Reserva realizada con éxito!");
@@ -388,8 +447,8 @@ export default function RegisterForm({
   return (
     // <div className="flex items-center justify-center bg-transparent">
     <div className="flex flex-1 min-h-0 items-stretch bg-transparent">
-      <form onSubmit={handleSubmit(onSubmit)} 
-      className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-black overflow-x-hidden"
+      <form onSubmit={handleSubmit(onSubmit)}
+        className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-black overflow-x-hidden"
       >
         {serverError && (
           <div className="mb-4 rounded-lg bg-red-600/20 border border-red-600 px-3 py-2 text-sm">

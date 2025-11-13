@@ -83,6 +83,20 @@ export default function ContactoStep({
                         autoComplete="tel"
                     />
                 </div>
+
+ <div className="sm:col-span-2">
+                    <label className="block mb-1">
+                        <span>¿La persona que realiza la reserva también asiste?</span>
+                        <input
+                            type="checkbox"
+                            {...register("reservaAsiste")}
+                            defaultChecked
+                        />
+
+                    </label>
+
+                </div>
+
                 <div className="sm:col-span-2">
                     <label className="block mb-1">Ciudad de origen</label>
                     <CityAutocomplete

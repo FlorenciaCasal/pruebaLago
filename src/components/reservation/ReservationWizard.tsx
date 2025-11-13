@@ -155,15 +155,6 @@ export default function ReservationWizard({
           className="w-full rounded-xl border border-emerald-300 bg-transparent text-neutral-900 hover:border-emerald-500 hover:bg-emerald-50/40 transition"
         />
       </div>
-      {/* aviso arriba del flujo si escuela está bloqueada */}
-      {/* {isSchoolSoldOut && (
-        <div
-          className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 text-red-200 px-4 py-3">
-          <strong>Reservas para instituciones educativas</strong><br />
-          Temporalmente no disponibles.
-        </div>
-      )} */}
-
 
       {/* Panel: Tipo */}
       <SidePanel open={open === "TYPE"} title="Tipo de visitante" onClose={() => setOpen(null)}>

@@ -74,11 +74,11 @@ export async function fetchReservations(
         status: r.status as "PENDING" | "CONFIRMED" | "CANCELLED",
         dni: (r.dni ?? "").replace(/\D+/g, ""), // <--- NUEVO (normalizado)
         // FUTURO: incluir acompañantes normalizados
-        // companions: r.companions?.map(c => ({
-        //   nombre: c.nombre,
-        //   apellido: c.apellido,
-        //   dni: c.dni.replace(/\D+/g, "")
-        // })),
+        companions: r.visitors?.map(c => ({
+            nombre: c.firstName,
+            apellido: c.lastName,
+            dni: (c.dni ?? "").replace(/\D+/g, "")
+        })) ?? [],
     }));
 }
 

@@ -7,6 +7,7 @@ import {
   type AdminStatus,
 } from "@/services/admin";
 import type { AdminReservation } from "@/types/admin";
+import CompanionsDisclosure from "@/components/admin/CompanionsDisclosure";
 
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
@@ -66,9 +67,16 @@ export default function ReservasPage() {
   const [activePage, setActivePage] = React.useState(0);
   const [showFilters, setShowFilters] = React.useState(false);
   const [searchDni, setSearchDni] = React.useState<string>(""); // nuevo
-
   const activeCount = [searchDate, searchName, searchDni].filter(Boolean).length;
+  const [openRows, setOpenRows] = React.useState<Record<string, boolean>>({});
+  const toggleRow = (id: string) => setOpenRows(s => ({ ...s, [id]: !s[id] }));
 
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(min-width: 640px)").matches) {
+      setShowFilters(true); // sm+: arrancá abierto
+    }
+  }, []);
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -88,11 +96,11 @@ export default function ReservasPage() {
         filtered = filtered.filter(r => {
           const mainDni = (r.dni ?? "").replace(/\D+/g, "");
           // FUTURO: incluir también los acompañantes
-          // const companionMatch = r.companions?.some(c =>
-          //   (c.dni ?? "").replace(/\D+/g, "").includes(q)
-          // );
-          // return mainDni.includes(q) || companionMatch;
-          return mainDni.includes(q);
+          const companionMatch = r.companions?.some(c =>
+            (c.dni ?? "").replace(/\D+/g, "").includes(q)
+          );
+          return mainDni.includes(q) || companionMatch;
+          // return mainDni.includes(q);
         });
       }
 
@@ -227,7 +235,8 @@ export default function ReservasPage() {
           </button>
         ))}
 
-        <div className="ms-auto shrink-0">
+        {/* <div className="ms-auto shrink-0"> */}
+        <div className="ms-auto shrink-0 flex items-center gap-2">
           <button
             onClick={load}
             className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 snap-end inline-flex items-center gap-2"
@@ -237,6 +246,14 @@ export default function ReservasPage() {
               <path d="M12 6v3l4-4-4-4v3a8 8 0 1 0 8 8h-2a6 6 0 1 1-6-6z" />
             </svg>
           </button>
+
+          {/* Nuevo: toggle de filtros para sm+ */}
+          {/* <button
+            onClick={() => setShowFilters(v => !v)}
+            className="hidden sm:inline-flex rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+          >
+            {showFilters ? "Ocultar filtros" : `Filtros${activeCount ? ` (${activeCount})` : ""}`}
+          </button> */}
         </div>
       </div>
 
@@ -260,17 +277,6 @@ export default function ReservasPage() {
         </div>
       )}
 
-      {/* Toolbar de filtros (solo mobile) */}
-      <div className="flex items-center justify-between sm:hidden">
-        <button
-          onClick={() => setShowFilters(v => !v)}
-          className="rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-1.5 text-sm"
-        >
-          {showFilters
-            ? `Filtros${activeCount ? ` (${activeCount})` : ""}`
-            : `Filtros${activeCount ? ` (${activeCount})` : ""}`}
-        </button>
-      </div>
 
       {/* Chips activos (mobile) */}
       {
@@ -308,7 +314,7 @@ export default function ReservasPage() {
       <div
         className={
           // en mobile: esconder si está cerrado y no hay activos; en sm+ siempre visible
-          `rounded-2xl border border-neutral-800 bg-neutral-950 ${!showFilters ? "hidden sm:block" : "block"} p-3 sm:p-4`
+          `rounded-2xl border border-neutral-800 bg-neutral-950 ${showFilters ? "block" : "hidden"} p-3 sm:p-4`
         }
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -326,7 +332,7 @@ export default function ReservasPage() {
 
           {/* Nombre */}
           <div className="min-w-0">
-            <label className="hidden sm:block text-sm text-neutral-300 mb-2">Buscar por nombre</label>
+            <label className="hidden sm:block text-sm text-neutral-300 mb-2">Buscar por nombre o apellido</label>
             <input
               type="text"
               value={searchName}
@@ -374,6 +380,18 @@ export default function ReservasPage() {
         )}
       </div>
 
+      {/* Mostrar botón para volver a abrir filtros cuando están ocultos (solo en sm+)  */}
+      {!showFilters && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowFilters(true)}
+            className="rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-1.5 text-sm hover:bg-neutral-800"
+          >
+            {`Mostrar filtros${activeCount ? ` (${activeCount})` : ""}`}
+          </button>
+        </div>
+      )}
+
       {/* Lista responsive */}
       {loading ? (
         <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">Cargando...</div>
@@ -390,21 +408,30 @@ export default function ReservasPage() {
           <div className="lg:hidden space-y-3">
             {data.map(r => (
               <div key={r.id} className="rounded-2xl border border-neutral-800 bg-neutral-950 p-4">
-                <div className="flex gap-1 text-neutral-400">
+                <div className="flex gap-1 text-sm text-neutral-400">
                   <dt className="text-neutral-400">Creada: </dt>
                   <dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd>
                 </div>
                 {/* <div className="text-sm text-neutral-400">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div> */}
                 <div className="text-base font-medium">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</div>
                 <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <div><dt className="text-neutral-400">Personas</dt><dd>{r.personas ?? "-"}</dd></div>
+                  <div><dt className="text-neutral-400">Pax</dt><dd>{r.personas ?? "-"}</dd></div>
                   <div><dt className="text-neutral-400">Tipo</dt><dd className="break-words">{tipoToEs(r.tipoVisitante)}</dd></div>
                   <div><dt className="text-neutral-400">Circuito</dt><dd>{r.circuito ?? "-"}</dd></div>
                   {/* <div><dt className="text-neutral-400">Estado</dt><dd>{r.status}</dd></div> */}
                   <div> <dt className="text-neutral-400">Estado</dt><dd>{statusToEs(r.status)}</dd></div>
-
-                  <div className="col-span-2"><dt className="text-neutral-400">Fecha de visita</dt> <div className="text-sm text-white">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div></div>
+                  <div> <dt className="text-neutral-400">Email</dt><dd className="break-words">{r.correo ?? "-"}</dd></div>
+                  <div> <dt className="text-neutral-400">Teléfono</dt><dd>{r.telefono ?? "-"}</dd></div>
+                  <div><dt className="text-neutral-400">Fecha de visita</dt> <div className="text-sm text-white">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div></div>
                   {/* <div className="col-span-2"><dt className="text-neutral-400">Creada</dt><dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd></div> */}
+
+
+
+                  {/* Acompañantes (desplegable) */}
+                  <div className="mt-3">
+                    <CompanionsDisclosure companions={r.companions} dense />
+                  </div>
+
                 </dl>
                 <div className="mt-3 flex justify-center sm:justify-end gap-4">
                   {r.status !== "CONFIRMED" && r.status !== "CANCELLED" && (
@@ -432,43 +459,68 @@ export default function ReservasPage() {
 
           {/* En md+ : tabla (ya no debería generar scroll del body) */}
           <div className="hidden lg:block">
-            <div className="rounded-2xl border border-gray-800">
-              <div className="overflow-x-hidden"> {/* mantenemos sin scroll del body */}
-                <table className="w-full text-[13px] table-auto">
-                  <thead className="bg-neutral-950/80">
-                    <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400">
-                      <th className="w-32">Fecha de visita</th>
-                      <th className="w-44">Nombre</th>
-                      <th className="w-20">Personas</th>
-                      {/* Tipo puede crecer pero con límite y rompiendo palabras */}
-                      <th className="max-w-[14rem]">Tipo</th>
-                      <th className="w-20">Circuito</th>
-                      <th className="w-28">Estado</th>
-                      {/* “Creada” solo en xl, para priorizar Acciones en lg */}
-                      <th className="w-44 hidden xl:table-cell">Creada</th>
-                      {/* Acciones con ancho fijo y sin shrink */}
-                      <th className="w-[220px] shrink-0 text-center">Acciones</th>
-                    </tr>
-                  </thead>
+            <div className="rounded-2xl border border-gray-800 overflow-x-auto">
+              <table className="w-full text-[13px] table-auto">
+                <thead className="bg-neutral-950/80">
+                  <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400">
+                    <th className="w-32">Fecha de visita</th>
+                    <th className="w-44">Nombre y apellido</th>
+                    <th className="w-20">Pax</th>
+                    {/* Tipo puede crecer pero con límite y rompiendo palabras */}
+                    <th className="max-w-[14rem]">Tipo</th>
+                    <th className="w-20">Circuito</th>
+                    <th className="w-28">Estado</th>
+                    {/* “Creada” solo en xl, para priorizar Acciones en lg */}
+                    <th className="w-44 xl:table-cell">Creada</th>
+                    {/* Acciones con ancho fijo y sin shrink */}
+                    <th >Email</th>
+                    <th >Teléfono</th>
 
-                  <tbody className="divide-y divide-neutral-800">
-                    {data.map(r => (
-                      <tr key={r.id} className="[&>td]:px-2 [&>td]:py-2 align-top">
+                    <th className="w-40 text-center">Visitantes</th>
+
+
+                    <th className="w-[220px] shrink-0 text-center">Acciones</th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-neutral-800">
+                  {data.map(r => (
+                    <React.Fragment key={r.id}>
+                      <tr className="[&>td]:px-2 [&>td]:py-2 align-center">
                         <td className="whitespace-nowrap">
                           {new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}
                         </td>
                         <td className="truncate">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
                         <td className="whitespace-nowrap">{r.personas ?? "-"}</td>
                         <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
-
                         <td className="whitespace-nowrap">{r.circuito ?? "-"}</td>
-                        {/* <td className="whitespace-nowrap">{r.status}</td> */}
                         <td className="whitespace-nowrap">{statusToEs(r.status)}</td>
-
-                        {/* 👇 Creada: OCULTA en lg, visible en xl (misma regla que el th) */}
-                        <td className="text-neutral-400 whitespace-nowrap hidden xl:table-cell">
+                        <td className="text-neutral-400 whitespace-nowrap">
                           {new Date(r.createdAt).toLocaleDateString("es-AR")}
                         </td>
+
+                        <td className="whitespace-nowrap">{r.correo ?? "-"}</td>
+                        <td className="whitespace-nowrap">{r.telefono ?? "-"}</td>
+
+                        <td className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => toggleRow(r.id)}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm hover:text-[#8e8e8f]"
+                            aria-expanded={!!openRows[r.id]}
+                          >
+                            Ver {r.companions?.length ?? 0}
+                            <svg
+                              className={"w-4 h-4 transition-transform " + (openRows[r.id] ? "rotate-180" : "")}
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path d="M7 10l5 5 5-5H7z" />
+                            </svg>
+                          </button>
+                        </td>
+
                         <td>
                           <div className="flex flex-wrap justify-center gap-2">
                             {r.status !== "CONFIRMED" && r.status !== "CANCELLED" && (
@@ -492,10 +544,20 @@ export default function ReservasPage() {
                           </div>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+
+                      {openRows[r.id] && (
+                        <tr>
+                          <td colSpan={11} className="px-2 py-2 bg-neutral-950">
+                            <CompanionsDisclosure companions={r.companions} />
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+
+
+              </table>
             </div>
 
           </div>

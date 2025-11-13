@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-gray-800 text-neutral-100">
       {/* Topbar solo mobile: título + hamburguesa */}
-      <div className="lg:hidden sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-neutral-800">
+      <div className="xl:hidden sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-neutral-800">
         <div className="mx-auto max-w-screen-2xl px-4 h-12 flex items-center justify-between">
           {/* Título: lo sobreescribe cada página si quiere (ver ReservasPage) */}
           <h1 className="text-base font-medium">Secciones</h1>
@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="mx-auto max-w-screen-2xl px-4 py-6 grid grid-cols-12 gap-6">
 
         {/* Sidebar: visible solo en lg+ */}
-        <aside className="hidden lg:block col-span-3 min-w-0 lg:sticky lg:top-0">
+        <aside className="hidden xl:block col-span-3 min-w-0 lg:sticky lg:top-0">
           <div className="rounded-2xl border border-neutral-800 bg-neutral-950 lg:h-full lg:overflow-auto">
             <div className="px-4 py-4 lg:sticky lg:top-0 lg:bg-neutral-950 lg:z-10 lg:border-b lg:border-neutral-900/60">
               <p className="text-xs uppercase tracking-wide text-neutral-400">Secciones</p>
@@ -60,7 +60,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Contenido */}
-        <main className="col-span-12 lg:col-span-9 min-w-0">
+        <main className="col-span-12 xl:col-span-9 min-w-0">
           {children}
         </main>
       </div>

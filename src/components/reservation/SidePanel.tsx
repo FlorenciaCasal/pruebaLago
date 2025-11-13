@@ -43,13 +43,8 @@ export function SidePanel({
       className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={onClose}
     >
-      {/* Backdrop */}
-      {/* <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" /> */}
-
       {/* Card centrada */}
       <div
-        // className={`relative w-[90vw] ${width} lg:w-[30vw] mb-48 lg:mr-64 xl:mr-50 lg:mb-0 rounded-2xl bg-white text-neutral-900 shadow-2xl border border-neutral-200
-        //            max-h-[85vh] grid grid-rows-[auto,1fr] `}
         className={`
           relative z-10 ${widthClasses}
           rounded-2xl bg-white text-neutral-900 shadow-2xl border border-neutral-200

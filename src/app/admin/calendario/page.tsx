@@ -300,14 +300,14 @@ export default function CalendarioAdminPage() {
                                 <table className="min-w-full text-xs sm:text-sm">
                                     <thead className="bg-white/5">
                                         <tr className="[&>th]:px-4 [&>th]:py-2 [&>th]:text-left text-neutral-400">
-                                            <th>Nombre</th>
-                                            <th>Personas</th>
+                                            <th>Nombre y apellido</th>
+                                            <th>Pax</th>
                                             <th>Tipo</th>
                                             <th>Circuito</th>
-                                            {/* <th>Email</th>
-                                            <th>Teléfono</th> */}
-                                            <th className="hidden md:table-cell">Email</th>
-                                            <th className="hidden md:table-cell">Teléfono</th>
+                                            {/* <th className="hidden md:table-cell">Email</th>
+                                            <th className="hidden md:table-cell">Teléfono</th> */}
+                                            <th>Email</th>
+                                            <th>Teléfono</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-neutral-800">
@@ -321,8 +321,8 @@ export default function CalendarioAdminPage() {
                                                     <td>{r.circuito ?? "-"}</td>
                                                     {/* <td className="text-neutral-400">{r.correo ?? "-"}</td>
                                                     <td className="text-neutral-400">{r.telefono ?? "-"}</td> */}
-                                                    <td className="text-neutral-400 hidden md:table-cell">{r.correo ?? "-"}</td>
-                                                    <td className="text-neutral-400 hidden md:table-cell">{r.telefono ?? "-"}</td>
+                                                    <td>{r.correo ?? "-"}</td>
+                                                    <td>{r.telefono ?? "-"}</td>
                                                 </tr>
                                             ))}
                                     </tbody>
