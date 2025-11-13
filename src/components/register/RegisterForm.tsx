@@ -117,6 +117,10 @@ export default function RegisterForm({
   const totalEsperado = tp;
   console.log("totalEsperado", totalEsperado)
 
+  const reservaAsiste = watch("reservaAsiste") ?? true;
+  // 👇 cantidad de filas que hay que cargar en el listado (solo acompañantes)
+  const extraListado = Math.max(tp - (reservaAsiste ? 1 : 0), 0);
+
   type StepType = "contacto" | "institucion" | "listado" | "salud" | "conociste" | "submit";
 
   // ----- Steps (DEBE declararse ANTES de leer safeIndex) -----
@@ -124,7 +128,8 @@ export default function RegisterForm({
     if (tipo === "INSTITUCION_EDUCATIVA") {
       return [
         { label: "Datos de la institución y responsable", type: "institucion" as const },
-        { label: "Listado de visitantes", type: "listado" as const },
+        // { label: "Listado de visitantes", type: "listado" as const },
+        ...(extraListado === 0 ? [] : [{ label: "Listado de visitantes", type: "listado" as const }]),
         { label: "Datos de salud o movilidad", type: "salud" as const },
         // { label: "Encuesta rápida", type: "conociste" as const },
         { label: "Revisión y envío", type: "submit" as const },
@@ -133,14 +138,13 @@ export default function RegisterForm({
     // PARTICULAR
     return [
       { label: "Datos de la persona que hace la reserva", type: "contacto" as const },
-      // ...(totalEsperado === 0 ? [] : [{ label: "Acompañantes", type: "listado" as const }]),
-      // { label: "Visitantes", type: "listado" as const },
-      { label: "Listado de visitantes", type: "listado" as const },
+      // { label: "Listado de visitantes", type: "listado" as const },
+      ...(extraListado === 0 ? [] : [{ label: "Listado de visitantes", type: "listado" as const }]),
       { label: "Datos de salud o movilidad", type: "salud" as const },
       // { label: "Encuesta rápida", type: "conociste" as const },
       { label: "Revisión y envío", type: "submit" as const },
     ] as const;
-  }, [tipo]);
+  }, [tipo, extraListado]);
 
   // ----- STEP: la fuente de verdad es la URL -----
   const rawStep = Number(searchParams.get("step"));
@@ -168,7 +172,7 @@ export default function RegisterForm({
   const onListadoMaybeFixed = async () => {
     // solo si estamos en el paso listado
     if (steps[safeIndex]?.type !== "listado") return;
-    const msg = await validateListadoWithYup(totalEsperado);
+    const msg = await validateListadoWithYup(extraListado);
     if (!msg && uxError) setUxError(null);
   };
 
@@ -323,15 +327,6 @@ export default function RegisterForm({
     });
   };
 
-
-  // const validateListadoWithYup = async (n: number): Promise<string | null> => {
-  //   try {
-  //     await listadoSchemaExact(n).validate(getListadoValues(), { abortEarly: true });
-  //     return null;
-  //   } catch (e) {
-  //     return e instanceof Yup.ValidationError ? prettyArrayError(e) : "Revisá el listado.";
-  //   }
-  // };
   const validateListadoWithYup = async (n: number): Promise<string | null> => {
     try {
       await listadoSchemaExact(n).validate(composeVisitantes(), { abortEarly: true });
@@ -478,7 +473,8 @@ export default function RegisterForm({
                 append={append}
                 remove={remove}
                 setValue={setValue}
-                totalEsperado={totalEsperado}
+                // totalEsperado={totalEsperado}
+                totalEsperado={extraListado}
                 tipo={tipo ?? null}
                 uxError={uxError}
                 onListChanged={onListadoMaybeFixed}
