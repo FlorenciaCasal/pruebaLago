@@ -68,7 +68,7 @@ export default function ContactoStep({
                 <div>
                     <label className="block mb-1">
                         Teléfono{" "}
-                        <span className="text-sm text-neutral-600">(sin el 0 y sin el 15)</span>
+                        <span className="text-xs text-neutral-600">(sin el 0 y sin el 15)</span>
                     </label>
                     <input
                         {...register("telefono", {
@@ -84,29 +84,41 @@ export default function ContactoStep({
                     />
                 </div>
 
- <div className="sm:col-span-2">
-                    <label className="block mb-1">
-                        <span>¿La persona que realiza la reserva también asiste?</span>
-                        <input
-                            type="checkbox"
-                            {...register("reservaAsiste")}
-                            defaultChecked
+                    <div>
+                        <label className="block mb-1">Ciudad de origen</label>
+                        <CityAutocomplete
+                            value={watch("origenVisita") || ""}
+                            onChange={(value) => setValue("origenVisita", value.trim(), { shouldDirty: true })}
+                            // placeholder="Ej. Córdoba, Argentina"
+                            className={inputBase}
+                            inputMode="text"
+                            maxLength={80}
                         />
-
-                    </label>
-
-                </div>
+                    </div>
+              
 
                 <div className="sm:col-span-2">
-                    <label className="block mb-1">Ciudad de origen</label>
-                    <CityAutocomplete
-                        value={watch("origenVisita") || ""}
-                        onChange={(value) => setValue("origenVisita", value.trim(), { shouldDirty: true })}
-                        // placeholder="Ej. Córdoba, Argentina"
-                        className={inputBase}
-                        inputMode="text"
-                        maxLength={80}
-                    />
+                    {/* <label className="block mb-1"> */}
+                    <label className="mt-4 flex items-center justify-between gap-4">
+                        <span>¿La persona que realiza la reserva también asiste?</span>
+                        <div className="relative w-11 h-6">
+                            {/* checkbox real, oculto pero sigue recibiendo el click por estar dentro del label */}
+                            <input
+                                type="checkbox"
+                                {...register("reservaAsiste")}
+                                defaultChecked
+                                className="peer sr-only"
+                            />
+                            {/* pista del switch */}
+                            <div
+                                className="w-11 h-6 rounded-full bg-gray-300 peer-checked:bg-emerald-500 transition-colors duration-200 cursor-pointer"
+                            />
+                            {/* bolita */}
+                            <div
+                                className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transform transition-transform duration-200 peer-checked:translate-x-5"
+                            />
+                        </div>
+                    </label>
                 </div>
             </div>
 

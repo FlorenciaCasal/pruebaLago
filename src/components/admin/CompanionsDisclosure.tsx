@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import type { Companion } from "@/types/admin";
+import formatName from "@/utils/formatName";
 
 type Props = {
     companions?: Companion[];
@@ -55,12 +56,15 @@ export default function CompanionsDisclosure({
                 >
                     {dense ? (
                         <ul className="p-2 text-sm space-y-1">
-                            {companions.map((c, i) => (
-                                <li key={i} className="flex justify-between gap-2">
-                                    <span className="truncate">{[c.nombre, c.apellido].filter(Boolean).join(" ")}</span>
-                                    <span className="font-mono text-neutral-300">{c.dni || "-"}</span>
-                                </li>
-                            ))}
+                            {companions.map((c, i) => {
+                                const fullName = [c.nombre, c.apellido].filter(Boolean).join(" ");
+                                return (
+                                    <li key={i} className="flex justify-between gap-2">
+                                        <span className="break-words">{formatName(fullName)}</span>
+                                        <span className="font-mono text-neutral-300">{c.dni || "-"}</span>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     ) : (
                         <table className="w-full text-sm">
@@ -71,12 +75,15 @@ export default function CompanionsDisclosure({
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-800">
-                                {companions.map((c, i) => (
-                                    <tr key={i} className="[&>td]:px-3 [&>td]:py-2">
-                                        <td className="truncate">{[c.nombre, c.apellido].filter(Boolean).join(" ")}</td>
-                                        <td className="font-mono">{c.dni || "-"}</td>
-                                    </tr>
-                                ))}
+                                {companions.map((c, i) => {
+                                    const fullName = [c.nombre, c.apellido].filter(Boolean).join(" ");
+                                    return (
+                                        <tr key={i} className="[&>td]:px-3 [&>td]:py-2">
+                                            <td className="truncate">{formatName(fullName)}</td>
+                                            <td className="font-mono">{c.dni || "-"}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     )}

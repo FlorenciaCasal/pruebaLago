@@ -13,7 +13,7 @@ import type { ReservationFormData } from "@/types/reservation";
 
 export default function ListadoStep({
   fields, register, watch, append, remove, setValue,
-  totalEsperado, tipo, uxError, onListChanged,
+  totalEsperado, tipo, uxError, onListChanged, reservaAsiste,
 }: {
   fields: FieldArrayWithId<ReservationFormData, "personas", "id">[];
   register: UseFormRegister<ReservationFormData>;
@@ -22,6 +22,7 @@ export default function ListadoStep({
   remove: UseFieldArrayRemove;
   setValue: UseFormSetValue<ReservationFormData>;
   totalEsperado: number;
+  reservaAsiste: boolean;
   tipo: "PARTICULAR" | "INSTITUCION_EDUCATIVA" | null;
   uxError: string | null;
   onListChanged?: () => void;
@@ -29,6 +30,7 @@ export default function ListadoStep({
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [backup, setBackup] = useState<{ nombre: string; apellido: string; dni: string } | null>(null);
   const canAddMore = fields.length < totalEsperado;
+
 
   const startEdit = (i: number) => {
     const nombre = String(watch(`personas.${i}.nombre`) ?? "");
@@ -53,15 +55,23 @@ export default function ListadoStep({
     setBackup(null);
     onListChanged?.();
   };
-  
+
 
   return (
     <div className="space-y-4">
-      {tipo === "PARTICULAR" && (
-        <p className="text-xs text-gray-700">
-          No incluyas a la persona que reserva, la misma ya fue cargada en el paso anterior.
-        </p>
-      )}
+      {/* {tipo === "PARTICULAR" && ( */}
+      <p className="text-sm">
+        {reservaAsiste ? (
+          <> Cargá a todas las personas que asistirán, excepto al responsable.
+            <span className="block text-xs text-gray-600">
+              El mismo fue incluido automáticamente en el paso anterior.
+            </span>
+          </>
+        ) : (
+          "Cargá a todas las personas que asistirán."
+        )}
+      </p>
+      {/* )} */}
 
       {/* mini form para agregar */}
       <div className="rounded-lg border border-gray-900 bg-white/5 p-4 space-y-3">

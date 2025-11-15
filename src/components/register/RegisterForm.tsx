@@ -478,6 +478,7 @@ export default function RegisterForm({
                 tipo={tipo ?? null}
                 uxError={uxError}
                 onListChanged={onListadoMaybeFixed}
+                reservaAsiste={reservaAsiste}
               />
             )}
 

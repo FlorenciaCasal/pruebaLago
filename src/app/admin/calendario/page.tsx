@@ -3,6 +3,7 @@ import React from "react";
 import { getCalendarState, setDayEnabled, setMonthEnabled, fetchReservations } from "@/services/admin";
 import type { CalendarMonthState, AdminReservation } from "@/types/admin";
 import BookingFlagsInline from "@/components/admin/BookingFlagsInline";
+import formatName from "@/utils/formatName";
 
 // const DEFAULT_CAPACITY =
 //   Number(process.env.NEXT_PUBLIC_DEFAULT_CAPACITY ?? 30); // mismo que app.defaultCapacity
@@ -313,26 +314,28 @@ export default function CalendarioAdminPage() {
                                     <tbody className="divide-y divide-neutral-800">
                                         {reservations
                                             .filter(r => r.reservationDate === selectedDay)
-                                            .map(r => (
-                                                <tr key={r.id} className="[&>td]:px-4 [&>td]:py-3">
-                                                    <td>{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
-                                                    <td>{r.personas ?? "-"}</td>
-                                                    <td>{r.tipoVisitante ?? "-"}</td>
-                                                    <td>{r.circuito ?? "-"}</td>
-                                                    {/* <td className="text-neutral-400">{r.correo ?? "-"}</td>
-                                                    <td className="text-neutral-400">{r.telefono ?? "-"}</td> */}
-                                                    <td>{r.correo ?? "-"}</td>
-                                                    <td>{r.telefono ?? "-"}</td>
-                                                </tr>
-                                            ))}
+                                            .map(r => {
+                                                const fullName = [r.nombre, r.apellido].filter(Boolean).join(" ");
+                                                return (
+                                                    <tr key={r.id} className="[&>td]:px-4 [&>td]:py-3" >
+                                                        <td>{formatName(fullName) || "-"}</td>
+                                                        <td>{r.personas ?? "-"}</td>
+                                                        <td>{r.tipoVisitante ?? "-"}</td>
+                                                        <td>{r.circuito ?? "-"}</td>
+                                                        <td> {r.correo ?? "-"}</td>
+                                                        <td>{r.telefono ?? "-"}</td>
+                                                    </tr>
+                                                );
+                                            })}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                    )}
-                </div>
+                    )
+                    }
+                </div >
             )}
-        </div>
+        </div >
     )
 }
 

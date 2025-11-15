@@ -23,13 +23,28 @@ export default function InstitucionStep({
                 <input {...register("responsableApellido")} placeholder="Apellido (responsable)" className={inputBase} />
                 <input {...register("responsableDni")} placeholder="DNI (responsable)" className={inputBase} />
             </div>
-            <label className="flex items-center gap-2 mt-4">
-                <input
-                    type="checkbox"
-                    {...register("reservaAsiste")}
-                    defaultChecked
-                />
-                <span>¿La persona responsable también va a presenciar la visita?</span>
+
+            <label className="mt-4 flex items-center justify-between gap-4">
+                <span className="text-sm font-medium">
+                    ¿El responsable asistirá a la visita?
+                </span>
+                <div className="relative w-11 h-6">
+                    {/* checkbox real, oculto pero sigue recibiendo el click por estar dentro del label */}
+                    <input
+                        type="checkbox"
+                        {...register("reservaAsiste")}
+                        defaultChecked
+                        className="peer sr-only"
+                    />
+                    {/* pista del switch */}
+                    <div
+                        className="w-11 h-6 rounded-full bg-gray-300 peer-checked:bg-emerald-500 transition-colors duration-200 cursor-pointer"
+                    />
+                    {/* bolita */}
+                    <div
+                        className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transform transition-transform duration-200 peer-checked:translate-x-5"
+                    />
+                </div>
             </label>
 
             {uxError && <p className="text-red-400 text-sm">{uxError}</p>}

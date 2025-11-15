@@ -1,7 +1,6 @@
-// app/admin/page.tsx
-
 import Link from "next/link";
 import { getAdminSummary, fetchRecentReservations } from "@/services/admin";
+import formatName from "@/utils/formatName";
 
 function StatusBadge({ s }: { s: "PENDING" | "CONFIRMED" | "CANCELLED" }) {
   const cls =
@@ -28,6 +27,7 @@ export default async function AdminDashboard() {
     getAdminSummary(),
     fetchRecentReservations(10),
   ]);
+
 
   return (
     <div className="space-y-6">
@@ -80,21 +80,22 @@ export default async function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {recent.map((r) => (
-                <tr key={r.id} className="border-t border-neutral-800">
-                  {/* <td className="px-4 py-2">{r.nombre}</td> */}
-                   <td className="px-4 py-2 truncate">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
-                  <td className="px-4 py-2">
-                    {r.tipoVisitante === "INSTITUCION_EDUCATIVA" ? "Institución" : "Particular"}
-                  </td>
-                  <td className="px-4 py-2">{fmt(r.reservationDate)}</td>
-                  <td className="px-4 py-2">{fmt(r.createdAt)}</td>
-                  <td className="px-4 py-2">{r.personas}</td>
-                  <td className="px-4 py-2"><StatusBadge s={r.status} /></td>
-                  <td className="px-4 py-2">{r.correo ?? "-"}</td>
-                  <td className="px-4 py-2">{r.telefono ?? "-"}</td>
+              {recent.map((r) => {
+                const fullName = [r.nombre, r.apellido].filter(Boolean).join(" ");
+                return (
+                  <tr key={r.id} className="border-t border-neutral-800">
+                    <td className="px-4 py-2 truncate">{formatName(fullName) || "-"}</td>
+                    <td className="px-4 py-2">
+                      {r.tipoVisitante === "INSTITUCION_EDUCATIVA" ? "Institución" : "Particular"}
+                    </td>
+                    <td className="px-4 py-2">{fmt(r.reservationDate)}</td>
+                    <td className="px-4 py-2">{fmt(r.createdAt)}</td>
+                    <td className="px-4 py-2">{r.personas}</td>
+                    <td className="px-4 py-2"><StatusBadge s={r.status} /></td>
+                    <td className="px-4 py-2">{r.correo ?? "-"}</td>
+                    <td className="px-4 py-2">{r.telefono ?? "-"}</td>
 
-                  {/* Aca deberiamos traer todos los datos, alergias, movilidad reducida, comentarios, o hacer una nueva page a la cual ir cuando clickeamos en ver/detalle
+                    {/* Aca deberiamos traer todos los datos, alergias, movilidad reducida, comentarios, o hacer una nueva page a la cual ir cuando clickeamos en ver/detalle
                   <td className="px-4 py-2">
                     <Link
                       href="/admin/reservas"
@@ -104,8 +105,9 @@ export default async function AdminDashboard() {
                     </Link>
                   </td> */}
 
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
               {recent.length === 0 && (
                 <tr>
                   <td className="px-4 py-8 text-center text-neutral-400" colSpan={7}>

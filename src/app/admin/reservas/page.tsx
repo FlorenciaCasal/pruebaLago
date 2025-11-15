@@ -1,11 +1,6 @@
 "use client";
 import React from "react";
-import {
-  fetchReservations,
-  confirmReservation,
-  cancelReservation,
-  type AdminStatus,
-} from "@/services/admin";
+import { fetchReservations, confirmReservation, cancelReservation, type AdminStatus, } from "@/services/admin";
 import type { AdminReservation } from "@/types/admin";
 import CompanionsDisclosure from "@/components/admin/CompanionsDisclosure";
 
@@ -20,7 +15,6 @@ const TABS: { key: AdminStatus; label: string }[] = [
   { key: "CONFIRMED", label: "Confirmadas" },
   { key: "CANCELLED", label: "Canceladas" },
 ];
-
 
 const STATUS_ES: Record<Exclude<AdminStatus, "ALL">, string> = {
   PENDING: "Pendiente",
@@ -50,7 +44,6 @@ function tipoToEs(v?: string) {
     .replace(/_/g, " ")
     .replace(/\b\p{L}/gu, (ch) => ch.toUpperCase());
 }
-
 
 
 export default function ReservasPage() {
@@ -88,9 +81,22 @@ export default function ReservasPage() {
 
       let filtered = d;
       if (searchName) {
-        const q = searchName.toLowerCase();
-        filtered = filtered.filter(r => `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase().includes(q));
+        const q = searchName.trim().toLowerCase();
+        filtered = filtered.filter(r => {
+          // nombre + apellido del responsable
+          const mainName = `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase();
+
+          // ¿coincide con algún acompañante?
+          const companionMatch = r.companions?.some(c => {
+            const compName = `${c.nombre ?? ""} ${c.apellido ?? ""}`.toLowerCase();
+            return compName.includes(q);
+          }) ?? false;
+
+          // matchea responsable O algún acompañante
+          return mainName.includes(q) || companionMatch;
+        });
       }
+
       if (searchDni) {
         const q = searchDni.replace(/\D+/g, "");
         filtered = filtered.filter(r => {
@@ -412,9 +418,9 @@ export default function ReservasPage() {
                   <dt className="text-neutral-400">Creada: </dt>
                   <dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd>
                 </div>
-                {/* <div className="text-sm text-neutral-400">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div> */}
-                <div className="text-base font-medium">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</div>
                 <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                  <div> <dt className="text-neutral-400">Nombre y apellido</dt><dd>{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</dd></div>
+                  <div> <dt className="text-neutral-400">DNI</dt><dd>{r.dni ?? "-"}</dd></div>
                   <div><dt className="text-neutral-400">Pax</dt><dd>{r.personas ?? "-"}</dd></div>
                   <div><dt className="text-neutral-400">Tipo</dt><dd className="break-words">{tipoToEs(r.tipoVisitante)}</dd></div>
                   <div><dt className="text-neutral-400">Circuito</dt><dd>{r.circuito ?? "-"}</dd></div>
@@ -428,7 +434,7 @@ export default function ReservasPage() {
 
 
                   {/* Acompañantes (desplegable) */}
-                  <div className="mt-3">
+                  <div className="mt-3 col-span-2">
                     <CompanionsDisclosure companions={r.companions} dense />
                   </div>
 
@@ -465,6 +471,7 @@ export default function ReservasPage() {
                   <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400">
                     <th className="w-32">Fecha de visita</th>
                     <th className="w-44">Nombre y apellido</th>
+                    <th className="w-20">DNI</th>
                     <th className="w-20">Pax</th>
                     {/* Tipo puede crecer pero con límite y rompiendo palabras */}
                     <th className="max-w-[14rem]">Tipo</th>
@@ -491,6 +498,7 @@ export default function ReservasPage() {
                           {new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}
                         </td>
                         <td className="truncate">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
+                        <td className="text-neutral-400">{r.dni ?? "-"}</td>
                         <td className="whitespace-nowrap">{r.personas ?? "-"}</td>
                         <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
                         <td className="whitespace-nowrap">{r.circuito ?? "-"}</td>
@@ -547,7 +555,7 @@ export default function ReservasPage() {
 
                       {openRows[r.id] && (
                         <tr>
-                          <td colSpan={11} className="px-2 py-2 bg-neutral-950">
+                          <td colSpan={12} className="px-2 py-2 bg-neutral-950">
                             <CompanionsDisclosure companions={r.companions} />
                           </td>
                         </tr>
