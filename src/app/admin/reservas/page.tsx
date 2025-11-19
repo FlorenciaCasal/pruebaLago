@@ -3,6 +3,32 @@ import React from "react";
 import { fetchReservations, confirmReservation, cancelReservation, type AdminStatus, } from "@/services/admin";
 import type { AdminReservation } from "@/types/admin";
 import CompanionsDisclosure from "@/components/admin/CompanionsDisclosure";
+// import ExportExcelButton from "@/components/ExportExcelButton";
+import * as XLSX from "xlsx";
+
+
+function exportToExcel(data: AdminReservation[]) {
+  const rows = data.map(r => ({
+    FechaVisita: new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR"),
+    NombreResponsable: r.nombre,
+    ApellidoResponsable : r.apellido,
+    DNIResponsable: r.dni,
+    Pax: r.personas,
+    Tipo: r.tipoVisitante,
+    Estado: r.status,
+    EmailResponsable: r.correo,
+    TeléfonoResponsable: r.telefono,
+    Visitantes: r.companions?.map(c => `${c.nombre} ${c.apellido} (DNI ${c.dni}), `).join("\n") ?? "",
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Reservas");
+
+  XLSX.writeFile(workbook, "reservas.xlsx");
+}
+
+
 
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
@@ -397,6 +423,23 @@ export default function ReservasPage() {
           </button>
         </div>
       )}
+
+
+      {/* 
+      {searchDate && (
+        <div className="flex justify-end mt-4">
+          <ExportExcelButton date={searchDate} />
+        </div>
+      )} */}
+      <button
+        onClick={() => exportToExcel(data)}
+        className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+      >
+        Exportar a Excel
+      </button>
+
+
+
 
       {/* Lista responsive */}
       {loading ? (

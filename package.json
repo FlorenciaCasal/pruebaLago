@@ -20,6 +20,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.60.0",
     "toposort": "^2.0.2",
+    "xlsx": "^0.18.5",
     "yup": "^1.6.1"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@ export type UserDTO = {
     firstName: string;
     lastName: string;
     email: string;
-    role: "ADMIN" | "USER";
+    role: "ADMIN" | "MANAGER" | "USER";
     enabled?: boolean;
     createdAt?: string;
     updatedAt?: string;
@@ -15,7 +15,7 @@ export type User = {
     id: string;
     name: string;              // firstName + " " + lastName
     email: string;
-    role: "ADMIN" | "USER";
+    role: "ADMIN" | "MANAGER" | "USER";
     enabled?: boolean;
     createdAt?: string;
     updatedAt?: string;
@@ -26,7 +26,7 @@ export type CreateUserRequest = {
     lastName: string;
     email: string;
     password: string;
-    role?: "ADMIN" | "USER";   // si no lo mandás, el backend puede defaultear a USER
+    role?: "ADMIN" | "MANAGER" | "USER";   // si no lo mandás, el backend puede defaultear a USER
 };
 
 export type UpdateUserRequest = Partial<{
@@ -34,7 +34,7 @@ export type UpdateUserRequest = Partial<{
     lastName: string;
     email: string;
     password: string;
-    role: "ADMIN" | "USER";
+    role: "ADMIN" | "MANAGER" | "USER";
     enabled: boolean;
 }>;
 

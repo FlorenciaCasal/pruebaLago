@@ -15,6 +15,11 @@ export default function AdminUsersPage() {
     const [email, setEmail] = useState("");
     const [pwd, setPwd] = useState("");
     const [creating, setCreating] = useState(false);
+    const [role, setRole] = useState<"ADMIN" | "MANAGER">("MANAGER");
+    const roleLabel =
+        role === "ADMIN"
+            ? "Admin completo"
+            : "Admin limitado (solo reservas)";
 
     useEffect(() => {
         (async () => {
@@ -40,13 +45,14 @@ export default function AdminUsersPage() {
         }
         setCreating(true);
         try {
-            const u = await createUser({ firstName, lastName, email, password: pwd });
+            const u = await createUser({ firstName, lastName, email, password: pwd, role });
             setUsers((prev) => [u, ...prev]);
             setFirstName("");
             setLastName("");
             setEmail("");
             setPwd("");
-            toast("Usuario administrador creado");
+            setRole("MANAGER");
+            toast("Usuario creado");
         } catch (err: unknown) {
             if (err instanceof ApiError) {
                 if (err.code === "EMAIL_EXISTS") toast("Ya existe un usuario con ese email");
@@ -78,8 +84,8 @@ export default function AdminUsersPage() {
 
             {/* Crear usuario admin */}
             <form onSubmit={onCreate} className="rounded-xl border border-neutral-800 bg-neutral-950 p-4 space-y-3">
-                <div className="font-medium mb-1">Crear administrador</div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="font-medium mb-1">Crear usuario</div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <input
                         className="rounded-md bg-neutral-900 border border-neutral-700 px-3 py-2 outline-none"
                         placeholder="Nombre"
@@ -103,13 +109,31 @@ export default function AdminUsersPage() {
                         value={pwd} onChange={(e) => setPwd(e.target.value)}
                     />
                 </div>
+
+                {/* selector de rol */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div className="sm:col-span-1 mb-1">
+                        {/* <label className="block text-sm text-neutral-300 mb-1">Rol</label> */}
+
+                        <select
+                            className="w-full rounded-md bg-neutral-900 border border-neutral-700 px-0 sm:px-3 py-2 outline-none cursor-pointer"
+                            value={role}
+                            onChange={(e) => setRole(e.target.value as "ADMIN" | "MANAGER")}
+                            title={roleLabel}
+                        >
+                            <option value="ADMIN" title="Admin completo">Admin completo</option>
+                            <option value="MANAGER" title="Admin limitado (solo reservas)">Admin limitado (solo reservas)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div className="flex justify-end">
                     <button
                         type="submit"
                         disabled={creating}
                         className="rounded-md bg-white text-gray-900 px-4 py-2 disabled:opacity-40"
                     >
-                        {creating ? "Creando..." : "Crear admin"}
+                        {creating ? "Creando..." : "Crear usuario"}
                     </button>
                 </div>
             </form>

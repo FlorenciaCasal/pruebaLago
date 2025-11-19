@@ -175,6 +175,20 @@ input[type="number"]::-webkit-outer-spin-button {
   scrollbar-width: none;
 }
 
+.btn-export {
+  background-color: #0070f3;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-export:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
 @media (max-width: 640px) {
   .fade-edges-mobile {
     mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
