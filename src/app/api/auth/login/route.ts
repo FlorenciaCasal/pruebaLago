@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         });
     }
 
-    const data = JSON.parse(text) as { token: string; role?: string };
+    const data = JSON.parse(text) as { token: string};
 
     // Leer ?next del referer y SANITIZAR
     const referer = req.headers.get("referer") || "";
@@ -39,18 +39,18 @@ export async function POST(req: NextRequest) {
         maxAge: 60 * 60 * 8,
     });
 
-    // Cookie de pista para UI: 1 si es admin, si no, la borramos
-    if (data.role === "ROLE_ADMIN") {
-        res.cookies.set("admin_perm", "1", {
-            httpOnly: true,                        // puede ser HttpOnly, la lee el server en Navbar
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 60 * 60 * 8,
-        });
-    } else {
-        res.cookies.set("admin_perm", "", { path: "/", maxAge: 0 });
-    }
+    // // Cookie de pista para UI: 1 si es admin, si no, la borramos
+    // if (data.role === "ROLE_ADMIN") {
+    //     res.cookies.set("admin_perm", "1", {
+    //         httpOnly: true,                        // puede ser HttpOnly, la lee el server en Navbar
+    //         secure: process.env.NODE_ENV === "production",
+    //         sameSite: "lax",
+    //         path: "/",
+    //         maxAge: 60 * 60 * 8,
+    //     });
+    // } else {
+    //     res.cookies.set("admin_perm", "", { path: "/", maxAge: 0 });
+    // }
 
     return res;
 }

@@ -39,7 +39,8 @@
 //   });
 // }
 import type { NextRequest } from "next/server";
-import { adminFetch } from "@/app/api/_backend";
+// import { adminFetch } from "@/app/api/_backend";
+import { backendFetch } from "@/app/api/_backend";
 
 const ALLOWED = new Set(["PENDING", "CONFIRMED", "CANCELLED"]);
 
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
   }
 
   const qs = sp.toString();
-  const resp = await adminFetch(`/api/admin/reservations${qs ? `?${qs}` : ""}`, {
+  const resp = await backendFetch(`/api/admin/reservations${qs ? `?${qs}` : ""}`, {
     headers: { "Content-Type": "application/json" },
   });
 

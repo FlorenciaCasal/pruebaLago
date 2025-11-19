@@ -32,7 +32,9 @@
 // src/app/api/admin/availability/state/route.ts
 // src/app/api/admin/availability/state/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { adminFetch, publicFetch } from "@/app/api/_backend";
+import { publicFetch } from "@/app/api/_backend";
+// import { adminFetch } from "@/app/api/_backend";
+import { backendFetch } from "@/app/api/_backend";
 
 const DEFAULT_CAPACITY = Number(process.env.NEXT_PUBLIC_DEFAULT_CAPACITY ?? 30);
 
@@ -117,7 +119,7 @@ export async function PUT(req: NextRequest) {
 
   const days = allDateISOsOfMonth(year, month);
   for (const iso of days) {
-    const resp = await adminFetch(`/api/admin/availability/${iso}`, {
+    const resp = await backendFetch(`/api/admin/availability/${iso}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ capacity: targetCapacity }),

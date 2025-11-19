@@ -1,38 +1,16 @@
-import { adminFetch } from "@/app/api/_backend";
+// import { adminFetch } from "@/app/api/_backend";
+import { backendFetch } from "@/app/api/_backend";
 import { NextRequest } from "next/server";
 
 
-// export async function PUT(
-//     req: Request,
-//     { params }: { params: { userId: string } }
-// ) {
-//     const body = await req.json(); // UpdateUserRequest
-//     const res = await adminFetch(`/api/admin/users/${params.userId}`, {
-//         method: "PUT",
-//         headers: { "content-type": "application/json" },
-//         body: JSON.stringify(body),
-//     });
-//     if (!res.ok) return new Response(null, { status: res.status });
-//     const json = await res.json();
-//     return Response.json(json);
-// }
-
-// export async function DELETE(
-//     _req: Request,
-//     { params }: { params: { userId: string } }
-// ) {
-//     const res = await adminFetch(`/api/admin/users/${params.userId}`, {
-//         method: "DELETE",
-//     });
-//     return new Response(null, { status: res.status });
-// }
 export async function PUT(
     _req: NextRequest,
     { params }: { params: Promise<{ userId: string }> }
 ) {
     const { userId } = await params;
     const body = await _req.json();
-    const res = await adminFetch(`/api/admin/users/${userId}`, {
+    // const res = await adminFetch(`/api/admin/users/${userId}`, {
+     const res = await backendFetch(`/api/admin/users/${userId}`, {
         method: "PUT",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(body),
@@ -51,7 +29,8 @@ export async function DELETE(
     { params }: { params: Promise<{ userId: string }> }
 ) {
     const { userId } = await params;
-    const res = await adminFetch(`/api/admin/users/${userId}`, {
+    // const res = await adminFetch(`/api/admin/users/${userId}`, {
+    const res = await backendFetch(`/api/admin/users/${userId}`, {
         method: "DELETE",
     });
     return new Response(null, { status: res.status });

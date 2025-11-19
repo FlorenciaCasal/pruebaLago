@@ -1,15 +1,16 @@
-import { adminFetch } from "@/app/api/_backend";
+// import { adminFetch } from "@/app/api/_backend";
+import { backendFetch } from "@/app/api/_backend";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
-    const res = await adminFetch("/api/admin/users");
+    const res = await backendFetch("/api/admin/users");
     const json = await res.json();
     return Response.json(json);
 }
 
 export async function POST(req: NextRequest) {
     const bodyText = await req.text(); // pasamos el cuerpo tal cual
-    const resp = await adminFetch("/api/admin/users", {
+    const resp = await backendFetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: bodyText,

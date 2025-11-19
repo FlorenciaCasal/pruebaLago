@@ -4,7 +4,8 @@ export type UserDTO = {
     firstName: string;
     lastName: string;
     email: string;
-    role: "ADMIN" | "MANAGER" | "USER";
+    // role: "ADMIN" | "MANAGER" | "USER";
+    role: "ADMIN" | "MANAGER";
     enabled?: boolean;
     createdAt?: string;
     updatedAt?: string;
@@ -15,7 +16,8 @@ export type User = {
     id: string;
     name: string;              // firstName + " " + lastName
     email: string;
-    role: "ADMIN" | "MANAGER" | "USER";
+    // role: "ADMIN" | "MANAGER" | "USER";
+    role: "ADMIN" | "MANAGER";
     enabled?: boolean;
     createdAt?: string;
     updatedAt?: string;
@@ -26,7 +28,8 @@ export type CreateUserRequest = {
     lastName: string;
     email: string;
     password: string;
-    role?: "ADMIN" | "MANAGER" | "USER";   // si no lo mandás, el backend puede defaultear a USER
+    // role?: "ADMIN" | "MANAGER" | "USER";   // si no lo mandás, el backend puede defaultear a USER
+    role?: "ADMIN" | "MANAGER";
 };
 
 export type UpdateUserRequest = Partial<{
@@ -34,7 +37,8 @@ export type UpdateUserRequest = Partial<{
     lastName: string;
     email: string;
     password: string;
-    role: "ADMIN" | "MANAGER" | "USER";
+    // role: "ADMIN" | "MANAGER" | "USER";
+    role: "ADMIN" | "MANAGER";
     enabled: boolean;
 }>;
 
@@ -78,7 +82,8 @@ export async function createUser(data: CreateUserRequest): Promise<User> {
         headers: jsonHeaders(),
         body: JSON.stringify(data),
     });
-    if (res.status === 409) throw new ApiError("EMAIL_EXISTS", "Email duplicado", 409);
+    // if (res.status === 409) throw new ApiError("EMAIL_EXISTS", "Email duplicado", 409);
+    if (res.status === 400) throw new ApiError("EMAIL_EXISTS", "Email duplicado", 400);
     if (!res.ok) {
         const msg = await res.text().catch(() => "");
         throw new ApiError("CREATE_FAILED", msg || "Create failed", res.status);

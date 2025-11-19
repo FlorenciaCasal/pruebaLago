@@ -17,7 +17,8 @@
 //   return new NextResponse(null, { status: res.status });
 // }
 
-import { adminFetch } from "@/app/api/_backend";
+// import { adminFetch } from "@/app/api/_backend";
+import { backendFetch } from "@/app/api/_backend";
 import { NextResponse } from "next/server";
 
 export async function PUT(
@@ -27,7 +28,7 @@ export async function PUT(
   const { date } = await params; // ← await
   const body = await req.text();
 
-  const res = await adminFetch(`/api/admin/availability/${date}`, {
+  const res = await backendFetch(`/api/admin/availability/${date}`, {
     method: "PUT",
     body,
     headers: { "Content-Type": "application/json" },

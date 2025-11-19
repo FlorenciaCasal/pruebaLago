@@ -20,7 +20,7 @@ export type AdminReservation = {
     notas?: string;
     dni?: string; // Agregado recientemente para hacer busqueda por dni
     //  entiendo que aca tambien hay que agregar este campo cuando esté implementado en el backend:
-     companions?: Companion[];
+    companions?: Companion[];
 };
 
 export type CalendarMonthState = {
