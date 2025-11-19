@@ -11,7 +11,7 @@ function exportToExcel(data: AdminReservation[]) {
   const rows = data.map(r => ({
     FechaVisita: new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR"),
     NombreResponsable: r.nombre,
-    ApellidoResponsable : r.apellido,
+    ApellidoResponsable: r.apellido,
     DNIResponsable: r.dni,
     Pax: r.personas,
     Tipo: r.tipoVisitante,

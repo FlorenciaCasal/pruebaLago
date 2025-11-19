@@ -169,14 +169,28 @@ export default function RegisterForm({
     }
   };
 
-  const validateListadoWithYup = async (n: number): Promise<string | null> => {
+  // const validateListadoWithYup = async (n: number): Promise<string | null> => {
+  //   try {
+  //     await listadoSchemaExact(n).validate(composeVisitantes(), { abortEarly: true });
+  //     return null;
+  //   } catch (e) {
+  //     return e instanceof Yup.ValidationError ? prettyArrayError(e) : "Revisá el listado.";
+  //   }
+  // };
+  // const getListadoValues = () =>
+  //   (watch("personas") ?? []) as Array<{ nombre: string; apellido: string; dni: string }>;
+
+  const validateListadoWithYup = async (expected: number): Promise<string | null> => {
     try {
-      await listadoSchemaExact(n).validate(composeVisitantes(), { abortEarly: true });
+      // Validamos SOLO lo que el usuario cargó en el listado (acompañantes)
+      const rows = getListadoValues();
+      await listadoSchemaExact(expected).validate(rows, { abortEarly: true });
       return null;
     } catch (e) {
       return e instanceof Yup.ValidationError ? prettyArrayError(e) : "Revisá el listado.";
     }
   };
+
 
   const onListadoMaybeFixed = async () => {
     // solo si estamos en el paso listado
@@ -400,7 +414,7 @@ export default function RegisterForm({
     const contactoErr = tipo === "INSTITUCION_EDUCATIVA" ? null : await validateContactoWithYup();
     const institErr = tipo === "INSTITUCION_EDUCATIVA" ? await validateInstitucionWithYup() : null;
     // const listadoErr = await validateListadoWithYup(totalEsperado);
-     const listadoErr = await validateListadoWithYup(extraListado);
+    const listadoErr = await validateListadoWithYup(extraListado);
     const necesidadesErr = validateNecesidades();
     const otros = [
       !watch("aceptaReglas") ? "Debés aceptar las políticas de visita." : null,

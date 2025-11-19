@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import LogoutButton from "./LogoutButton";
 import Image from "next/image";
 
-export default function NavbarClient({ isLogged, isAdmin }: { isLogged: boolean; isAdmin: boolean }) {
+export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLogged: boolean; isAdmin: boolean; isAdminLimit: boolean }) {
   const pathname = usePathname();
   const isHome = pathname == "/";
   const showHomeLink = pathname !== "/";
@@ -14,7 +14,7 @@ export default function NavbarClient({ isLogged, isAdmin }: { isLogged: boolean;
 
   if (hide) return null; // ⟵ no se renderiza nada
   return (
-  <nav className="sticky top-0 z-50 bg-neutral-900 text-white">
+    <nav className="sticky top-0 z-50 bg-neutral-900 text-white">
       <div className="mx-auto w-full max-w-6xl px-3 sm:px-4">
         <div className="flex items-center justify-between gap-2 py-2 md:py-3">
           {/* LOGO: más chico en mobile */}
@@ -37,13 +37,13 @@ export default function NavbarClient({ isLogged, isAdmin }: { isLogged: boolean;
                 <Link
                   href="/"
                   // className="whitespace-nowrap px-2 py-1 rounded hover:bg-neutral-800"
-                    className="px-3 py-1.5 text-sm hover:text-[#8e8e8f]"
+                  className="px-3 py-1.5 text-sm hover:text-[#8e8e8f]"
                 >
                   Inicio
                 </Link>
               )}
 
-              {isHome && isLogged && isAdmin && (
+              {isHome && isLogged && isAdmin || isAdminLimit && (
                 <Link
                   href="/admin"
                   className="text-white no-underlinepx-3 py-1.5 text-sm hover:text-[#8e8e8f] whitespace-nowrap"

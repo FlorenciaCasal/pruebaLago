@@ -3,11 +3,11 @@ import NavbarClient from "./NavbarClient";
 import { getAuthInfo } from "@/lib/auth";
 
 export default async function Navbar() {
-    const { isLogged, isAdmin, role } = await getAuthInfo();
+    const { isLogged, isAdmin, role, isAdminLimit } = await getAuthInfo();
 
     console.log("[Navbar]", { isLogged, role });
 
-    return <NavbarClient isLogged={isLogged} isAdmin={isAdmin} />;
+    return <NavbarClient isLogged={isLogged} isAdmin={isAdmin} isAdminLimit={isAdminLimit} />;
 }
 
 

@@ -7,6 +7,7 @@ export async function getAuthInfo(): Promise<{
     isLogged: boolean;
     role: Role;
     isAdmin: boolean;
+    isAdminLimit: boolean;
 }> {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
@@ -27,6 +28,7 @@ export async function getAuthInfo(): Promise<{
 
     const isLogged = !!token;
     const isAdmin = role === "ROLE_ADMIN";
+    const isAdminLimit = role === "ROLE_MANAGER";
 
-    return { isLogged, role, isAdmin };
+    return { isLogged, role, isAdmin, isAdminLimit };
 }
