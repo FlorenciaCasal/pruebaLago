@@ -56,7 +56,7 @@ export async function fetchReservations(
     const qs = params.toString() ? `?${params}` : "";
     const res = await fetchInternal(`/api/admin/reservations${qs}`);
     const backendData = await ok<BackendReservationDTO[]>(res);
-    console.log(`Reservas recibidas del backend: ${backendData.length}`, backendData.map(r => r.visitDate));
+    console.log("RAW ADMIN BACKEND DATA EJEMPLO:", backendData[backendData.length - 1]);
     // Mapear del formato backend al formato frontend
     return backendData.map((r) => ({
         id: r.id,
@@ -71,6 +71,14 @@ export async function fetchReservations(
         telefono: r.phone,
         correo: r.email,
         personas: r.adults18Plus + r.children2To17 + r.babiesLessThan2,
+        // 👇 detalle pax
+        adultos: r.adults18Plus,
+        ninos: r.children2To17,
+        bebes: r.babiesLessThan2,
+        tieneAlergias: (r.allergies ?? 0) > 0,
+        movilidadReducida: r.reducedMobility ?? 0,
+        cantidadAlergicos: r.allergies ?? 0,
+        comentarios: r.comment ?? "",
         status: r.status as "PENDING" | "CONFIRMED" | "CANCELLED",
         dni: (r.dni ?? "").replace(/\D+/g, ""), // <--- NUEVO (normalizado)
         // FUTURO: incluir acompañantes normalizados

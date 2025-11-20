@@ -51,7 +51,7 @@ export default function AdminSidebarClient({
                 <div className="mx-auto max-w-screen-2xl px-4 py-6 grid grid-cols-12 gap-6">
 
                     {/* Sidebar: visible solo en lg+ */}
-                    <aside className="hidden xl:block col-span-3 min-w-0 lg:sticky lg:top-0">
+                    <aside className="hidden xl:block col-span-2 min-w-0 lg:sticky lg:top-0">
                         <div className="rounded-2xl border border-neutral-800 bg-neutral-950 lg:h-full lg:overflow-auto">
                             <div className="px-4 py-4 lg:sticky lg:top-0 lg:bg-neutral-950 lg:z-10 lg:border-b lg:border-neutral-900/60">
                                 <p className="text-xs uppercase tracking-wide text-neutral-400">Secciones</p>
@@ -69,7 +69,7 @@ export default function AdminSidebarClient({
                     </aside>
 
                     {/* Contenido */}
-                    <main className="col-span-12 xl:col-span-9 min-w-0">
+                    <main className="col-span-12 xl:col-span-10 min-w-0">
                         {children}
                     </main>
                 </div>

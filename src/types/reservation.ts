@@ -54,4 +54,7 @@ export type BackendReservationDTO = {
   dni: string;
   //  Agregar este campo cuando esté implementado en el backend:
   visitors?: { firstName: string; lastName: string; dni: string }[];
+  reducedMobility: number;
+  allergies: number;
+  comment: string;
 };

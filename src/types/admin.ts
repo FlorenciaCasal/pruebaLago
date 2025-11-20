@@ -17,10 +17,16 @@ export type AdminReservation = {
     correo?: string;
     personas?: number;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
-    notas?: string;
+    // notas?: string;
     dni?: string; // Agregado recientemente para hacer busqueda por dni
-    //  entiendo que aca tambien hay que agregar este campo cuando esté implementado en el backend:
     companions?: Companion[];
+    adultos: number;
+    ninos: number;
+    bebes: number;
+    movilidadReducida: number;      // cantidad
+    tieneAlergias: boolean;
+    cantidadAlergicos: number;
+    comentarios?: string;
 };
 
 export type CalendarMonthState = {

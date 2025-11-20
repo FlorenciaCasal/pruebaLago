@@ -14,6 +14,9 @@ function exportToExcel(data: AdminReservation[]) {
     ApellidoResponsable: r.apellido,
     DNIResponsable: r.dni,
     Pax: r.personas,
+    Adultos: r.adultos,
+    Niños: r.ninos,
+    Bebés: r.bebes,
     Tipo: r.tipoVisitante,
     Estado: r.status,
     EmailResponsable: r.correo,
@@ -438,9 +441,6 @@ export default function ReservasPage() {
         Exportar a Excel
       </button>
 
-
-
-
       {/* Lista responsive */}
       {loading ? (
         <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">Cargando...</div>
@@ -464,7 +464,19 @@ export default function ReservasPage() {
                 <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                   <div> <dt className="text-neutral-400">Nombre y apellido</dt><dd>{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</dd></div>
                   <div> <dt className="text-neutral-400">DNI</dt><dd>{r.dni ?? "-"}</dd></div>
-                  <div><dt className="text-neutral-400">Pax</dt><dd>{r.personas ?? "-"}</dd></div>
+                  {/* <div><dt className="text-neutral-400">Pax</dt><dd>{r.personas ?? "-"}</dd></div> */}
+                  <div>
+                    <dt className="text-neutral-400">Pax</dt>
+                    <dd>
+                      {r.personas ?? "-"}
+                      {typeof r.adultos === "number" && (
+                        <span className="block text-xs text-neutral-400">
+                          {r.adultos} adultos · {r.ninos} niños · {r.bebes} bebés
+                        </span>
+                      )}
+                    </dd>
+                  </div>
+
                   <div><dt className="text-neutral-400">Tipo</dt><dd className="break-words">{tipoToEs(r.tipoVisitante)}</dd></div>
                   <div><dt className="text-neutral-400">Circuito</dt><dd>{r.circuito ?? "-"}</dd></div>
                   {/* <div><dt className="text-neutral-400">Estado</dt><dd>{r.status}</dd></div> */}
@@ -472,9 +484,40 @@ export default function ReservasPage() {
                   <div> <dt className="text-neutral-400">Email</dt><dd className="break-words">{r.correo ?? "-"}</dd></div>
                   <div> <dt className="text-neutral-400">Teléfono</dt><dd>{r.telefono ?? "-"}</dd></div>
                   <div><dt className="text-neutral-400">Fecha de visita</dt> <div className="text-sm text-white">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div></div>
-                  {/* <div className="col-span-2"><dt className="text-neutral-400">Creada</dt><dd className="text-neutral-400">{new Date(r.createdAt).toLocaleDateString("es-AR")}</dd></div> */}
 
+                  {/* 👇 NUEVO: Salud */}
+                  <div className="mt-2 col-span-2">
+                    <dt className="text-neutral-400">Salud</dt>
+                    <dd className="text-sm">
+                      {r.movilidadReducida > 0 && (
+                        <span className="block">
+                          {r.movilidadReducida} con movilidad reducida
+                        </span>
+                      )}
 
+                      {r.tieneAlergias && (
+                        <span className="block">
+                          {r.cantidadAlergicos > 0
+                            ? `${r.cantidadAlergicos} con alergias`
+                            : "Personas con alergias"}
+                        </span>
+                      )}
+
+                      {r.movilidadReducida === 0 && !r.tieneAlergias && (
+                        <span className="text-neutral-500">Sin datos registrados</span>
+                      )}
+                    </dd>
+                  </div>
+
+                  {/* 👇 NUEVO: Comentarios */}
+                  <div className="col-span-2">
+                    <dt className="text-neutral-400">Comentarios</dt>
+                    <dd className="text-sm text-neutral-300">
+                      {r.comentarios && r.comentarios.trim()
+                        ? r.comentarios
+                        : <span className="text-neutral-500">-</span>}
+                    </dd>
+                  </div>
 
                   {/* Acompañantes (desplegable) */}
                   <div className="mt-3 col-span-2">
@@ -512,6 +555,9 @@ export default function ReservasPage() {
               <table className="w-full text-[13px] table-auto">
                 <thead className="bg-neutral-950/80">
                   <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400">
+                    {/* “Creada” solo en xl, para priorizar Acciones en lg */}
+                    {/* <th className="w-44 xl:table-cell">Creada</th> */}
+                    <th className="w-32">Creada</th>
                     <th className="w-32">Fecha de visita</th>
                     <th className="w-44">Nombre y apellido</th>
                     <th className="w-20">DNI</th>
@@ -520,15 +566,13 @@ export default function ReservasPage() {
                     <th className="max-w-[14rem]">Tipo</th>
                     <th className="w-20">Circuito</th>
                     <th className="w-28">Estado</th>
-                    {/* “Creada” solo en xl, para priorizar Acciones en lg */}
-                    <th className="w-44 xl:table-cell">Creada</th>
+
                     {/* Acciones con ancho fijo y sin shrink */}
                     <th >Email</th>
                     <th >Teléfono</th>
-
+                    <th className="w-40">Salud</th>
+                    <th className="w-56">Comentarios</th>
                     <th className="w-40 text-center">Visitantes</th>
-
-
                     <th className="w-[220px] shrink-0 text-center">Acciones</th>
                   </tr>
                 </thead>
@@ -537,21 +581,65 @@ export default function ReservasPage() {
                   {data.map(r => (
                     <React.Fragment key={r.id}>
                       <tr className="[&>td]:px-2 [&>td]:py-2 align-center">
+                        <td className="text-neutral-400 whitespace-nowrap">
+                          {new Date(r.createdAt).toLocaleDateString("es-AR")}
+                        </td>
                         <td className="whitespace-nowrap">
                           {new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}
                         </td>
                         <td className="truncate">{[r.nombre, r.apellido].filter(Boolean).join(" ") || "-"}</td>
                         <td className="text-neutral-400">{r.dni ?? "-"}</td>
-                        <td className="whitespace-nowrap">{r.personas ?? "-"}</td>
+                        {/* <td className="whitespace-nowrap">{r.personas ?? "-"}</td> */}
+                        <td className="whitespace-nowrap">
+                          {r.personas ?? "-"}
+                          {typeof r.adultos === "number" && typeof r.ninos === "number" && typeof r.bebes === "number" && (
+                            <span className="ml-1 text-[11px] text-neutral-400">
+                              ({r.adultos}A / {r.ninos}N / {r.bebes}B)
+                            </span>
+                          )}
+                        </td>
+
                         <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
                         <td className="whitespace-nowrap">{r.circuito ?? "-"}</td>
                         <td className="whitespace-nowrap">{statusToEs(r.status)}</td>
-                        <td className="text-neutral-400 whitespace-nowrap">
-                          {new Date(r.createdAt).toLocaleDateString("es-AR")}
-                        </td>
+
 
                         <td className="whitespace-nowrap">{r.correo ?? "-"}</td>
                         <td className="whitespace-nowrap">{r.telefono ?? "-"}</td>
+
+
+                        {/* 👇 Columna Salud */}
+                        <td className="text-xs leading-snug align-top">
+                          {r.movilidadReducida > 0 && (
+                            <div>{r.movilidadReducida} mov. reducida</div>
+                          )}
+
+                          {r.tieneAlergias && (
+                            <div>
+                              {r.cantidadAlergicos > 0
+                                ? `${r.cantidadAlergicos} alergias`
+                                : "Personas con alergias"}
+                            </div>
+                          )}
+
+                          {r.movilidadReducida === 0 && !r.tieneAlergias && (
+                            <span className="text-neutral-500">-</span>
+                          )}
+                        </td>
+
+                        {/* 👇 Columna Comentarios */}
+                        <td className="text-xs leading-snug align-top">
+                          {r.comentarios && r.comentarios.trim() ? (
+                            <div
+                              className="text-neutral-400 line-clamp-2"
+                              title={r.comentarios}
+                            >
+                              {r.comentarios}
+                            </div>
+                          ) : (
+                            <span className="text-neutral-500">-</span>
+                          )}
+                        </td>
 
                         <td className="text-center">
                           <button
@@ -598,7 +686,7 @@ export default function ReservasPage() {
 
                       {openRows[r.id] && (
                         <tr>
-                          <td colSpan={12} className="px-2 py-2 bg-neutral-950">
+                          <td colSpan={14} className="px-2 py-2 bg-neutral-950">
                             <CompanionsDisclosure companions={r.companions} />
                           </td>
                         </tr>

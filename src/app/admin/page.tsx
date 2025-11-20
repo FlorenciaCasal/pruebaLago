@@ -65,15 +65,12 @@ export default async function AdminDashboard() {
           <table className="min-w-full text-sm">
             <thead className="bg-neutral-900/60">
               <tr className="[&>th]:px-4 [&>th]:py-2 text-left text-neutral-400">
+                <th>Creada</th>
                 <th>Nombre y apellido</th>
                 <th>Tipo</th>
                 <th>Visita</th>
-                <th>Creada</th>
                 <th>Pax</th>
                 <th>Estado</th>
-                {/*  Agregado */}
-                {/* <th className="hidden md:table-cell">Email</th>
-                <th className="hidden md:table-cell">Teléfono</th> */}
                 <th >Email</th>
                 <th >Teléfono</th>
                 <th></th>
@@ -84,12 +81,13 @@ export default async function AdminDashboard() {
                 const fullName = [r.nombre, r.apellido].filter(Boolean).join(" ");
                 return (
                   <tr key={r.id} className="border-t border-neutral-800">
+                    <td className="px-4 py-2">{fmt(r.createdAt)}</td>
                     <td className="px-4 py-2 truncate">{formatName(fullName) || "-"}</td>
                     <td className="px-4 py-2">
                       {r.tipoVisitante === "INSTITUCION_EDUCATIVA" ? "Institución" : "Particular"}
                     </td>
                     <td className="px-4 py-2">{fmt(r.reservationDate)}</td>
-                    <td className="px-4 py-2">{fmt(r.createdAt)}</td>
+
                     <td className="px-4 py-2">{r.personas}</td>
                     <td className="px-4 py-2"><StatusBadge s={r.status} /></td>
                     <td className="px-4 py-2">{r.correo ?? "-"}</td>

@@ -48,6 +48,9 @@ export async function submitReservation(data: ReservationFormData): Promise<{ id
   const dni = (isSchool ? data.responsableDni : data.dni)?.trim() ?? "";
   const phone = (isSchool ? data.institucionTelefono : data.telefono)?.trim() ?? "";
   const email = (isSchool ? data.institucionEmail : data.correo)?.trim() ?? "";
+  const reducedMobility = Number(data.movilidadReducida ?? 0);
+  const alergiasFlag = data.alergias ?? "no";            // "si" | "no"
+  const alergicosCount = Number(data.alergicos ?? 0);
 
   const visitors = (data.visitantes ?? []).map(v => ({
     firstName: v.nombre,
@@ -71,8 +74,10 @@ export async function submitReservation(data: ReservationFormData): Promise<{ id
     adults18Plus: data.adultos,
     children2To17: data.ninos,
     babiesLessThan2: data.bebes,
-    reducedMobility: data.movilidadReducida || 0,
-    allergies: data.alergias === "si" ? 1 : 0,
+    // reducedMobility: data.movilidadReducida || 0,
+    // allergies: data.alergias === "si" ? 1 : 0,
+    reducedMobility,                                     // nombre exacto del record Java
+    allergies: alergiasFlag === "si" ? alergicosCount : 0,
     comment: data.comentarios || "",
     originLocation,
     howHeard: "OTHER",
