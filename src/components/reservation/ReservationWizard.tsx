@@ -160,8 +160,8 @@ export default function ReservationWizard({
       <SidePanel open={open === "TYPE"} title="Tipo de visitante" onClose={() => setOpen(null)}>
         <OptionButton
           title="Particular"
-          subtitle="Reserva individual, familia o amigos."
-          imageSrc="/img/particular.png"
+          subtitle="Individual, familia o amigos."
+          imageSrc="/img/particular.jpg"
           onSelect={() => {
             setValue("tipoVisitante", "PARTICULAR", { shouldValidate: true });
             setOpen(null);
@@ -170,7 +170,7 @@ export default function ReservationWizard({
         <OptionButton
           title="Institución educativa"
           subtitle={schoolOff ? "Temporalmente no disponible" : "Escuelas, universidades o grupos educativos."}
-          imageSrc="/img/escuela.png"
+          imageSrc="/img/escuela.jpg"
           disabled={loadingFlags || schoolOff}
           onDisabledClick={() => toast("En este momento no tenemos disponibilidad para instituciones educativas.")}
           onSelect={() => {

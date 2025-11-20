@@ -4,8 +4,6 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
-// import { useRouter } from "next/navigation";
-
 
 
 type FormValues = {
@@ -71,7 +69,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-[calc(100dvh-4rem)] w-full bg-neutral-950 text-neutral-100 grid place-items-center px-4">
+    <main className="min-h-[calc(100dvh-4rem)] w-full bg-gray-800 text-neutral-100 grid place-items-center px-4">
       {/* Contenedor */}
       <div className="w-full max-w-md">
         {/* Tarjeta */}

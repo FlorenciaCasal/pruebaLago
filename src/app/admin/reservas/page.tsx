@@ -22,6 +22,10 @@ function exportToExcel(data: AdminReservation[]) {
     EmailResponsable: r.correo,
     TeléfonoResponsable: r.telefono,
     Visitantes: r.companions?.map(c => `${c.nombre} ${c.apellido} (DNI ${c.dni}), `).join("\n") ?? "",
+    MovilidadReducida: r.movilidadReducida ?? 0,
+    TieneAlergias: r.tieneAlergias ? "Sí" : "No",
+    CantidadAlergicos: r.cantidadAlergicos ?? 0,
+    Comentarios: r.comentarios ?? "",
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(rows);
@@ -253,7 +257,7 @@ export default function ReservasPage() {
       {/* <div className="flex flex-wrap gap-2"> */}
       <div
         ref={tabsRef}
-        className="flex gap-1 overflow-x-auto no-scrollbar -mx-1 px-1 snap-x snap-mandatory sm:flex-wrap fade-edges-mobile [touch-action:pan-x]"
+        className="flex gap-1 overflow-x-auto no-scrollbar -mx-1 px-1 snap-x snap-mandatory sm:flex-wrap fade-edges-mobile [touch-action:pan-x] mt-[16px] xl:mt-0"
       >
         {TABS.map(t => (
           <button
@@ -280,6 +284,13 @@ export default function ReservasPage() {
             <svg className="xs:hidden w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 6v3l4-4-4-4v3a8 8 0 1 0 8 8h-2a6 6 0 1 1-6-6z" />
             </svg>
+          </button>
+
+          <button
+            onClick={() => exportToExcel(data)}
+            className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+          >
+            Exportar a Excel
           </button>
 
           {/* Nuevo: toggle de filtros para sm+ */}
@@ -417,7 +428,7 @@ export default function ReservasPage() {
 
       {/* Mostrar botón para volver a abrir filtros cuando están ocultos (solo en sm+)  */}
       {!showFilters && (
-        <div className="flex justify-end">
+        <div className="flex justify-start">
           <button
             onClick={() => setShowFilters(true)}
             className="rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-1.5 text-sm hover:bg-neutral-800"
@@ -428,18 +439,12 @@ export default function ReservasPage() {
       )}
 
 
-      {/* 
-      {searchDate && (
-        <div className="flex justify-end mt-4">
-          <ExportExcelButton date={searchDate} />
-        </div>
-      )} */}
-      <button
+      {/* <button
         onClick={() => exportToExcel(data)}
         className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
       >
         Exportar a Excel
-      </button>
+      </button> */}
 
       {/* Lista responsive */}
       {loading ? (
@@ -686,7 +691,8 @@ export default function ReservasPage() {
 
                       {openRows[r.id] && (
                         <tr>
-                          <td colSpan={14} className="px-2 py-2 bg-neutral-950">
+                          {/* <td colSpan={14} className="px-2 py-2 bg-neutral-950"> */}
+                          <td className="px-2 py-2 bg-neutral-950">
                             <CompanionsDisclosure companions={r.companions} />
                           </td>
                         </tr>
