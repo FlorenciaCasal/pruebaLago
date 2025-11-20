@@ -29,7 +29,8 @@ export default function AdminSidebarClient({
         <>
             <div className="min-h-screen w-full overflow-x-hidden bg-gray-800 text-neutral-100">
                 {/* Topbar solo mobile: título + hamburguesa */}
-                <div className="xl:hidden sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-neutral-800">
+                {/* <div className="xl:hidden sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-neutral-800"> */}
+                <div className="sm:hidden sticky top-0 z-30 bg-gray-900/80 backdrop-blur border-b border-neutral-800">
                     <div className="mx-auto max-w-screen-2xl px-4 h-12 flex items-center justify-between">
                         {/* Título: lo sobreescribe cada página si quiere (ver ReservasPage) */}
                         <h1 className="text-base font-medium">Secciones</h1>
@@ -49,28 +50,8 @@ export default function AdminSidebarClient({
 
                 {/* grid principal */}
                 <div className="mx-auto max-w-screen-2xl grid grid-cols-12 gap-6">
-
-                    {/* Sidebar: visible solo en lg+ */}
-                    {/* <aside className="hidden xl:block col-span-2 min-w-0 lg:sticky lg:top-0"> */}
-                    {/* <aside className="hidden" /> */}
-                    {/* <div className="rounded-2xl border border-neutral-800 bg-neutral-950 lg:h-full lg:overflow-auto">
-                            <div className="px-4 py-4 lg:sticky lg:top-0 lg:bg-neutral-950 lg:z-10 lg:border-b lg:border-neutral-900/60">
-                                <p className="text-xs uppercase tracking-wide text-neutral-400">Secciones</p>
-                            </div>
-                            <nav className="px-4 pb-4">
-                                <ul className="space-y-1">
-                                    <li><Link href="/admin/reservas" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/reservas" ? "bg-neutral-900" : ""}`}>Reservas</Link></li>
-                                    <li><Link href="/admin/calendario" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/calendario" ? "bg-neutral-900" : ""}`}>Calendario</Link></li>
-                                    <li><Link href="/admin" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin" ? "bg-neutral-900" : ""}`}>Panel de Administración</Link></li>
-                                    {isAdmin && (<li><Link href="/admin/usuarios" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/usuarios" ? "bg-neutral-900" : ""}`}>Usuarios</Link></li>
-                                    )}
-                                </ul>
-                            </nav>
-                        </div> */}
-                    {/* NAVBAR HORIZONTAL SOLO PARA XL+ */}
-                    {/* Navbar horizontal (solo en pantallas grandes) */}
-
-                    <div className="hidden xl:flex bg-gray-900 items-center mx-auto px-8 justify-between w-[100vw]">
+                    {/* <div className="hidden xl:flex bg-gray-900 items-center mx-auto px-8 justify-between w-[100vw]"> */}
+                    <div className="hidden sm:flex bg-gray-900 items-center mx-auto px-8 justify-between w-[100vw]">
                         <h1 className="text-base font-medium">Secciones</h1>
                         <div className="h-12 flex items-center gap-x-6">
 
@@ -83,12 +64,6 @@ export default function AdminSidebarClient({
                                 className={`px-3 py-2 rounded-lg text-sm hover:bg-neutral-800 ${pathname === "/admin/calendario" ? "bg-neutral-800 text-white" : "text-neutral-300"}`}>
                                 Calendario
                             </Link>
-
-                            {/* <Link href="/admin"
-                                className={`px-3 py-2 rounded-lg text-sm whitespace-nowrap hover:bg-neutral-800 ${pathname === "/admin" ? "bg-neutral-800 text-white" : "text-neutral-300"}`}>
-                                Panel de Administración
-                            </Link> */}
-
                             {isAdmin && (
                                 <Link href="/admin/usuarios"
                                     className={`px-3 py-2 rounded-lg text-sm hover:bg-neutral-800 ${pathname === "/admin/usuarios" ? "bg-neutral-800 text-white" : "text-neutral-300"}`}>
@@ -98,12 +73,6 @@ export default function AdminSidebarClient({
 
                         </div>
                     </div>
-
-
-                    {/* </aside> */}
-
-                    {/* Contenido */}
-                    {/* <main className="col-span-12 xl:col-span-10 min-w-0"> */}
                     <main className="col-span-12 px-4 min-w-0">
                         {children}
                     </main>
