@@ -14,7 +14,9 @@ export type UserDTO = {
 // Para mostrar en UI, si te gusta seguir trabajando con "name", creamos un tipo “adaptado”
 export type User = {
     id: string;
-    name: string;              // firstName + " " + lastName
+    name: string;
+    firstName: string;
+    lastName: string;           // firstName + " " + lastName
     email: string;
     // role: "ADMIN" | "MANAGER" | "USER";
     role: "ADMIN" | "MANAGER";
@@ -47,6 +49,8 @@ function toUser(u: UserDTO): User {
     return {
         id: u.id,
         name: [u.firstName, u.lastName].filter(Boolean).join(" "),
+        firstName: u.firstName,
+        lastName: u.lastName,
         email: u.email,
         role: u.role,
         enabled: u.enabled,
@@ -99,7 +103,10 @@ export async function updateUser(userId: string, data: UpdateUserRequest): Promi
         headers: jsonHeaders(),
         body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error("UPDATE_FAILED");
+    if (!res.ok) {
+        const msg = await res.text().catch(() => "");
+        throw new ApiError("UPDATE_FAILED", msg || "Update failed", res.status);
+    }
     const dto = (await res.json()) as UserDTO;
     return toUser(dto);
 }
