@@ -47,4 +47,4 @@ export const radioBadge = `
 //     `mt-0.5 w-4 h-4 cursor-pointer appearance-none border ${lineColor} rounded-sm
 //    checked:bg-white checked:shadow-[inset_0_0_0_2px_rgba(17,24,39,1)]`;
 export const checkboxBox =
-  "mt-0.5 h-4 w-4 cursor-pointer accent-emerald-600";
+  "mt-0.5 h-4 w-4 cursor-pointer accent-button";

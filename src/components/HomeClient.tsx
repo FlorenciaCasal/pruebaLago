@@ -8,8 +8,6 @@ import { useToast } from "@/components/ui/Toast";
 import Image from "next/image";
 import { isVisitante } from "@/utils/visitante";
 
-
-
 export default function HomePage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -49,7 +47,8 @@ export default function HomePage() {
 
   return (
     // <main className="min-h-screen flex flex-col bg-gray-900 items-center justify-center overflow-x-hidden p-4">
-    <main className="bg-rose-50 overflow-x-hidden flex-1 flex flex-col min-h-0 h-full">
+    // <main className="bg-rose-50 overflow-x-hidden flex-1 flex flex-col min-h-0 h-full">
+    <main className="bg-[#f5f5f5] overflow-x-hidden flex-1 flex flex-col min-h-0 h-full">
       {/* HERO SPLIT */}
       {/* <section className="mx-auto grid grid-cols-1 lg:grid-cols-2"> */}
       <section className="flex-1 flex flex-col h-full lg:flex-row items-stretch min-h-0">
@@ -72,9 +71,6 @@ export default function HomePage() {
           {/* <div className="w-full max-w-md rounded-2xl bg-white border border-emerald-200/60 shadow-xl p-6 md:p-7"> */}
           {/* <div className=" w-[90vw] max-w-xl lg:max-w-md rounded-2xl md:p-6 "> */}
           <div className="w-[90vw] max-w-xl lg:max-w-md">
-            {/* <h2 className="text-2xl text-center font-semibold text-neutral-900 mb-4">
-              Reserva tu visita
-            </h2> */}
 
             <Suspense fallback={<div className="text-white">Cargando...</div>}>
               {!(showForm || forceForm) ? (

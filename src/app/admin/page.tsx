@@ -31,7 +31,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-semibold">Panel de Administración</h1>
+      <h1 className="text-xl sm:text-2xl pt-4 font-semibold">Panel de Administración</h1>
 
       {/* Tarjetas */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4">

@@ -542,7 +542,7 @@ export default function RegisterForm({
               <button
                 type="button"
                 onClick={prevStep}
-                className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border border-emerald-600 text-emerald-600 hover:bg-white hover:text-gray-900 transition cursor-pointer"
+                className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border border-button text-button hover:bg-white hover:text-gray-900 transition cursor-pointer"
               >
                 Volver
               </button>
@@ -552,7 +552,7 @@ export default function RegisterForm({
                   <button
                     type="submit"
                     disabled={submitting || !aceptaReglas}
-                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-emerald-600 text-white hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
+                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-button text-white hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
                   >
                     Enviar
                   </button>
@@ -560,7 +560,7 @@ export default function RegisterForm({
                   <button
                     type="button"
                     onClick={guardedNext}
-                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-emerald-600 hover:opacity-90 transition cursor-pointer"
+                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-button hover:opacity-90 transition cursor-pointer"
                   >
                     Continuar
                   </button>

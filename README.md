@@ -63,3 +63,13 @@ Yo creo que para tu caso, el Zebra DS8178 es de lo mejor:
 Es inalámbrico, rápido, soporta PDF417, tiene base para recargar, y funciona a varios metros de la PC.
 
 Si lo usás en modo HID, no tenés que cambiar tu backend: lo que leés aparece igual que si te lo escribieran.
+
+
+
+Fondo principal: blanco o un tono muy claro (como #FFF9F8) para mantener la sensación limpia y moderna.
+Texto principal: gris oscuro (#2E2E2E) para buena legibilidad y sobriedad.
+Botones y elementos interactivos: verde musgo suave (#597C64) o un tono de verde similar (#559470), para ligarlo con el sitio madre y la naturaleza.
+Encabezados y títulos: un verde más oscuro (#446451) para dar contraste y jerarquía en el texto.
+Fondos de modal o cuadros: blanco puro (#FFFFFF) con bordes suaves o sombras para crear separación pero mantener ligereza.
+Bordes e íconos: verde medio a oscuro (#678D77) para armonizar sin saturar.
+Hover o destacables: un toque de color verde brillante o amarillo suave (#D9B75A) para mejorar la experiencia visual sin romper la paleta.

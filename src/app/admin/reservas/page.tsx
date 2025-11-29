@@ -237,6 +237,7 @@ export default function ReservasPage() {
 
   return (
     <div className="space-y-4 w-full overflow-x-hidden">
+      <h1 className="text-xl sm:text-2xl pt-4 font-semibold">Reservas</h1>
       {/* Mensajes de éxito y error */}
       {successMsg && (
         <div className="rounded-xl border border-green-800 bg-green-950/40 p-4 text-green-300 flex items-center justify-between">

@@ -161,7 +161,7 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
         <textarea
           {...register("comentarios")}
           rows={4}
-          className="w-full rounded-md border border-emerald-600 bg-white/5 p-2 text-black"
+          className="w-full rounded-md border border-button bg-white/5 p-2 text-black"
           placeholder={comentariosPlaceholder}
         />
       </section>

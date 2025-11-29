@@ -21,9 +21,10 @@ export function Step({
       disabled={disabled}
       className={[
         "flex w-full items-center justify-between rounded-lg border p-3 text-left transition",
-        "bg-white border-emerald-400 hover:bg-white/10",
+        // "bg-white border-emerald-400 hover:bg-white/10",
+        "bg-white border-button hover:bg-white/10",
         disabled ? "opacity-50 cursor-not-allowed" : "",
-        error ? "border-red-400" : "",
+        error ? "border-red-500" : "",
       ].join(" ")}
     >
       <span className="truncate">{value || label}</span>

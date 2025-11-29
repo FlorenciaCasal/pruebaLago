@@ -38,7 +38,7 @@ export default function InstitucionStep({
                     />
                     {/* pista del switch */}
                     <div
-                        className="w-11 h-6 rounded-full bg-gray-300 peer-checked:bg-emerald-500 transition-colors duration-200 cursor-pointer"
+                        className="w-11 h-6 rounded-full bg-gray-300 peer-checked:bg-button transition-colors duration-200 cursor-pointer"
                     />
                     {/* bolita */}
                     <div
