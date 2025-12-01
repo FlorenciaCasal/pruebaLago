@@ -81,7 +81,7 @@ export default function LoginPage() {
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Ingresar</h1>
             <p className="mt-2 text-sm text-neutral-400">
               Si todavía no tenés cuenta, {" "}
-              <Link href="/register" className="text-white underline-offset-4 hover:underline">
+              <Link href="/admin/usuarios" className="text-white underline-offset-4 hover:underline">
                 creá una
               </Link>
               .
@@ -142,17 +142,9 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              {/* <label className="inline-flex items-center gap-2 text-sm text-neutral-300">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-neutral-600 bg-neutral-800 text-neutral-200 focus:ring-0"
-                  {...register("remember")}
-                />
-                Recordarme
-              </label> */}
-              <Link href="/forgot" className="text-xs text-neutral-400 hover:text-neutral-200">
+              {/* <Link href="/forgot" className="text-xs text-neutral-400 hover:text-neutral-200">
                 ¿Olvidaste tu contraseña?
-              </Link>
+              </Link> */}
             </div>
 
             <button
@@ -162,16 +154,6 @@ export default function LoginPage() {
             >
               {isSubmitting ? "Ingresando…" : "Ingresar"}
             </button>
-
-            {/* Separador opcional */}
-            {/* <div className="flex items-center gap-3 text-neutral-500">
-              <div className="h-px flex-1 bg-neutral-800" />
-              <span className="text-xs">o</span>
-              <div className="h-px flex-1 bg-neutral-800" />
-            </div>
-            <button type="button" className="w-full rounded-xl border border-neutral-700 py-2 text-sm hover:bg-neutral-800/60">
-              Continuar con Google
-            </button> */}
           </form>
         </div>
 

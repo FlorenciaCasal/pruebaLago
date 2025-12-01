@@ -78,35 +78,83 @@ export default function AdminSidebarClient({
                     </main>
                 </div>
 
-                {/* Drawer mobile (overlay + panel) */}
-                {open && (
-                    <>
-                        {/* fondo */}
+
+                {/* Drawer mobile (overlay + panel) con animación */}
+                {/* Overlay con fade */}
+                <div
+                    onClick={() => setOpen(false)}
+                    className={`
+    fixed inset-0 z-40 bg-black/50 sm:hidden
+    transition-opacity duration-300
+    ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+  `}
+                />
+
+                {/* Panel lateral con slide-in / slide-out */}
+                <div
+                    className={`
+    fixed z-50 inset-y-0 left-0 w-72 max-w-[80vw]
+    bg-neutral-950 border-r border-neutral-800 p-4 shadow-2xl sm:hidden
+
+    transform transition-transform duration-300 ease-out
+    ${open ? "translate-x-0" : "-translate-x-full"}
+  `}
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs uppercase tracking-wide text-neutral-400">
+                            Secciones
+                        </p>
                         <button
-                            aria-label="Cerrar menú"
                             onClick={() => setOpen(false)}
-                            className="fixed inset-0 z-40 bg-black/50"
-                        />
-                        {/* panel */}
-                        <div className="fixed z-50 inset-y-0 left-0 w-72 max-w-[80vw] bg-neutral-950 border-r border-neutral-800 p-4 shadow-2xl">
-                            <div className="flex items-center justify-between mb-3">
-                                <p className="text-xs uppercase tracking-wide text-neutral-400">Secciones</p>
-                                <button onClick={() => setOpen(false)} aria-label="Cerrar" className="rounded-md px-2 py-1 hover:bg-neutral-900">
-                                    ✕
-                                </button>
-                            </div>
-                            <nav>
-                                <ul className="space-y-1">
-                                    <li><Link href="/admin/reservas" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/reservas" ? "bg-neutral-900" : ""}`}>Reservas</Link></li>
-                                    <li><Link href="/admin/calendario" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/calendario" ? "bg-neutral-900" : ""}`}>Calendario</Link></li>
-                                    <li><Link href="/admin" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin" ? "bg-neutral-900" : ""}`}>Panel de Administración</Link></li>
-                                    {isAdmin && (<li><Link href="/admin/usuarios" className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/usuarios" ? "bg-neutral-900" : ""}`}>Usuarios</Link></li>
-                                    )}
-                                </ul>
-                            </nav>
-                        </div>
-                    </>
-                )}
+                            aria-label="Cerrar"
+                            className="rounded-md px-2 py-1 hover:bg-neutral-900 text-neutral-300"
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    <nav>
+                        <ul className="space-y-1 text-neutral-200 text-sm">
+                            <li>
+                                <Link
+                                    href="/admin/reservas"
+                                    className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/reservas" ? "bg-neutral-900" : ""}`}
+                                >
+                                    Reservas
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link
+                                    href="/admin/calendario"
+                                    className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/calendario" ? "bg-neutral-900" : ""}`}
+                                >
+                                    Calendario
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link
+                                    href="/admin"
+                                    className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin" ? "bg-neutral-900" : ""}`}
+                                >
+                                    Panel de Administración
+                                </Link>
+                            </li>
+
+                            {isAdmin && (
+                                <li>
+                                    <Link
+                                        href="/admin/usuarios"
+                                        className={`block rounded-xl px-3 py-2 hover:bg-neutral-800 ${pathname === "/admin/usuarios" ? "bg-neutral-900" : ""}`}
+                                    >
+                                        Usuarios
+                                    </Link>
+                                </li>
+                            )}
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </>
     );

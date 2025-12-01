@@ -7,14 +7,14 @@ import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 
 export default function Topbar() {
     return (
-        <div className="hidden sm:block w-full bg-[#1D1D1E] text-white text-sm py-3 px-12">
+        <div className="hidden sm:block w-full bg-[#1D1D1E] text-[#ffffff99] text-[13px] py-3 px-10">
             <div className="mx-auto max-w-7xl flex justify-between items-center">
 
                 {/* IZQUIERDA: contacto */}
-                <div className="flex items-center gap-4 opacity-80">
+                <div className="flex items-center gap-6 opacity-80">
 
-                    <span><FontAwesomeIcon icon={faMobileScreenButton} /> +54 2944 491027</span>
-                    <span><FontAwesomeIcon icon={faEnvelope} /> info@lago-escondido.com</span>
+                    <span><FontAwesomeIcon icon={faMobileScreenButton} size="lg" className="text-white" /> +54 2944 491027</span>
+                    <span><FontAwesomeIcon icon={faEnvelope} size="lg" className="text-white" /> info@lago-escondido.com</span>
                 </div>
 
                 {/* DERECHA: redes (si querés agregar) */}

@@ -9,10 +9,12 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
   const pathname = usePathname();
   const isHome = pathname == "/";
   const showHomeLink = pathname !== "/";
+
   // 👇 rutas donde NO queremos mostrar el navbar
   const HIDE_ON: string[] = ["/politicas-de-visita"];
 
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false); // ← menú mobile
 
   // Detectar scroll
   useEffect(() => {
@@ -21,136 +23,174 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // cerrar drawer al cambiar de ruta
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   // return condicional DESPUÉS de hooks
   if (HIDE_ON.includes(pathname)) return null;
 
 
   return (
-    //     // <nav className="sticky top-0 z-50 bg-neutral-900 text-white">
-    //     <nav className="sticky top-0 z-50 bg-[#E2BC52] text-text">
-    //       <div className="mx-auto w-full max-w-6xl px-3 sm:px-4">
-    //         <div className="flex items-center justify-between gap-2 py-2 md:py-3">
-    //           {/* LOGO: más chico en mobile */}
-    //           <div className="shrink-0">
-    //             <Link
-    //               href="/" >
-    //               <Image
-    //                 src="/img/logo.png"
-    //                 alt="Reserva Natural Lago Escondido"
-    //                 width={160}
-    //                 height={40}
-    //                 priority
-    //                 sizes="(max-width: 640px) 120px, 160px"
-    //                 className="h-8 w-auto md:h-12" /* h-6 (~24px) en xs, h-8 (~32px) en md+ */
-    //               />
-    //             </Link>
-    //           </div>
-
-    //           {/* LINKS: texto corto en mobile, padding/gap más compactos */}
-    //           <div className="min-w-0 flex flex-1 justify-end">
-    //             <div className="flex items-center gap-1 md:gap-3 text-sm md:text-base overflow-x-auto no-scrollbar">
-    //               {showHomeLink && (
-    //                 <Link
-    //                   href="/"
-    //                   // className="whitespace-nowrap px-2 py-1 rounded hover:bg-neutral-800"
-    //                   className="px-3 py-1.5 text-sm hover:text-[#8e8e8f]"
-    //                 >
-    //                   INICIO
-    //                 </Link>
-    //               )}
-
-    //               {isHome && isLogged && isAdmin || isAdminLimit && (
-    //                 <Link
-    //                   href="/admin"
-    //                   // className="text-white no-underlinepx-3 py-1.5 text-sm hover:text-[#8e8e8f] whitespace-nowrap"
-    //                   className="no-underlinepx-3 py-1.5 text-sm hover:text-[#8e8e8f] whitespace-nowrap"
-    //                 >
-    //                   {/* Etiqueta corta en xs, larga en md+ */}
-    //                   <span className="md:hidden">ADMIN</span>
-    //                   <span className="hidden md:inline">PANEL DE ADMINISTRACIÓN</span>
-    //                 </Link>
-    //               )}
-
-    //               {!isLogged ? (
-    //                 <Link
-    //                   href="/login"
-    //                   // className="text-white no-underline px-2 md:px-3 py-1 text-sm hover:text-[#8e8e8f] whitespace-nowrap"
-    //                   className="no-underline px-2 md:px-3 py-1 text-sm hover:text-[#8e8e8f] whitespace-nowrap"
-    //                 >
-    //                   INGRESAR
-    //                 </Link>
-    //               ) : (
-    //                 <div className="px-0.5 md:px-0">
-    //                   <LogoutButton />
-    //                 </div>
-    //               )}
-    //             </div>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </nav>
-    //   );
-    // }
-    <nav
-      className={`
-        w-full sticky top-0 z-50 transition-colors duration-300
-        ${scrolled ? "bg-white shadow-md" : "bg-background"}
+    <>
+      <nav
+        className={`
+        w-full sticky top-0 z-50 transition-colors duration-300 border-b-2 border-white
+        ${scrolled ? "bg-white shadow-md" : "bg-transparent"}
       `}
-    >
-      <div className="mx-auto max-w-7xl px-3 sm:px-16">
-        <div className="flex items-center justify-between gap-4 py-3">
+      >
+        <div className="mx-auto max-w-7xl px-3 sm:px-16">
+          <div className="flex items-center justify-between gap-4 py-3">
 
-          {/* LOGO */}
-          <Link href="/">
-            <Image
-              src="/img/logo.png"
-              alt="Reserva Natural Lago Escondido"
-              width={160}
-              height={40}
-              priority
-              className="w-auto h-10 md:h-12 "
-            />
-          </Link>
+            {/* LOGO */}
+            <Link href="/">
+              <Image
+                src="/img/logo.png"
+                alt="Reserva Natural Lago Escondido"
+                width={160}
+                height={40}
+                priority
+                className="w-auto h-10 md:h-12 "
+              />
+            </Link>
 
-          {/* LINKS */}
-          <div className="flex items-center justify-end text-text gap-2 sm:gap-6 text-xs font-semibold">
+            {/* BOTÓN HAMBURGUESA (solo mobile) */}
+            <button
+              aria-label="Abrir menú"
+              className="sm:hidden text-text px-2 py-1"
+              onClick={() => setOpen(true)}
+            >
+              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
+                <rect x="3" y="6" width="18" height="2" rx="1" />
+                <rect x="3" y="11" width="18" height="2" rx="1" />
+                <rect x="3" y="16" width="18" height="2" rx="1" />
+              </svg>
+            </button>
 
+
+            {/* LINKS DESKTOP */}
+            {/* <div className="flex items-center justify-end text-text gap-2 sm:gap-6 text-xs font-semibold"> */}
+            <div className="hidden sm:flex items-center justify-end text-text gap-6 text-sm font-semibold">
+
+              {showHomeLink && (
+                <Link
+                  href="/"
+                  // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
+                  //   }`}
+                  className="transition hover:text-[#8e8e8f]"
+                >
+                  INICIO
+                </Link>
+              )}
+
+              {isHome && (isLogged && isAdmin || isAdminLimit) && (
+                <Link
+                  href="/admin"
+                  // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
+                  //   }`}
+                  className="transition hover:text-[#8e8e8f]"
+                >
+                  <span className="md:hidden">ADMIN</span>
+                  <span className="hidden md:inline">PANEL DE ADMINISTRACIÓN</span>
+                </Link>
+              )}
+
+              {!isLogged ? (
+                <Link
+                  href="/login"
+                  // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
+                  className="transition hover:text-[#8e8e8f]"
+                // }`
+                // }
+                >
+                  INGRESAR
+                </Link>
+              ) : (
+                <LogoutButton />
+              )}
+
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* --- DRAWER MOBILE CON ANIMACIÓN --- */}
+      {/* overlay oscuro con fade y sin clics cuando está cerrado */}
+      <div
+        onClick={() => setOpen(false)}
+        className={`
+    fixed inset-0 z-40 bg-black/50 sm:hidden
+    transition-opacity duration-300
+    ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+  `}
+      />
+
+      {/* panel lateral con slide horizontal */}
+      <div
+        className={`
+    fixed z-50 inset-y-0 left-0 w-72 max-w-[80vw]
+    bg-neutral-950 border-r border-neutral-800
+    p-4 shadow-2xl sm:hidden
+
+    transform transition-transform duration-300 ease-out
+    ${open ? "translate-x-0" : "-translate-x-full"}
+  `}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs uppercase tracking-wide text-neutral-400">
+            Menú
+          </p>
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Cerrar"
+            className="rounded-md px-2 py-1 hover:bg-neutral-900 text-neutral-300"
+          >
+            ✕
+          </button>
+        </div>
+
+        <nav>
+          <ul className="space-y-1 text-neutral-200 text-sm">
             {showHomeLink && (
-              <Link
-                href="/"
-                className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
-                  }`}
-              >
-                INICIO
-              </Link>
+              <li>
+                <Link
+                  href="/"
+                  className="block rounded-xl px-3 py-2 hover:bg-neutral-800"
+                >
+                  Inicio
+                </Link>
+              </li>
             )}
 
             {isHome && (isLogged && isAdmin || isAdminLimit) && (
-              <Link
-                href="/admin"
-                className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
-                  }`}
-              >
-                <span className="md:hidden">ADMIN</span>
-                <span className="hidden md:inline">PANEL DE ADMINISTRACIÓN</span>
-              </Link>
+              <li>
+                <Link
+                  href="/admin"
+                  className="block rounded-xl px-3 py-2 hover:bg-neutral-800"
+                >
+                  Panel de Administración
+                </Link>
+              </li>
             )}
 
             {!isLogged ? (
-              <Link
-                href="/login"
-                className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
-                  }`}
-              >
-                INGRESAR
-              </Link>
+              <li>
+                <Link
+                  href="/login"
+                  className="block rounded-xl px-3 py-2 hover:bg-neutral-800"
+                >
+                  Ingresar
+                </Link>
+              </li>
             ) : (
-              <LogoutButton />
+              <li>
+                <LogoutButton isMobile />
+              </li>
             )}
-
-          </div>
-        </div>
+          </ul>
+        </nav>
       </div>
-    </nav>
-  );
+    </>
+  )
 }
