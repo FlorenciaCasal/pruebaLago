@@ -211,3 +211,41 @@ export async function setAdminBookingFlags(f: BookingFlags): Promise<void> {
     });
     if (!r.ok) throw new Error("No se pudo guardar flags");
 }
+
+/* ============== EXPORTACIÓN EXCEL DESDE BACKEND ============== */
+
+export async function exportReservationsBackend(params: {
+    date?: string;
+    month?: string;
+    year?: number;
+    status?: string;
+    visitorType?: string;
+    dni?: string;
+}) {
+    const query = new URLSearchParams();
+
+    if (params.date) query.set("date", params.date);
+    if (params.month) query.set("month", params.month);
+    if (params.year) query.set("year", String(params.year));
+    if (params.status) query.set("status", params.status);
+    if (params.visitorType) query.set("visitorType", params.visitorType);
+    if (params.dni) query.set("dni", params.dni);
+
+    const qs = query.toString() ? `?${query.toString()}` : "";
+
+    // IMPORTANTE: usamos fetchInternal así se reenvían cookies JWT
+    const res = await fetchInternal(`/api/admin/reservations/export${qs}`, {
+        method: "GET",
+    });
+
+    if (!res.ok) throw new Error("Error al exportar archivo");
+
+    const blob = await res.blob();
+    const contentDisposition = res.headers.get("content-disposition");
+    const filename =
+        contentDisposition?.split("filename=")[1]?.replace(/"/g, "") ||
+        "reservas.xlsx";
+
+    return { blob, filename };
+}
+

@@ -3,37 +3,38 @@ import React from "react";
 import { fetchReservations, confirmReservation, cancelReservation, type AdminStatus, } from "@/services/admin";
 import type { AdminReservation } from "@/types/admin";
 import CompanionsDisclosure from "@/components/admin/CompanionsDisclosure";
-// import ExportExcelButton from "@/components/ExportExcelButton";
-import * as XLSX from "xlsx";
+//  import ExportExcelButton from "@/components/ExportExcelButton";
+import { exportReservationsBackend } from "@/services/admin";
 
 
-function exportToExcel(data: AdminReservation[]) {
-  const rows = data.map(r => ({
-    FechaVisita: new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR"),
-    NombreResponsable: r.nombre,
-    ApellidoResponsable: r.apellido,
-    DNIResponsable: r.dni,
-    Pax: r.personas,
-    Adultos: r.adultos,
-    Niños: r.ninos,
-    Bebés: r.bebes,
-    Tipo: r.tipoVisitante,
-    Estado: r.status,
-    EmailResponsable: r.correo,
-    TeléfonoResponsable: r.telefono,
-    Visitantes: r.companions?.map(c => `${c.nombre} ${c.apellido} (DNI ${c.dni}), `).join("\n") ?? "",
-    MovilidadReducida: r.movilidadReducida ?? 0,
-    TieneAlergias: r.tieneAlergias ? "Sí" : "No",
-    CantidadAlergicos: r.cantidadAlergicos ?? 0,
-    Comentarios: r.comentarios ?? "",
-  }));
 
-  const worksheet = XLSX.utils.json_to_sheet(rows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Reservas");
+// function exportToExcel(data: AdminReservation[]) {
+//   const rows = data.map(r => ({
+//     FechaVisita: new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR"),
+//     NombreResponsable: r.nombre,
+//     ApellidoResponsable: r.apellido,
+//     DNIResponsable: r.dni,
+//     Pax: r.personas,
+//     Adultos: r.adultos,
+//     Niños: r.ninos,
+//     Bebés: r.bebes,
+//     Tipo: r.tipoVisitante,
+//     Estado: r.status,
+//     EmailResponsable: r.correo,
+//     TeléfonoResponsable: r.telefono,
+//     Visitantes: r.companions?.map(c => `${c.nombre} ${c.apellido} (DNI ${c.dni}), `).join("\n") ?? "",
+//     MovilidadReducida: r.movilidadReducida ?? 0,
+//     TieneAlergias: r.tieneAlergias ? "Sí" : "No",
+//     CantidadAlergicos: r.cantidadAlergicos ?? 0,
+//     Comentarios: r.comentarios ?? "",
+//   }));
 
-  XLSX.writeFile(workbook, "reservas.xlsx");
-}
+//   const worksheet = XLSX.utils.json_to_sheet(rows);
+//   const workbook = XLSX.utils.book_new();
+//   XLSX.utils.book_append_sheet(workbook, worksheet, "Reservas");
+
+//   XLSX.writeFile(workbook, "reservas.xlsx");
+// }
 
 
 
@@ -235,6 +236,31 @@ export default function ReservasPage() {
     el.scrollTo({ left: targetLeft, behavior: "smooth" });
   }
 
+
+  const handleBackendExport = async () => {
+    try {
+      const { blob, filename } = await exportReservationsBackend({
+        date: searchDate || undefined,
+        status: status !== "ALL" ? status : undefined,
+        dni: searchDni || undefined,
+        // Si querés exportar por mes o año, los agregás acá
+        // month: selectedMonth,
+        // year: selectedYear,
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo exportar el archivo.");
+    }
+  };
+
+
   return (
     <div className="space-y-4 w-full overflow-x-hidden">
       <h1 className="text-xl sm:text-2xl pt-4 font-semibold">Reservas</h1>
@@ -287,8 +313,14 @@ export default function ReservasPage() {
             </svg>
           </button>
 
-          <button
+          {/* <button
             onClick={() => exportToExcel(data)}
+            className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+          >
+            Exportar a Excel
+          </button> */}
+          <button
+            onClick={handleBackendExport}
             className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
           >
             Exportar a Excel
@@ -438,14 +470,6 @@ export default function ReservasPage() {
           </button>
         </div>
       )}
-
-
-      {/* <button
-        onClick={() => exportToExcel(data)}
-        className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
-      >
-        Exportar a Excel
-      </button> */}
 
       {/* Lista responsive */}
       {loading ? (
