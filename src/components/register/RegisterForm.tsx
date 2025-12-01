@@ -169,17 +169,6 @@ export default function RegisterForm({
     }
   };
 
-  // const validateListadoWithYup = async (n: number): Promise<string | null> => {
-  //   try {
-  //     await listadoSchemaExact(n).validate(composeVisitantes(), { abortEarly: true });
-  //     return null;
-  //   } catch (e) {
-  //     return e instanceof Yup.ValidationError ? prettyArrayError(e) : "Revisá el listado.";
-  //   }
-  // };
-  // const getListadoValues = () =>
-  //   (watch("personas") ?? []) as Array<{ nombre: string; apellido: string; dni: string }>;
-
   const validateListadoWithYup = async (expected: number): Promise<string | null> => {
     try {
       // Validamos SOLO lo que el usuario cargó en el listado (acompañantes)
@@ -233,17 +222,13 @@ export default function RegisterForm({
   const validateNecesidades = () => {
     const total = (adultos ?? 0) + (ninos ?? 0) + (bebes ?? 0);
     const mov = Number(watch("movilidadReducida") ?? 0);
-    const alergias = (watch("alergias") ?? "no") as "si" | "no";
-    const alergicos = Number(watch("alergicos") ?? 0);
     if (mov < 0 || mov > total) return "Cantidad con movilidad reducida inválida.";
-    if (alergias === "si" && alergicos <= 0) return "Cantidad de alérgicos requerida.";
     return null;
   };
 
   const validators: Omit<Record<StepType, () => string | null>, "listado"> = {
     contacto: validateContacto,
     institucion: () => null,
-    // listado: validateListado,
     salud: validateNecesidades,
     conociste: validateConociste,
     submit: () => null,
@@ -380,8 +365,6 @@ export default function RegisterForm({
     nextStep();
   };
 
-  // ⛔ Importante: desactivamos este hook por ahora para que NO toque `step`
-  // useRegisterUrlSync({ currentStep: safeIndex, successMsg, pathname, routerReplace: (url) => router.replace(url, { scroll: false }), searchParams, tipo, fechaISO: watch("fechaISO"), adultos, ninos, bebes });
 
   useEffect(() => {
     if (!tipo) return;
@@ -449,14 +432,7 @@ export default function RegisterForm({
 
   const step = steps[safeIndex];
 
-  // const policiesUrlWithReturn = (() => {
-  //   const qs = new URLSearchParams(searchParams);
-  //   qs.set("step", String(safeIndex));
-  //   return `${POLICIES_URL}?returnTo=${encodeURIComponent(`${pathname}?${qs.toString()}`)}`;
-  // })();
-
   return (
-    // <div className="flex items-center justify-center bg-transparent">
     <div className="flex flex-1 min-h-0 items-stretch bg-transparent">
       <form onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-black overflow-x-hidden"

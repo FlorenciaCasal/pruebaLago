@@ -15,25 +15,15 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
   // MOVILIDAD
   const movSiNo = (watch("movilidadReducidaSiNo") ?? "no") as "si" | "no";
   const movCant = Number(watch("movilidadReducida") ?? 0);
-
-  // ALERGIAS
-  const alergias = (watch("alergias") ?? "no") as "si" | "no";
-  const alergicos = Number(watch("alergicos") ?? 0);
-
   const movSi = movCant > 0;
-  const alergiasSi = alergias === "si";
 
   const clamp = (n: number) =>
     Math.max(0, Math.min(Number.isFinite(n) ? n : 0, totalPersonas));
 
-  let comentariosPlaceholder = "Escribí cualquier información adicional relevante…";
-  if (alergiasSi && movSi) {
-    comentariosPlaceholder = "Detalles sobre las alergias y las necesidades de movilidad reducida…";
-  } else if (alergiasSi) {
-    comentariosPlaceholder = "Detalles sobre las alergias (tipo, precauciones, etc.)…";
-  } else if (movSi) {
-    comentariosPlaceholder = "Indicá requerimientos para personas con movilidad reducida…";
-  }
+  // Nuevo placeholder sin alergias
+  const comentariosPlaceholder = movSi
+    ? "Indicá requerimientos para personas con movilidad reducida…"
+    : "Escribí cualquier información adicional relevante…";
 
   return (
     <div className="space-y-6 rounded-xl bg-white/5 border border-gray-800 p-4">
@@ -87,62 +77,6 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
                 onChange={(e) =>
                   setValue(
                     "movilidadReducida",
-                    Math.max(1, clamp(parseInt(e.target.value, 10))),
-                    { shouldDirty: true }
-                  )
-                }
-                inputMode="numeric"
-                className="w-20"
-              />
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Alérgicos */}
-      <section className="space-y-2">
-        <div className="font-medium">¿Personas alérgicas?</div>
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-6 text-sm">
-            <label className="inline-flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                // className="accent-white"
-                className="accent-gray-800 w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
-                checked={alergias === "si"}
-                onChange={() => {
-                  setValue("alergias", "si", { shouldDirty: true });
-                  if (!alergicos) setValue("alergicos", 1, { shouldDirty: true });
-                }}
-              />
-              <span>Sí</span>
-            </label>
-            <label className="inline-flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                // className="accent-white"
-                className="accent-gray-800 w-4 h-4 rounded-full checked:ring-[3px] checked:ring-black"
-                checked={alergias === "no"}
-                onChange={() => {
-                  setValue("alergias", "no", { shouldDirty: true });
-                  setValue("alergicos", 0, { shouldDirty: true });
-                }}
-              />
-              <span>No</span>
-            </label>
-          </div>
-
-          {alergias === "si" && (
-            <div className="flex items-center gap-2 md:ml-auto">
-              <label className="text-sm text-black">¿Cuántas?</label>
-              <input
-                type="number"
-                min={1}
-                max={totalPersonas}
-                value={alergicos || 1}
-                onChange={(e) =>
-                  setValue(
-                    "alergicos",
                     Math.max(1, clamp(parseInt(e.target.value, 10))),
                     { shouldDirty: true }
                   )

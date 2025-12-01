@@ -3,38 +3,7 @@ import React from "react";
 import { fetchReservations, confirmReservation, cancelReservation, type AdminStatus, } from "@/services/admin";
 import type { AdminReservation } from "@/types/admin";
 import CompanionsDisclosure from "@/components/admin/CompanionsDisclosure";
-//  import ExportExcelButton from "@/components/ExportExcelButton";
 import { exportReservationsBackend } from "@/services/admin";
-
-
-
-// function exportToExcel(data: AdminReservation[]) {
-//   const rows = data.map(r => ({
-//     FechaVisita: new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR"),
-//     NombreResponsable: r.nombre,
-//     ApellidoResponsable: r.apellido,
-//     DNIResponsable: r.dni,
-//     Pax: r.personas,
-//     Adultos: r.adultos,
-//     Niños: r.ninos,
-//     Bebés: r.bebes,
-//     Tipo: r.tipoVisitante,
-//     Estado: r.status,
-//     EmailResponsable: r.correo,
-//     TeléfonoResponsable: r.telefono,
-//     Visitantes: r.companions?.map(c => `${c.nombre} ${c.apellido} (DNI ${c.dni}), `).join("\n") ?? "",
-//     MovilidadReducida: r.movilidadReducida ?? 0,
-//     TieneAlergias: r.tieneAlergias ? "Sí" : "No",
-//     CantidadAlergicos: r.cantidadAlergicos ?? 0,
-//     Comentarios: r.comentarios ?? "",
-//   }));
-
-//   const worksheet = XLSX.utils.json_to_sheet(rows);
-//   const workbook = XLSX.utils.book_new();
-//   XLSX.utils.book_append_sheet(workbook, worksheet, "Reservas");
-
-//   XLSX.writeFile(workbook, "reservas.xlsx");
-// }
 
 
 
