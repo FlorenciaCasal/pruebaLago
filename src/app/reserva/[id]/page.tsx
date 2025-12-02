@@ -1,12 +1,13 @@
 import ReservationCard, { ReservationView } from "@/components/reservation/ReservationCard";
 
 async function fetchReservation(id: string): Promise<ReservationView> {
-    // const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const base = process.env.APP_ORIGIN || "http://localhost:3000";
 
-    // const res = await fetch(`${base}/api/reservations/${id}`, {
-    //     cache: "no-store",
-    // });
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/reservations/${id}`);
+    console.log("APP_ORIGIN:", process.env.APP_ORIGIN)
+    const res = await fetch(`${base}/api/reservations/${id}`, {
+        cache: "no-store",
+    });
+
 
     if (!res.ok) throw new Error("No se pudo cargar la reserva");
 

@@ -18,7 +18,7 @@ export default function ReservationCard({ data }: { data: ReservationView }) {
     });
 
     return (
-        <div className="w-full max-w-xl mx-auto bg-[#f4f5f5] border border-gray-300 rounded-2xl p-6 shadow-md">
+        <div className="w-full max-w-xl mx-auto bg-white border border-gray-300 rounded-2xl p-6 shadow-md">
             <h1 className="text-2xl font-semibold text-center mb-6">
                 Reserva confirmada
             </h1>
