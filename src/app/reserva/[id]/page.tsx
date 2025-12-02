@@ -25,7 +25,7 @@ export default async function ReservationPage({
     const data = await fetchReservation(id);
 
     return (
-        <main className="min-h-[calc(100dvh-4rem)] flex items-center justify-center p-4 bg-white">
+        <main className="min-h-[calc(100dvh-4rem)] flex items-center justify-center pt-4 bg-background">
             <ReservationCard data={data} />
         </main>
     );
