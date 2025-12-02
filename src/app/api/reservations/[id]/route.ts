@@ -31,3 +31,16 @@ export async function GET(
 
     return NextResponse.json(mockData, { status: 200 });
 }
+
+// cuando el back este listo:
+// const backend = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+//     const res = await fetch(`${backend}/reservations/${id}`);
+
+//     if (!res.ok) {
+//         return NextResponse.json(
+//             { error: "No se pudo obtener la reserva" },
+//             { status: res.status }
+//         );
+
+
