@@ -26,7 +26,7 @@ export async function GET(
         firstName: "Martina",
         lastName: "Guerzi",
         locationUrl:
-            "https://www.google.com/maps?q=-41.7166667,-71.6666667",
+            "https://www.google.com/maps?q=-41.740568,-71.483703",
     };
 
     return NextResponse.json(mockData, { status: 200 });
