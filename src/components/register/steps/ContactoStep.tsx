@@ -84,18 +84,18 @@ export default function ContactoStep({
                     />
                 </div>
 
-                    <div>
-                        <label className="block mb-1">Ciudad de origen</label>
-                        <CityAutocomplete
-                            value={watch("origenVisita") || ""}
-                            onChange={(value) => setValue("origenVisita", value.trim(), { shouldDirty: true })}
-                            // placeholder="Ej. Córdoba, Argentina"
-                            className={inputBase}
-                            inputMode="text"
-                            maxLength={80}
-                        />
-                    </div>
-              
+                <div>
+                    <label className="block mb-1">Ciudad de origen</label>
+                    <CityAutocomplete
+                        value={watch("origenVisita") || ""}
+                        onChange={(value) => setValue("origenVisita", value, { shouldDirty: true })}
+                        // placeholder="Ej. Córdoba, Argentina"
+                        className={inputBase}
+                        inputMode="text"
+                        maxLength={80}
+                    />
+                </div>
+
 
                 <div className="sm:col-span-2">
                     {/* <label className="block mb-1"> */}
@@ -112,7 +112,7 @@ export default function ContactoStep({
                             {/* pista del switch */}
                             <div
                                 // className="w-11 h-6 rounded-full bg-gray-300 peer-checked:bg-emerald-500 transition-colors duration-200 cursor-pointer"
-                                 className="w-11 h-6 rounded-full bg-gray-300 peer-checked:bg-button transition-colors duration-200 cursor-pointer"
+                                className="w-11 h-6 rounded-full bg-gray-300 peer-checked:bg-button transition-colors duration-200 cursor-pointer"
                             />
                             {/* bolita */}
                             <div

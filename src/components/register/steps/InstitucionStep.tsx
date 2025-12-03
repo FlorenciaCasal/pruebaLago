@@ -1,19 +1,31 @@
 import { inputBase } from "@/styles/ui";
-import type { UseFormRegister } from "react-hook-form";
+import type { UseFormRegister, UseFormWatch, UseFormSetValue } from "react-hook-form";
 import type { ReservationFormData } from "@/types/reservation";
+import CityAutocomplete from "@/components/forms/CityAutocomplete";
 
 export default function InstitucionStep({
     register,
+    watch,
+    setValue,
     uxError,
 }: {
     register: UseFormRegister<ReservationFormData>;
+    watch: UseFormWatch<ReservationFormData>;
+    setValue: UseFormSetValue<ReservationFormData>;
     uxError: string | null;
 }) {
     return (
         <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-3">
                 <input {...register("institucion")} placeholder="Nombre de la institución" className={inputBase} />
-                <input {...register("institucionLocalidad")} placeholder="Localidad" className={inputBase} />
+                {/* <input {...register("institucionLocalidad")} placeholder="Localidad" className={inputBase} /> */}
+                <CityAutocomplete
+                    value={watch("institucionLocalidad") || ""}
+                    onChange={(value) => setValue("institucionLocalidad", value, { shouldDirty: true })}
+                    placeholder="Localidad"
+                    className={inputBase}
+                />
+
                 <input {...register("institucionEmail")} placeholder="Email" className={inputBase} />
                 <input {...register("institucionTelefono")} placeholder="Teléfono" className={inputBase} />
             </div>

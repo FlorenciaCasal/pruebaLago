@@ -114,8 +114,8 @@ export default function RegisterForm({
   // ANTES:
   // const totalEsperado = tipo === "INSTITUCION_EDUCATIVA" ? tp : Math.max(0, tp - 1);  
   // AHORA: SIEMPRE igual al total (porque los visitantes son todos los que van físicamente)
-  const totalEsperado = tp;
-  console.log("totalEsperado", totalEsperado)
+  // const totalEsperado = tp;
+  // console.log("totalEsperado", totalEsperado)
 
   const reservaAsiste = watch("reservaAsiste") ?? true;
   // 👇 cantidad de filas que hay que cargar en el listado (solo acompañantes)
@@ -475,7 +475,7 @@ export default function RegisterForm({
             )}
 
             {step.type === "institucion" && tipo === "INSTITUCION_EDUCATIVA" && (
-              <InstitucionStep register={register} uxError={uxError} />
+              <InstitucionStep register={register} watch={watch} setValue={setValue} uxError={uxError} />
             )}
 
             {step.type === "salud" && (

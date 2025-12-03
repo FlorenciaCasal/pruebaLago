@@ -1,0 +1,326 @@
+[
+    {
+        "nombre": "Buenos Aires",
+        "nombre_normalizado": "buenos aires"
+    },
+    {
+        "nombre": "Córdoba",
+        "nombre_normalizado": "cordoba"
+    },
+    {
+        "nombre": "Rosario",
+        "nombre_normalizado": "rosario"
+    },
+    {
+        "nombre": "Mendoza",
+        "nombre_normalizado": "mendoza"
+    },
+    {
+        "nombre": "La Plata",
+        "nombre_normalizado": "la plata"
+    },
+    {
+        "nombre": "San Miguel de Tucumán",
+        "nombre_normalizado": "san miguel de tucuman"
+    },
+    {
+        "nombre": "Mar del Plata",
+        "nombre_normalizado": "mar del plata"
+    },
+    {
+        "nombre": "Salta",
+        "nombre_normalizado": "salta"
+    },
+    {
+        "nombre": "Santa Fe",
+        "nombre_normalizado": "santa fe"
+    },
+    {
+        "nombre": "San Juan",
+        "nombre_normalizado": "san juan"
+    },
+    {
+        "nombre": "Resistencia",
+        "nombre_normalizado": "resistencia"
+    },
+    {
+        "nombre": "Posadas",
+        "nombre_normalizado": "posadas"
+    },
+    {
+        "nombre": "Santiago del Estero",
+        "nombre_normalizado": "santiago del estero"
+    },
+    {
+        "nombre": "Corrientes",
+        "nombre_normalizado": "corrientes"
+    },
+    {
+        "nombre": "Bahía Blanca",
+        "nombre_normalizado": "bahia blanca"
+    },
+    {
+        "nombre": "San Salvador de Jujuy",
+        "nombre_normalizado": "san salvador de jujuy"
+    },
+    {
+        "nombre": "Paraná",
+        "nombre_normalizado": "parana"
+    },
+    {
+        "nombre": "Neuquén",
+        "nombre_normalizado": "neuquen"
+    },
+    {
+        "nombre": "Formosa",
+        "nombre_normalizado": "formosa"
+    },
+    {
+        "nombre": "San Luis",
+        "nombre_normalizado": "san Luis"
+    },
+    {
+        "nombre": "Catamarca",
+        "nombre_normalizado": "catamarca"
+    },
+    {
+        "nombre": "La Rioja",
+        "nombre_normalizado": "la rioja"
+    },
+    {
+        "nombre": "Rio Gallegos",
+        "nombre_normalizado": "rio gallegos"
+    },
+    {
+        "nombre": "Puerto Madryn",
+        "nombre_normalizado": "puerto madryn"
+    },
+    {
+        "nombre": "Ushuaia",
+        "nombre_normalizado": "ushuaia"
+    },
+    {
+        "nombre": "Trelew",
+        "nombre_normalizado": "trelew"
+    },
+    {
+        "nombre": "Comodoro Rivadavia",
+        "nombre_normalizado": "comodoro rivadavia"
+    },
+    {
+        "nombre": "San Nicolás",
+        "nombre_normalizado": "san nicolas"
+    },
+    {
+        "nombre": "San Rafael",
+        "nombre_normalizado": "san rafael"
+    },
+    {
+        "nombre": "Villa María",
+        "nombre_normalizado": "villa maria"
+    },
+    {
+        "nombre": "Río Cuarto",
+        "nombre_normalizado": "rio cuarto"
+    },
+    {
+        "nombre": "Junín",
+        "nombre_normalizado": "junin"
+    },
+    {
+        "nombre": "Tandil",
+        "nombre_normalizado": "tandil"
+    },
+    {
+        "nombre": "Luján",
+        "nombre_normalizado": "lujan"
+    },
+    {
+        "nombre": "Zárate",
+        "nombre_normalizado": "zarate"
+    },
+    {
+        "nombre": "Pilar",
+        "nombre_normalizado": "pilar"
+    },
+    {
+        "nombre": "Escobar",
+        "nombre_normalizado": "escobar"
+    },
+    {
+        "nombre": "Pacheco",
+        "nombre_normalizado": "pacheco"
+    },
+    {
+        "nombre": "Moreno",
+        "nombre_normalizado": "moreno"
+    },
+    {
+        "nombre": "Reconquista",
+        "nombre_normalizado": "reconquista"
+    },
+    {
+        "nombre": "Rafaela",
+        "nombre_normalizado": "rafaela"
+    },
+    {
+        "nombre": "Villa Carlos Paz",
+        "nombre_normalizado": "villa carlos paz"
+    },
+    {
+        "nombre": "Jesús María",
+        "nombre_normalizado": "jesus maria"
+    },
+    {
+        "nombre": "Villa Allende",
+        "nombre_normalizado": "villa allende"
+    },
+    {
+        "nombre": "Alta Gracia",
+        "nombre_normalizado": "alta gracia"
+    },
+    {
+        "nombre": "Yerba Buena",
+        "nombre_normalizado": "yerba buena"
+    },
+    {
+        "nombre": "Tafí Viejo",
+        "nombre_normalizado": "tafi viejo"
+    },
+    {
+        "nombre": "Concepción",
+        "nombre_normalizado": "concepcion"
+    },
+    {
+        "nombre": "Goya",
+        "nombre_normalizado": "goya"
+    },
+    {
+        "nombre": "Mercedes",
+        "nombre_normalizado": "mercedes"
+    },
+    {
+        "nombre": "Curuzú Cuatiá",
+        "nombre_normalizado": "curuzu cuatia"
+    },
+    {
+        "nombre": "Gualeguaychú",
+        "nombre_normalizado": "gualeguaychu"
+    },
+    {
+        "nombre": "Concordia",
+        "nombre_normalizado": "concordia"
+    },
+    {
+        "nombre": "Villaguay",
+        "nombre_normalizado": "villaguay"
+    },
+    {
+        "nombre": "San Fernando del Valle de Catamarca",
+        "nombre_normalizado": "san fernando del valle de catamarca"
+    },
+    {
+        "nombre": "Humahuaca",
+        "nombre_normalizado": "humahuaca"
+    },
+    {
+        "nombre": "Tilcara",
+        "nombre_normalizado": "tilcara"
+    },
+    {
+        "nombre": "San Pedro de Jujuy",
+        "nombre_normalizado": "san pedro de jujuy"
+    },
+    {
+        "nombre": "Libertador General San Martín",
+        "nombre_normalizado": "libertador general san martin"
+    },
+    {
+        "nombre": "Bariloche",
+        "nombre_normalizado": "bariloche"
+    },
+    {
+        "nombre": "El Bolsón",
+        "nombre_normalizado": "el bolson"
+    },
+    {
+        "nombre": "General Roca",
+        "nombre_normalizado": "general roca"
+    },
+    {
+        "nombre": "Cipolletti",
+        "nombre_normalizado": "cipolletti"
+    },
+    {
+        "nombre": "Viedma",
+        "nombre_normalizado": "viedma"
+    },
+    {
+        "nombre": "Allen",
+        "nombre_normalizado": "allen"
+    },
+    {
+        "nombre": "Rawson",
+        "nombre_normalizado": "rawson"
+    },
+    {
+        "nombre": "Puerto Deseado",
+        "nombre_normalizado": "puerto deseado"
+    },
+    {
+        "nombre": "Río Grande",
+        "nombre_normalizado": "rio grande"
+    },
+    {
+        "nombre": "Tolhuin",
+        "nombre_normalizado": "tolhuin"
+    },
+    {
+        "nombre": "Caleta Olivia",
+        "nombre_normalizado": "caleta olivia"
+    },
+    {
+        "nombre": "Perito Moreno",
+        "nombre_normalizado": "perito moreno"
+    },
+    {
+        "nombre": "Villa María",
+        "nombre_normalizado": "villa maria"
+    },
+    {
+        "nombre": "Villa Mercedes",
+        "nombre_normalizado": "villa mercedes"
+    },
+    {
+        "nombre": "Merlo",
+        "nombre_normalizado": "merlo"
+    },
+    {
+        "nombre": "Comandante Fontana",
+        "nombre_normalizado": "comandante fontana"
+    },
+    {
+        "nombre": "Clorinda",
+        "nombre_normalizado": "clorinda"
+    },
+    {
+        "nombre": "Pirané",
+        "nombre_normalizado": "pirane"
+    },
+    {
+        "nombre": "Las Lomitas",
+        "nombre_normalizado": "las lomitas"
+    },
+    {
+        "nombre": "San Antonio Oeste",
+        "nombre_normalizado": "san antonio oeste"
+    },
+    {
+        "nombre": "Choele Choel",
+        "nombre_normalizado": "choele choel"
+    },
+    {
+        "nombre": "Villa Regina",
+        "nombre_normalizado": "villa regina"
+    }
+]
