@@ -62,10 +62,8 @@ export default function ReservasPage() {
   const [pageCount, setPageCount] = React.useState(0);
   const [activePage, setActivePage] = React.useState(0);
   const [showFilters, setShowFilters] = React.useState(false);
-  const [searchDni, setSearchDni] = React.useState<string>("");
-  const [selectedMonth, setSelectedMonth] = React.useState<string>(""); // formato: YYYY-MM
-  const [selectedYear, setSelectedYear] = React.useState<string>(""); // formato: YYYY
-  const activeCount = [searchDate, searchName, searchDni, selectedMonth, selectedYear].filter(Boolean).length;
+  const [searchDni, setSearchDni] = React.useState<string>(""); // nuevo
+  const activeCount = [searchDate, searchName, searchDni].filter(Boolean).length;
   const [openRows, setOpenRows] = React.useState<Record<string, boolean>>({});
   const toggleRow = (id: string) => setOpenRows(s => ({ ...s, [id]: !s[id] }));
 
@@ -214,9 +212,9 @@ export default function ReservasPage() {
         date: searchDate || undefined,
         status: status !== "ALL" ? status : undefined,
         dni: searchDni || undefined,
-        name: searchName || undefined,
-        month: selectedMonth || undefined,
-        year: selectedYear ? parseInt(selectedYear) : undefined,
+        // Si querés exportar por mes o año, los agregás acá
+        // month: selectedMonth,
+        // year: selectedYear,
       });
 
       const url = window.URL.createObjectURL(blob);
@@ -356,22 +354,6 @@ export default function ReservasPage() {
                 DNI: {searchDni} <span>×</span>
               </button>
             )}
-            {selectedMonth && (
-              <button
-                onClick={() => setSelectedMonth("")}
-                className="inline-flex items-center gap-1 rounded-full bg-neutral-800 px-2.5 py-1 text-xs"
-              >
-                Mes: {selectedMonth} <span>×</span>
-              </button>
-            )}
-            {selectedYear && (
-              <button
-                onClick={() => setSelectedYear("")}
-                className="inline-flex items-center gap-1 rounded-full bg-neutral-800 px-2.5 py-1 text-xs"
-              >
-                Año: {selectedYear} <span>×</span>
-              </button>
-            )}
           </div>
         )
       }
@@ -408,7 +390,7 @@ export default function ReservasPage() {
             />
           </div>
 
-          {/* DNI */}
+          {/* DNI — NUEVO */}
           <div className="min-w-0">
             <label className="hidden sm:block text-sm text-neutral-300 mb-2">Buscar por DNI</label>
             <input
@@ -417,31 +399,6 @@ export default function ReservasPage() {
               value={searchDni}
               onChange={(e) => setSearchDni(e.target.value.replace(/\D+/g, "").slice(0, 10))}
               placeholder="DNI"
-              className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Mes */}
-          <div className="min-w-0">
-            <label className="hidden sm:block text-sm text-neutral-300 mb-2">Filtrar por mes</label>
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Año */}
-          <div className="min-w-0">
-            <label className="hidden sm:block text-sm text-neutral-300 mb-2">Filtrar por año</label>
-            <input
-              type="number"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              placeholder="Año (ej: 2025)"
-              min="2020"
-              max="2030"
               className="w-full rounded-lg border border-neutral-700 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none"
             />
           </div>
@@ -457,20 +414,14 @@ export default function ReservasPage() {
           </button>
 
           <button
-            onClick={() => {
-              setSearchDate("");
-              setSearchName("");
-              setSearchDni("");
-              setSelectedMonth("");
-              setSelectedYear("");
-            }}
+            onClick={() => { setSearchDate(""); setSearchName(""); setSearchDni(""); }}
             className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
           >
             Limpiar filtros
           </button>
         </div>
 
-        {(searchDate || searchName || searchDni || selectedMonth || selectedYear) && (
+        {(searchDate || searchName || searchDni) && (
           <div className="mt-3 text-sm text-neutral-400">
             {data.length} reserva{data.length !== 1 ? "s" : ""} encontrada{data.length !== 1 ? "s" : ""}
           </div>
@@ -494,7 +445,7 @@ export default function ReservasPage() {
         <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">Cargando...</div>
       ) : data.length === 0 ? (
         <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
-          {(searchDate || searchName || searchDni || selectedMonth || selectedYear)
+          {(searchDate || searchName || searchDni)
             ? "No se encontraron reservas con los filtros aplicados."
             : "No hay reservas."}
         </div>
