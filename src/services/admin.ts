@@ -221,6 +221,7 @@ export async function exportReservationsBackend(params: {
     status?: string;
     visitorType?: string;
     dni?: string;
+    name?: string;
 }) {
     const query = new URLSearchParams();
 
@@ -230,6 +231,7 @@ export async function exportReservationsBackend(params: {
     if (params.status) query.set("status", params.status);
     if (params.visitorType) query.set("visitorType", params.visitorType);
     if (params.dni) query.set("dni", params.dni);
+    if (params.name) query.set("name", params.name);
 
     const qs = query.toString() ? `?${query.toString()}` : "";
 
