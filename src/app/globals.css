@@ -5,23 +5,42 @@
 /* ====== Paleta semántica ====== */
 :root {
   /* Base actual */
-  --background: #F3F3F3;
+  /* --background: #F3F3F3; */
+  --background: #F3EFE7;
+  /* Arena clara */
   /* Fondo muy claro */
-  --foreground: #333333;
+  /* --foreground: #333333; */
+  --foreground: #2D2D2D;
+  /* Texto principal */
   /* Texto principal */
 
-  /* Nombres para reusar */
-  /* Fondo muy claro */
-  --text-main: #2D2D2D;
   /* Texto principal (gris oscuro) */
-  --heading: #00665A;
-  /* Encabezados y títulos (verde oscuro) */
-  --link: #009577;
-  /* botones */
-  --button: #6FA69C;
-  /* Enlaces e índice (verde medio) */
-  --accent-earth: #7A6E5A;
-  /* Detalles importantes (tono tierra suave) */
+  --text-main: #2D2D2D;
+
+  /* Agregado */
+  --text-muted: #5A5A5A;
+
+  /* Colores de marca */
+  --primary: #3A9C98;
+  /* Verde alerce (principal) */
+  /* --primary-light: #4EB2AB; */
+  --primary-light: #D9C27A;
+  /* Hover / superficies */
+  --primary-dark: #2A837C;
+  /* Activo */
+
+  --secondary: #2BA6A4;
+  /* Agua dulce */
+  --secondary-dark: #238785;
+  /* Hover */
+
+  --accent-earth: #7A5A3A;
+  /* Marrón huemul */
+
+  --surface: #FFFFFF;
+  --border: #D4D4D4;
+
+  /* Si querés mantener este color funcional */
   --yellow: #D3B04D;
 
 }
@@ -34,23 +53,26 @@
 
   /* Tokens semánticos */
   --color-text: var(--text-main);
-  --color-heading: var(--heading);
-  --color-link: var(--link);
-  --color-button: var(--button);
-   --color-yellow: var(--yellow);
+  --color-text-muted: var(--text-muted);
+
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
+
   --color-accent: var(--accent-earth);
-  --color-muted: var(--muted);
+
+  --color-surface: var(--surface);
   --color-border: var(--border);
 
-  /* Si usás “primario/secundario” en componentes */
-  --color-primary: var(--link);
-  --color-primary-foreground: #ffffff;
-  --color-secondary: var(--accent-earth);
-  --color-secondary-foreground: #ffffff;
-
-  /* Tipografías que ya tenías */
+  /* Para compatibilidad con tus nombres anteriores */
+  --color-heading: var(--primary);
+  --color-link: var(--secondary);
+  --color-button: var(--yellow);
+  --color-yellow: var(--yellow);
   --font-sans: 'Open Sans', sans-serif;
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {

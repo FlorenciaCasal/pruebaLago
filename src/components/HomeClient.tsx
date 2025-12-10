@@ -56,7 +56,7 @@ export default function HomePage() {
         {/* <div className="relative h-[40vh] lg:h-[calc(100vh-64px)]"> */}
         <div className="relative flex-1 flex min-h-[40vh] lg:min-h-0 ">
           <Image
-            src="/img/form.jpg"            // ⚠️ poné tu imagen real
+            src="/img/form.jpeg"            // ⚠️ poné tu imagen real
             alt="Lago Escondido"
             fill
             priority

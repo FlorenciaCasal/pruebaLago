@@ -13,15 +13,14 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
   // 👇 rutas donde NO queremos mostrar el navbar
   const HIDE_ON: string[] = ["/politicas-de-visita"];
 
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false); // ← menú mobile
 
-  // Detectar scroll
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  // // Detectar scroll
+  // useEffect(() => {
+  //   const onScroll = () => setScrolled(window.scrollY > 40);
+  //   window.addEventListener("scroll", onScroll);
+  //   return () => window.removeEventListener("scroll", onScroll);
+  // }, []);
 
   // cerrar drawer al cambiar de ruta
   useEffect(() => {
@@ -36,29 +35,29 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
     <>
       <nav
         className={`
-        w-full sticky top-0 z-50 transition-colors duration-300 border-b-2 border-white
-        ${scrolled ? "bg-white shadow-md" : "bg-transparent"}
+        w-full sticky top-0 z-50 transition-colors duration-300 
+       bg-primary text-surface
       `}
       >
         <div className="mx-auto max-w-7xl px-3 sm:px-16">
-          <div className="flex items-center justify-between gap-4 py-3">
+          <div className="flex items-center justify-between gap-4 py-1">
 
             {/* LOGO */}
             <Link href="/">
               <Image
-                src="/img/logo.png"
+                src="/img/logo1.png"
                 alt="Reserva Natural Lago Escondido"
                 width={160}
                 height={40}
                 priority
-                className="w-auto h-10 md:h-12 "
+                className="w-auto h-14 md:h-16 "
               />
             </Link>
 
             {/* BOTÓN HAMBURGUESA (solo mobile) */}
             <button
               aria-label="Abrir menú"
-              className="sm:hidden text-text px-2 py-1"
+              className="sm:hidden text-white px-2 py-1"
               onClick={() => setOpen(true)}
             >
               <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
@@ -71,14 +70,14 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
 
             {/* LINKS DESKTOP */}
             {/* <div className="flex items-center justify-end text-text gap-2 sm:gap-6 text-xs font-semibold"> */}
-            <div className="hidden sm:flex items-center justify-end text-text gap-6 text-sm font-semibold">
+            <div className="hidden sm:flex items-center justify-end text-surface gap-6 text-sm font-semibold">
 
               {showHomeLink && (
                 <Link
                   href="/"
                   // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
                   //   }`}
-                  className="transition hover:text-[#8e8e8f]"
+                  className="transition hover:text-secondary-dark"
                 >
                   INICIO
                 </Link>
@@ -89,7 +88,7 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
                   href="/admin"
                   // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
                   //   }`}
-                  className="transition hover:text-[#8e8e8f]"
+                  className="transition hover:text-secondary-dark"
                 >
                   <span className="md:hidden">ADMIN</span>
                   <span className="hidden md:inline">PANEL DE ADMINISTRACIÓN</span>
@@ -100,7 +99,7 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
                 <Link
                   href="/login"
                   // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
-                  className="transition hover:text-[#8e8e8f]"
+                  className="transition hover:text-secondary-dark"
                 // }`
                 // }
                 >

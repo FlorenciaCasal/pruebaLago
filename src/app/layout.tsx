@@ -3,7 +3,6 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ToastProvider } from "@/components/ui/Toast";
 import Footer from "@/components/Footer";
-import Topbar from "@/components/Topbar";
 
 
 export const metadata: Metadata = {
@@ -20,7 +19,6 @@ export default function RootLayout({ children, }: Readonly<{
         className="min-h-dvh flex flex-col antialiased"
       >
         <ToastProvider>
-          <Topbar />
           <Navbar />
           <main className="flex-1 min-h-0 flex flex-col">{children}</main>
           <Footer />

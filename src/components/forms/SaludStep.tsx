@@ -20,7 +20,6 @@ export default function SaludStep({ register, watch, setValue, totalPersonas, ux
   const clamp = (n: number) =>
     Math.max(0, Math.min(Number.isFinite(n) ? n : 0, totalPersonas));
 
-  // Nuevo placeholder sin alergias
   const comentariosPlaceholder = movSi
     ? "Indicá requerimientos para personas con movilidad reducida…"
     : "Escribí cualquier información adicional relevante…";

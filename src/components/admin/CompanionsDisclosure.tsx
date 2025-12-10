@@ -31,7 +31,7 @@ export default function CompanionsDisclosure({
                 type="button"
                 onClick={() => setOpen(v => !v)}
                 className={
-                    "inline-flex items-center gap-2 py-1.5 text-sm hover:text-neutral-800 " +
+                    "inline-flex items-center gap-2 py-1.5 text-sm hover:text-neutral-400 " +
                     buttonClassName
                 }
                 aria-expanded={open}

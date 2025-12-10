@@ -14,7 +14,8 @@ export default function Footer() {
 
   return (
     // <footer className="w-full bg-[#D3B04D] text-white py-6 mt-10">
-    <footer className="w-full bg-yellow text-white py-4 sm:py-6">
+    // <footer className="w-full bg-[#E9E4DA] text-white py-4 sm:py-6">
+    <footer className="w-full bg-[#fff] text-black py-4 sm:py-6">
       {/* <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4"> */}
       {/* <div className="mx-auto max-w-6xl px-4 flex flex-col items-center justify-between gap-4"> */}
       <div

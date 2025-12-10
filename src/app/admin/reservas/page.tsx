@@ -484,26 +484,16 @@ export default function ReservasPage() {
                   <div> <dt className="text-neutral-400">Teléfono</dt><dd>{r.telefono ?? "-"}</dd></div>
                   <div><dt className="text-neutral-400">Fecha de visita</dt> <div className="text-sm text-white">{new Date(r.reservationDate + "T00:00:00").toLocaleDateString("es-AR")}</div></div>
 
-                  {/* 👇 NUEVO: Salud */}
+                  {/* 👇 Movilidad reducida */}
                   <div className="mt-2 col-span-2">
-                    <dt className="text-neutral-400">Salud</dt>
+                    <dt className="text-neutral-400">Movilidad reducida</dt>
                     <dd className="text-sm">
-                      {r.movilidadReducida > 0 && (
+                      {r.movilidadReducida > 0 ? (
                         <span className="block">
-                          {r.movilidadReducida} con movilidad reducida
+                          {r.movilidadReducida} persona{r.movilidadReducida > 1 ? "s" : ""} con movilidad reducida
                         </span>
-                      )}
-
-                      {r.tieneAlergias && (
-                        <span className="block">
-                          {r.cantidadAlergicos > 0
-                            ? `${r.cantidadAlergicos} con alergias`
-                            : "Personas con alergias"}
-                        </span>
-                      )}
-
-                      {r.movilidadReducida === 0 && !r.tieneAlergias && (
-                        <span className="text-neutral-500">Sin datos registrados</span>
+                      ) : (
+                        <span className="text-neutral-500">-</span>
                       )}
                     </dd>
                   </div>
@@ -569,7 +559,7 @@ export default function ReservasPage() {
                     {/* Acciones con ancho fijo y sin shrink */}
                     <th >Email</th>
                     <th >Teléfono</th>
-                    <th className="w-40">Salud</th>
+                    <th className="w-40">Mov. reducida</th>
                     <th className="w-56">Comentarios</th>
                     <th className="w-40 text-center">Visitantes</th>
                     <th className="w-[220px] shrink-0 text-center">Acciones</th>
@@ -607,21 +597,11 @@ export default function ReservasPage() {
                         <td className="whitespace-nowrap">{r.telefono ?? "-"}</td>
 
 
-                        {/* 👇 Columna Salud */}
+                        {/* 👇 Columna Movilidad reducida */}
                         <td className="text-xs leading-snug align-top">
-                          {r.movilidadReducida > 0 && (
+                          {r.movilidadReducida > 0 ? (
                             <div>{r.movilidadReducida} mov. reducida</div>
-                          )}
-
-                          {r.tieneAlergias && (
-                            <div>
-                              {r.cantidadAlergicos > 0
-                                ? `${r.cantidadAlergicos} alergias`
-                                : "Personas con alergias"}
-                            </div>
-                          )}
-
-                          {r.movilidadReducida === 0 && !r.tieneAlergias && (
+                          ) : (
                             <span className="text-neutral-500">-</span>
                           )}
                         </td>
@@ -685,8 +665,7 @@ export default function ReservasPage() {
 
                       {openRows[r.id] && (
                         <tr>
-                          {/* <td colSpan={14} className="px-2 py-2 bg-neutral-950"> */}
-                          <td className="px-2 py-2 bg-neutral-950">
+                          <td colSpan={14} className="px-2 py-2 bg-neutral-950">
                             <CompanionsDisclosure companions={r.companions} />
                           </td>
                         </tr>

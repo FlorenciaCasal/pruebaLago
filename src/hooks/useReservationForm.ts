@@ -20,9 +20,6 @@ export function useReservationForm(options?: UseFormProps<ReservationFormData>) 
       movilidadReducidaSiNo: "no",
 
       // otros
-      alergicos: 0,
-      alergias: "no",
-      detalleAlergias: "",
       comentarios: "",
       comoNosConociste: undefined,
       aceptaReglas: false,
