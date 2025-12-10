@@ -24,8 +24,6 @@ export type AdminReservation = {
     ninos: number;
     bebes: number;
     movilidadReducida: number;      // cantidad
-    tieneAlergias: boolean;
-    cantidadAlergicos: number;
     comentarios?: string;
 };
 

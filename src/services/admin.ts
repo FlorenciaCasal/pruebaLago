@@ -75,9 +75,7 @@ export async function fetchReservations(
         adultos: r.adults18Plus,
         ninos: r.children2To17,
         bebes: r.babiesLessThan2,
-        tieneAlergias: (r.allergies ?? 0) > 0,
         movilidadReducida: r.reducedMobility ?? 0,
-        cantidadAlergicos: r.allergies ?? 0,
         comentarios: r.comment ?? "",
         status: r.status as "PENDING" | "CONFIRMED" | "CANCELLED",
         dni: (r.dni ?? "").replace(/\D+/g, ""), // <--- NUEVO (normalizado)

@@ -93,7 +93,7 @@ export default async function AdminDashboard() {
                     <td className="px-4 py-2">{r.correo ?? "-"}</td>
                     <td className="px-4 py-2">{r.telefono ?? "-"}</td>
 
-                    {/* Aca deberiamos traer todos los datos, alergias, movilidad reducida, comentarios, o hacer una nueva page a la cual ir cuando clickeamos en ver/detalle
+                    {/* Aca deberiamos traer todos los datos, movilidad reducida, comentarios, o hacer una nueva page a la cual ir cuando clickeamos en ver/detalle
                   <td className="px-4 py-2">
                     <Link
                       href="/admin/reservas"

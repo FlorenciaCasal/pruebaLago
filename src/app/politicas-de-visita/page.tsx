@@ -103,7 +103,7 @@ export default function PoliticasDeVisitaPage() {
                     <h2 className="text-2xl text-heading font-semibold mb-3">7. Seguridad y clima</h2>
                     <ul className="list-disc pl-6 space-y-2 text-justify">
                         <li>Llevá <strong className="text-accent">ropa cómoda</strong>, calzado adecuado, <strong className="text-accent">gorro</strong> y <strong className="text-accent">protector solar</strong>.</li>
-                        <li>Informanos <strong className="text-accent">alergias</strong> o condiciones de salud relevantes.</li>
+                        <li>Informanos cualquier <strong className="text-accent">condición de salud</strong> relevante.</li>
                         <li>La actividad puede suspenderse por <strong className="text-accent">clima adverso</strong> o riesgos ambientales.</li>
                     </ul>
                 </section>

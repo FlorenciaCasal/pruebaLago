@@ -2,14 +2,34 @@
 "use client";
 import { useState } from "react";
 
-export default function ExportExcelButton({ date }: { date: string }) {
+type ExportFilters = {
+    date?: string;
+    month?: string;
+    year?: string;
+    status?: string;
+    visitorType?: string;
+    dni?: string;
+    name?: string;
+};
+
+export default function ExportExcelButton({ filters }: { filters: ExportFilters }) {
     const [loading, setLoading] = useState(false);
 
     const handleExport = async () => {
         setLoading(true);
         try {
-            // const res = await fetch(`/api/export?date=${date}`);
-                 const res = await fetch(`/api/admin/reservations/export?date=${date}`);
+            // Construir query string solo con filtros definidos
+            const params = new URLSearchParams();
+            if (filters.date) params.append("date", filters.date);
+            if (filters.month) params.append("month", filters.month);
+            if (filters.year) params.append("year", filters.year);
+            if (filters.status) params.append("status", filters.status);
+            if (filters.visitorType) params.append("visitorType", filters.visitorType);
+            if (filters.dni) params.append("dni", filters.dni);
+            if (filters.name) params.append("name", filters.name);
+
+            const queryString = params.toString();
+            const res = await fetch(`/api/admin/reservations/export${queryString ? `?${queryString}` : ""}`);
             if (!res.ok) throw new Error("Error al exportar");
 
             const blob = await res.blob();

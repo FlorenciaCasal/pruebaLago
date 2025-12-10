@@ -10,9 +10,6 @@ export type ReservationFormData = {
   bebes: number;          // <2
   movilidadReducidaSiNo?: "si" | "no";
   movilidadReducida: number;
-  alergias?: "si" | "no";
-  alergicos: number;
-  detalleAlergias?: string;
   comentarios?: string;
   comoNosConociste?: ComoNosConociste;
   aceptaReglas: boolean;
@@ -55,6 +52,5 @@ export type BackendReservationDTO = {
   //  Agregar este campo cuando esté implementado en el backend:
   visitors?: { firstName: string; lastName: string; dni: string }[];
   reducedMobility: number;
-  allergies: number;
   comment: string;
 };
