@@ -9,102 +9,6 @@ const normalize = (str: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-
-// Lista de ciudades argentinas principales con sus provincias
-// const ARGENTINE_CITIES = [
-//   // Buenos Aires
-//   "Buenos Aires, Argentina", "La Plata, Buenos Aires", "Mar del Plata, Buenos Aires", "Quilmes, Buenos Aires", "Lomas de Zamora, Buenos Aires",
-//   "Banfield, Buenos Aires", "Avellaneda, Buenos Aires", "San Isidro, Buenos Aires", "Vicente López, Buenos Aires", "Tigre, Buenos Aires",
-//   "San Miguel, Buenos Aires", "Moreno, Buenos Aires", "Pilar, Buenos Aires", "Escobar, Buenos Aires", "Zárate, Buenos Aires",
-
-//   // Córdoba
-//   "Córdoba, Argentina", "Villa Carlos Paz, Córdoba", "Río Cuarto, Córdoba", "Villa María, Córdoba", "San Francisco, Córdoba",
-//   "Cosquín, Córdoba", "La Falda, Córdoba", "Jesús María, Córdoba", "Villa General Belgrano, Córdoba", "Unquillo, Córdoba",
-
-//   // Santa Fe
-//   "Rosario, Santa Fe", "Santa Fe, Argentina", "Villa Gobernador Gálvez, Santa Fe", "Rafaela, Santa Fe", "Reconquista, Santa Fe",
-//   "Venado Tuerto, Santa Fe", "Santo Tomé, Santa Fe", "San Lorenzo, Santa Fe", "Pérez, Santa Fe", "Funes, Santa Fe",
-
-//   // Mendoza
-//   "Mendoza, Argentina", "Godoy Cruz, Mendoza", "Las Heras, Mendoza", "San Rafael, Mendoza", "Luján de Cuyo, Mendoza",
-//   "Maipú, Mendoza", "Rivadavia, Mendoza", "Guaymallén, Mendoza", "Tunuyán, Mendoza", "San Martín, Mendoza",
-
-//   // Tucumán
-//   "San Miguel de Tucumán, Tucumán", "Yerba Buena, Tucumán", "Tafí Viejo, Tucumán", "Banda del Río Salí, Tucumán",
-//   "Alderetes, Tucumán", "Concepción, Tucumán", "Monteros, Tucumán", "Aguilares, Tucumán",
-
-//   // Entre Ríos
-//   "Paraná, Entre Ríos", "Concordia, Entre Ríos", "Gualeguaychú, Entre Ríos", "Concepción del Uruguay, Entre Ríos", "Villaguay, Entre Ríos",
-//   "Gualeguay, Entre Ríos", "Colón, Entre Ríos", "Federación, Entre Ríos",
-
-//   // Salta
-//   "Salta, Argentina", "San Ramón de la Nueva Orán, Salta", "Tartagal, Salta", "Metán, Salta", "Rosario de Lerma, Salta",
-//   "Cafayate, Salta", "Cerrillos, Salta", "Chicoana, Salta",
-
-//   // Misiones
-//   "Posadas, Misiones", "Eldorado, Misiones", "Oberá, Misiones", "San Vicente, Misiones", "Puerto Iguazú, Misiones",
-//   "Apóstoles, Misiones", "Leandro N. Alem, Misiones", "Aristóbulo del Valle, Misiones",
-
-//   // Chaco
-//   "Resistencia, Chaco", "Barranqueras, Chaco", "Villa Ángela, Chaco", "Charata, Chaco", "Presidencia Roque Sáenz Peña, Chaco",
-//   "General San Martín, Chaco", "Machagai, Chaco", "Quitilipi, Chaco",
-
-//   // Corrientes
-//   "Corrientes, Argentina", "Goya, Corrientes", "Mercedes, Corrientes", "Paso de los Libres, Corrientes", "Curuzú Cuatiá, Corrientes",
-//   "Monte Caseros, Corrientes", "Esquina, Corrientes", "Santo Tomé, Corrientes",
-
-//   // Santiago del Estero
-//   "Santiago del Estero, Argentina", "La Banda, Santiago del Estero", "Añatuya, Santiago del Estero", "Termas de Río Hondo, Santiago del Estero", "Frías, Santiago del Estero",
-//   "Loreto, Santiago del Estero", "Suncho Corral, Santiago del Estero", "Quimilí, Santiago del Estero",
-
-//   // San Juan
-//   "San Juan, Argentina", "Pocito, San Juan", "Rivadavia, San Juan", "Chimbas, San Juan", "Caucete, San Juan",
-//   "Rawson, San Juan", "Albardón, San Juan", "Zonda, San Juan",
-
-//   // Jujuy
-//   "San Salvador de Jujuy, Jujuy", "Palpalá, Jujuy", "San Pedro de Jujuy, Jujuy", "Perico, Jujuy", "Libertador General San Martín, Jujuy",
-//   "Fraile Pintado, Jujuy", "El Carmen, Jujuy", "Humahuaca, Jujuy",
-
-//   // Río Negro
-//   "Bariloche, Río Negro", "General Roca, Río Negro", "Cipolletti, Río Negro", "Viedma, Río Negro", "San Antonio Oeste, Río Negro",
-//   "Villa Regina, Río Negro", "Choele Choel, Río Negro", "Allen, Río Negro",
-
-//   // Neuquén
-//   "Neuquén, Argentina", "Cutral Có, Neuquén", "Plottier, Neuquén", "Centenario, Neuquén", "San Martín de los Andes, Neuquén",
-//   "Zapala, Neuquén", "Rincón de los Sauces, Neuquén", "Junín de los Andes, Neuquén",
-
-//   // Chubut
-//   "Comodoro Rivadavia, Chubut", "Rawson, Chubut", "Trelew, Chubut", "Puerto Madryn, Chubut", "Esquel, Chubut",
-//   "Sarmiento, Chubut", "Gaiman, Chubut", "Dolavon, Chubut",
-
-//   // Formosa
-//   "Formosa, Argentina", "Clorinda, Formosa", "Pirané, Formosa", "Las Lomitas, Formosa", "Ingeniero Juárez, Formosa",
-//   "Comandante Fontana, Formosa", "Villa Escolar, Formosa", "Laguna Blanca, Formosa",
-
-//   // San Luis
-//   "San Luis, Argentina", "Villa Mercedes, San Luis", "Merlo, San Luis", "Justo Daract, San Luis", "La Toma, San Luis",
-//   "Concarán, San Luis", "Naschel, San Luis", "Quines, San Luis",
-
-//   // Catamarca
-//   "San Fernando del Valle de Catamarca, Catamarca", "Valle Viejo, Catamarca", "Fray Mamerto Esquiú, Catamarca", "Paclín, Catamarca",
-//   "Ambato, Catamarca", "Ancasti, Catamarca", "Andalgalá, Catamarca", "Antofagasta de la Sierra, Catamarca",
-
-//   // La Rioja
-//   "La Rioja, Argentina", "Chilecito, La Rioja", "Arauco, La Rioja", "Castro Barros, La Rioja", "Chamical, La Rioja",
-//   "Coronel Felipe Varela, La Rioja", "Famatina, La Rioja", "General Ángel V. Peñaloza, La Rioja",
-
-//   // Santa Cruz
-//   "Río Gallegos, Santa Cruz", "Caleta Olivia, Santa Cruz", "El Calafate, Santa Cruz", "Puerto Deseado, Santa Cruz", "Pico Truncado, Santa Cruz",
-//   "Las Heras, Santa Cruz", "Perito Moreno, Santa Cruz", "Los Antiguos, Santa Cruz",
-
-//   // Tierra del Fuego
-//   "Ushuaia, Tierra del Fuego", "Río Grande, Tierra del Fuego", "Tolhuin, Tierra del Fuego",
-
-//   // La Pampa
-//   "Santa Rosa, La Pampa", "General Pico, La Pampa", "Toay, La Pampa", "Realicó, La Pampa", "Macachín, La Pampa",
-//   "General Acha, La Pampa", "Guatraché, La Pampa", "Victorica, La Pampa",
-// ];
-
 interface CityAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
@@ -151,7 +55,7 @@ export default function CityAutocomplete({
     }
   }, [value]);
 
- 
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) return;
 

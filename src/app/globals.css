@@ -22,6 +22,7 @@
   /* Enlaces e índice (verde medio) */
   --accent-earth: #7A6E5A;
   /* Detalles importantes (tono tierra suave) */
+  --yellow: #D3B04D;
 
 }
 
@@ -36,6 +37,7 @@
   --color-heading: var(--heading);
   --color-link: var(--link);
   --color-button: var(--button);
+   --color-yellow: var(--yellow);
   --color-accent: var(--accent-earth);
   --color-muted: var(--muted);
   --color-border: var(--border);
@@ -64,6 +66,7 @@
     --link: #33BFA8;
     --button: #7FB5A3;
     /* verde medio más visible en dark */
+    --yellow: #D3B04D;
     --accent-earth: #9A8E78;
     /* tierra suavemente aclarado */
     --muted: #1a1a1a;
