@@ -15,13 +15,6 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
 
   const [open, setOpen] = useState(false); // ← menú mobile
 
-  // // Detectar scroll
-  // useEffect(() => {
-  //   const onScroll = () => setScrolled(window.scrollY > 40);
-  //   window.addEventListener("scroll", onScroll);
-  //   return () => window.removeEventListener("scroll", onScroll);
-  // }, []);
-
   // cerrar drawer al cambiar de ruta
   useEffect(() => {
     setOpen(false);
@@ -75,8 +68,6 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
               {showHomeLink && (
                 <Link
                   href="/"
-                  // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
-                  //   }`}
                   className="transition hover:text-secondary-dark"
                 >
                   INICIO
@@ -86,8 +77,6 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
               {isHome && (isLogged && isAdmin || isAdminLimit) && (
                 <Link
                   href="/admin"
-                  // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
-                  //   }`}
                   className="transition hover:text-secondary-dark"
                 >
                   <span className="md:hidden">ADMIN</span>
@@ -98,10 +87,7 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
               {!isLogged ? (
                 <Link
                   href="/login"
-                  // className={`transition ${scrolled ? "hover:text-[#8e8e8f]" : "hover:text-[#8e8e8f]"
                   className="transition hover:text-secondary-dark"
-                // }`
-                // }
                 >
                   INGRESAR
                 </Link>
