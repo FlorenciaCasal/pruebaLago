@@ -94,7 +94,7 @@ export default function AdminSidebarClient({
                 <div
                     className={`
     fixed z-50 inset-y-0 left-0 w-72 max-w-[80vw]
-    bg-neutral-950 border-r border-neutral-800 p-4 shadow-2xl sm:hidden
+    bg-neutral-950/90 border-r border-neutral-800 p-4 shadow-2xl sm:hidden
 
     transform transition-transform duration-300 ease-out
     ${open ? "translate-x-0" : "-translate-x-full"}

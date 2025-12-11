@@ -7,12 +7,6 @@
   /* Base actual */
   /* --background: #F3F3F3; */
   --background: #F3EFE7;
-  /* Arena clara */
-  /* Fondo muy claro */
-  /* --foreground: #333333; */
-  --foreground: #2D2D2D;
-  /* Texto principal */
-  /* Texto principal */
 
   /* Texto principal (gris oscuro) */
   --text-main: #2D2D2D;
@@ -49,7 +43,7 @@
 @theme inline {
   /* Mantiene compat de tus tokens actuales */
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-main: var(--text-main);
 
   /* Tokens semánticos */
   --color-text: var(--text-main);
@@ -226,3 +220,4 @@ input[type="number"]::-webkit-outer-spin-button {
     -webkit-mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
   }
 }
+

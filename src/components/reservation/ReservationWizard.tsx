@@ -113,24 +113,16 @@ export default function ReservationWizard({
   };
 
   return (
-    // <div className="mx-auto max-w-3xl p-6 text-black">
-    // <div className="text-neutral-900">
-    <div className="text-[#2E2E2E]">
-      {/* <h1 className="text-2xl text-center font-semibold text-neutral-900 mb-4">Reserva tu visita</h1> */}
+    <div className="text-main">
       <h1 className="text-2xl text-center font-semibold text-black mb-4">Reserva tu visita</h1>
 
-
       {/* Steps */}
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">  paso el cols a 3 porque saque circuito */}
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"> */}
       <div className="grid grid-cols-1 gap-3">
         <Step
           label="Tipo de visitante"
           value={tipoVisitante ? (tipoVisitante === "PARTICULAR" ? "Particular" : "Institución educativa") : undefined}
           onClick={() => setOpen("TYPE")}
           error={!!errors.tipoVisitante}
-          // className="rounded-xl border border-emerald-200/60 bg-white text-neutral-900 shadow-sm hover:border-emerald-400 hover:shadow"
-          // className="w-full rounded-xl border border-emerald-300 bg-transparent text-neutral-900 hover:border-emerald-500 hover:bg-emerald-50/40 transition"
           className="w-full rounded-xl border border-button bg-[#FFFFFF] text-neutral-900 hover:border-button hover:bg-button-50/40 transition"
         />
         {/* <Step
@@ -147,7 +139,6 @@ export default function ReservationWizard({
           // disabled={!circuito}
           disabled={!tipoVisitante || isSchoolSoldOut}
           error={!!errors.fechaISO}
-          // className="rounded-xl border border-emerald-200/60 bg-white text-neutral-900 shadow-sm hover:border-emerald-400 hover:shadow disabled:opacity-60"
           className="w-full rounded-xl border border-button bg-transparent text-neutral-900 hover:border-button hover:bg-button-50/40 transition"
         />
         <Step
@@ -156,7 +147,6 @@ export default function ReservationWizard({
           onClick={() => setOpen("VISITORS")}
           disabled={!fechaISO}
           error={!!errors.adultos || !!errors.ninos || !!errors.bebes}
-          // className="rounded-xl border border-emerald-200/60 bg-white text-neutral-900 shadow-sm hover:border-emerald-400 hover:shadow disabled:opacity-60"
           className="w-full rounded-xl border border-button bg-transparent text-neutral-900 hover:border-button hover:bg-button-50/40 transition"
         />
       </div>
@@ -273,7 +263,7 @@ export default function ReservationWizard({
         />
 
         {/* 👇 Mensaje visible en el panel */}
-        <div className="mt-2 text-sm text-red-300 min-h-5">
+        <div className="mt-2 text-sm text-red-500 min-h-5">
           {errors.adultos?.message || (!visitorsValid && "Debe haber al menos 1 adulto")}
         </div>
 
@@ -292,18 +282,8 @@ export default function ReservationWizard({
 
       {/* CTA */}
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex items-center justify-between">
-        <div className="text-sm text-red-300 space-x-3">
-
+        <div className="text-sm text-red-500 space-x-3">
         </div>
-        {/* <button className="rounded-md bg-white w-full px-5 py-2 text-gray-900 disabled:opacity-40" */}
-        {/* <button
-          // className="w-full rounded-lg bg-emerald-600 text-white px-5 py-3 font-medium hover:bg-emerald-700 disabled:opacity-40"
-          className="w-full rounded-lg bg-[#7FB5A3] text-white px-5 py-3 font-medium hover:bg-[#74AB98] disabled:cursor-not-allowed"
-          disabled={!isValid}
-        // disabled={!isValid || isSchoolSoldOut}
-        >
-          Continuar
-        </button> */}
         <button
           onClick={async () => {
             const ok = await trigger(); // fuerza validación
@@ -315,7 +295,7 @@ export default function ReservationWizard({
           }}
           className={`
     w-full rounded-lg bg-button text-white px-5 py-3 font-medium 
-    ${!isValid ? "cursor-not-allowed" : "hover:bg-[#74AB98]"}
+    ${!isValid ? "cursor-not-allowed" : "hover:bg-primary-light"}
   `}
         >
           Continuar

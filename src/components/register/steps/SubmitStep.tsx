@@ -26,9 +26,9 @@ export default function SubmitStep({
             )}
 
             <div className="grid gap-4 sm:grid-cols-2">
-            
-            {/* <div className="grid gap-4 grid-cols-1"> */}
-                <div className="rounded-xl bg-white/5 border border-button p-4 min-w-0">
+
+                {/* <div className="grid gap-4 grid-cols-1"> */}
+                <div className="rounded-xl bg-white/5 border border-secondary p-4 min-w-0">
                     <div className="text-sm text-black mb-2">Reserva</div>
                     <div className="space-y-1 text-sm">
                         <div><b>Tipo:</b> {tipo === "INSTITUCION_EDUCATIVA" ? "Institución educativa" : "Particular"}</div>
@@ -37,7 +37,7 @@ export default function SubmitStep({
                     </div>
                 </div>
 
-                <div className="rounded-xl bg-white/5 border border-button p-4 min-w-0">
+                <div className="rounded-xl bg-white/5 border border-secondary p-4 min-w-0">
                     <div className="text-sm text-black mb-2">{tipo === "INSTITUCION_EDUCATIVA" ? "Institución" : "Contacto"}</div>
                     {tipo === "INSTITUCION_EDUCATIVA" ? (
                         <div className="space-y-1 text-sm">
@@ -54,7 +54,7 @@ export default function SubmitStep({
                         <div className="space-y-1 text-sm">
                             <div><b>Nombre:</b> {`${watch("nombre") || ""} ${watch("apellido") || ""}`.trim() || "—"}</div>
                             <div><b>DNI:</b> {watch("dni") || "—"}</div>
-                             <div className="break-words [overflow-wrap:anywhere] max-w-full inline-block"><b>Email:</b> {watch("correo") || "—"}</div>
+                            <div className="break-words [overflow-wrap:anywhere] max-w-full inline-block"><b>Email:</b> {watch("correo") || "—"}</div>
                             <div><b>Teléfono:</b> {watch("telefono") || "—"}</div>
                         </div>
                     )}

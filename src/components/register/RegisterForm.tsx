@@ -435,7 +435,7 @@ export default function RegisterForm({
   return (
     <div className="flex flex-1 min-h-0 items-stretch bg-transparent">
       <form onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-black overflow-x-hidden"
+        className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-main overflow-x-hidden"
       >
         {serverError && (
           <div className="mb-4 rounded-lg bg-red-600/20 border border-red-600 px-3 py-2 text-sm">
@@ -488,15 +488,6 @@ export default function RegisterForm({
               />
             )}
 
-            {/* {step.type === "conociste" && (
-              <ConocisteStep
-                register={register}
-                watch={watch}
-                setValue={setValue}
-                uxError={uxError}
-              />
-            )} */}
-
             {step.type === "submit" && (
               <SubmitStep
                 tipo={tipo ?? null}
@@ -518,7 +509,7 @@ export default function RegisterForm({
               <button
                 type="button"
                 onClick={prevStep}
-                className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border border-button text-button hover:bg-white hover:text-gray-900 transition cursor-pointer"
+                  className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border-2 border-button text-button hover:bg-white hover:text-gray-900 transition cursor-pointer"
               >
                 Volver
               </button>
@@ -528,7 +519,7 @@ export default function RegisterForm({
                   <button
                     type="submit"
                     disabled={submitting || !aceptaReglas}
-                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-button text-white hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
+                   className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-button text-white hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
                   >
                     Enviar
                   </button>
@@ -536,7 +527,7 @@ export default function RegisterForm({
                   <button
                     type="button"
                     onClick={guardedNext}
-                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-button hover:opacity-90 transition cursor-pointer"
+                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-white text-button hover:bg-transparent hover:text-gray-900 hover:border-2 hover:border-button cursor-pointer"
                   >
                     Continuar
                   </button>
