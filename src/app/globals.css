@@ -6,7 +6,8 @@
 :root {
   /* Base actual */
   /* --background: #F3F3F3; */
-  --background: #F3EFE7;
+  /* --background: #F3EFE7; */
+    --background: #F5f5f5;
 
   /* Texto principal (gris oscuro) */
   --text-main: #2D2D2D;

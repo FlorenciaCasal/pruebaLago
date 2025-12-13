@@ -243,8 +243,6 @@ export default function CalendarioAdminPage() {
                                         void toggleDay(dateISO);
                                     }}
                                     disabled={busy}
-                                    // className={
-                                    //     "aspect-square w-full rounded-lg border px-2 py-2 text-sm relative " +
                                     className={
                                         // en xs: más padding a la derecha para que no tape el número
                                         "w-full rounded-lg border px-1.5 pr-6 py-1.5 text-xs sm:text-sm relative min-h-10 sm:min-h-0 aspect-square " +
@@ -256,15 +254,9 @@ export default function CalendarioAdminPage() {
                                     }
                                     title={`${dateISO} - ${reservationCount} reserva${reservationCount !== 1 ? 's' : ''} confirmada${reservationCount !== 1 ? 's' : ''}\nClick izquierdo: ${reservationCount > 0 ? 'Ver reservas' : 'Habilitar/Deshabilitar'}\nClick derecho: Habilitar/Deshabilitar`}
                                 >
-                                    {/* <div className="text-right font-medium">{d.getDate()}</div> */}
                                     {/* número del día en la esquina superior izquierda para alejarlo del badge */}
                                     <div className="absolute left-1 top-1 font-medium leading-none">{d.getDate()}</div>
                                     {reservationCount > 0 && (
-                                        // <div className="mt-1 text-xs text-center">
-                                        //     <span className="inline-block px-1.5 py-0.5 rounded bg-blue-600 text-white font-semibold">
-                                        //         {reservationCount}
-                                        //     </span>
-                                        // </div>
                                         <span
                                             className="absolute bottom-1 right-1 inline-flex items-center justify-center min-w-[14px] h-[14px] text-[9px] px-[2px] sm:min-w-5 sm:h-5 sm:text-xs sm:px-1 rounded bg-blue-600 text-white font-semibold"
                                         >
@@ -295,7 +287,6 @@ export default function CalendarioAdminPage() {
                                     ✕
                                 </button>
                             </div>
-
                             <div className="overflow-x-auto">
                                 {/* <table className="min-w-full text-sm"> */}
                                 <table className="min-w-full text-xs sm:text-sm">
@@ -305,8 +296,6 @@ export default function CalendarioAdminPage() {
                                             <th>Pax</th>
                                             <th>Tipo</th>
                                             <th>Circuito</th>
-                                            {/* <th className="hidden md:table-cell">Email</th>
-                                            <th className="hidden md:table-cell">Teléfono</th> */}
                                             <th>Email</th>
                                             <th>Teléfono</th>
                                         </tr>

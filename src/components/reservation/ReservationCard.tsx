@@ -111,7 +111,7 @@ export default function ReservationCard({ data }: { data: ReservationView }) {
                     <a
                         href={mapRoute}
                         target="_blank"
-                        className="block w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md text-center font-semibold"
+                        className="block w-full bg-primary-dark hover:bg-primary text-white py-3 rounded-md text-center font-semibold"
                     >
                         Abrir en Google Maps
                     </a>
@@ -119,11 +119,11 @@ export default function ReservationCard({ data }: { data: ReservationView }) {
 
                 {/* POLÍTICAS */}
                 <div className="border-t pt-4 space-y-2 text-sm text-gray-700">
-                    <p className="font-semibold text-gray-900">📣 Indicaciones para tu visita</p>
+                    <p className="font-semibold text-center text-gray-900">📣 Indicaciones para tu visita</p>
                     <ul className="list-disc pl-5 space-y-1">
-                        <li>Llegar 15 minutos antes.</li>
-                        <li>No dejar basura ni alimentar a la fauna.</li>
-                        <li>Está prohibido ingresar con mascotas.</li>
+                        <li>⏰ Te esperamos 15 minutos antes del horario indicado para organizar el ingreso.</li>
+                        <li>🌿 Ayudanos a cuidar este entorno natural: llevate tus residuos con vos.</li>
+                        <li>🐾 Para proteger la fauna y el equilibrio del lugar, no está permitido ingresar con mascotas.</li>
                         {/* <li>Si ya tenés una reserva y no podés asistir, por favor avisanos a traves de nuestro WhatsApp.</li> */}
                     </ul>
                 </div>
