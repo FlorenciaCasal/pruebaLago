@@ -79,41 +79,49 @@ export default function ReservasPage() {
     setError(null);
     try {
       // Pasar la fecha al backend si está presente
-      const d = await fetchReservations(status, searchDate || undefined);
-      console.log("BACK->UI count:", d.length, "DNIs:", d.slice(0, 5).map(x => x.dni));
+      // const d = await fetchReservations(status, searchDate || undefined);
+      const d = await fetchReservations(
+        status,
+        searchDate || undefined,
+        searchDni || undefined,
+        searchName || undefined
+      );
 
-      let filtered = d;
-      if (searchName) {
-        const q = searchName.trim().toLowerCase();
-        filtered = filtered.filter(r => {
-          // nombre + apellido del responsable
-          const mainName = `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase();
+      // console.log("BACK->UI count:", d.length, "DNIs:", d.slice(0, 5).map(x => x.dni));
 
-          // ¿coincide con algún acompañante?
-          const companionMatch = r.companions?.some(c => {
-            const compName = `${c.nombre ?? ""} ${c.apellido ?? ""}`.toLowerCase();
-            return compName.includes(q);
-          }) ?? false;
+      // let filtered = d;
+      // if (searchName) {
+      //   const q = searchName.trim().toLowerCase();
+      //   filtered = filtered.filter(r => {
+      //     // nombre + apellido del responsable
+      //     const mainName = `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase();
 
-          // matchea responsable O algún acompañante
-          return mainName.includes(q) || companionMatch;
-        });
-      }
+      //     // ¿coincide con algún acompañante?
+      //     const companionMatch = r.companions?.some(c => {
+      //       const compName = `${c.nombre ?? ""} ${c.apellido ?? ""}`.toLowerCase();
+      //       return compName.includes(q);
+      //     }) ?? false;
 
-      if (searchDni) {
-        const q = searchDni.replace(/\D+/g, "");
-        filtered = filtered.filter(r => {
-          const mainDni = (r.dni ?? "").replace(/\D+/g, "");
-          // FUTURO: incluir también los acompañantes
-          const companionMatch = r.companions?.some(c =>
-            (c.dni ?? "").replace(/\D+/g, "").includes(q)
-          );
-          return mainDni.includes(q) || companionMatch;
-          // return mainDni.includes(q);
-        });
-      }
+      //     // matchea responsable O algún acompañante
+      //     return mainName.includes(q) || companionMatch;
+      //   });
+      // }
 
-      setData(filtered);
+      // if (searchDni) {
+      //   const q = searchDni.replace(/\D+/g, "");
+      //   filtered = filtered.filter(r => {
+      //     const mainDni = (r.dni ?? "").replace(/\D+/g, "");
+      //     // FUTURO: incluir también los acompañantes
+      //     const companionMatch = r.companions?.some(c =>
+      //       (c.dni ?? "").replace(/\D+/g, "").includes(q)
+      //     );
+      //     return mainDni.includes(q) || companionMatch;
+      //     // return mainDni.includes(q);
+      //   });
+      // }
+
+      // setData(filtered);
+      setData(d);
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -212,11 +220,8 @@ export default function ReservasPage() {
         date: searchDate || undefined,
         status: status !== "ALL" ? status : undefined,
         dni: searchDni || undefined,
-        // Si querés exportar por mes o año, los agregás acá
-        // month: selectedMonth,
-        // year: selectedYear,
+        name: searchName || undefined,
       });
-
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

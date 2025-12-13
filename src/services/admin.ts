@@ -48,11 +48,15 @@ async function ok<T>(res: Response): Promise<T> {
 
 export async function fetchReservations(
     status: AdminStatus = "PENDING",
-    date?: string
+    date?: string,
+    dni?: string,
+    name?: string
 ): Promise<AdminReservation[]> {
     const params = new URLSearchParams();
     if (status && status !== "ALL") params.append("status", status);
     if (date) params.append("date", date);
+    if (dni) params.append("dni", dni);
+    if (name) params.append("name", name);
     const qs = params.toString() ? `?${params}` : "";
     const res = await fetchInternal(`/api/admin/reservations${qs}`);
     const backendData = await ok<BackendReservationDTO[]>(res);
