@@ -4,6 +4,7 @@ export type UserDTO = {
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
     // role: "ADMIN" | "MANAGER" | "USER";
     role: "ADMIN" | "MANAGER";
     enabled?: boolean;
@@ -18,6 +19,7 @@ export type User = {
     firstName: string;
     lastName: string;           // firstName + " " + lastName
     email: string;
+    phone?: string;
     // role: "ADMIN" | "MANAGER" | "USER";
     role: "ADMIN" | "MANAGER";
     enabled?: boolean;
@@ -29,6 +31,7 @@ export type CreateUserRequest = {
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
     password: string;
     // role?: "ADMIN" | "MANAGER" | "USER";   // si no lo mandás, el backend puede defaultear a USER
     role?: "ADMIN" | "MANAGER";
@@ -38,6 +41,7 @@ export type UpdateUserRequest = Partial<{
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
     password: string;
     // role: "ADMIN" | "MANAGER" | "USER";
     role: "ADMIN" | "MANAGER";
@@ -52,6 +56,7 @@ function toUser(u: UserDTO): User {
         firstName: u.firstName,
         lastName: u.lastName,
         email: u.email,
+        phone: u.phone,
         role: u.role,
         enabled: u.enabled,
         createdAt: u.createdAt,

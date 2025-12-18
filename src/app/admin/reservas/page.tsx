@@ -6,7 +6,6 @@ import CompanionsDisclosure from "@/components/admin/CompanionsDisclosure";
 import { exportReservationsBackend } from "@/services/admin";
 
 
-
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
   if (typeof err === "string") return err;
@@ -66,7 +65,8 @@ export default function ReservasPage() {
   const activeCount = [searchDate, searchName, searchDni].filter(Boolean).length;
   const [openRows, setOpenRows] = React.useState<Record<string, boolean>>({});
   const toggleRow = (id: string) => setOpenRows(s => ({ ...s, [id]: !s[id] }));
-
+  const [page, setPage] = React.useState(0);
+  const [totalPages, setTotalPages] = React.useState(1);
 
   React.useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia("(min-width: 640px)").matches) {
@@ -80,56 +80,29 @@ export default function ReservasPage() {
     try {
       // Pasar la fecha al backend si está presente
       // const d = await fetchReservations(status, searchDate || undefined);
-      const d = await fetchReservations(
+      const res = await fetchReservations(
         status,
         searchDate || undefined,
         searchDni || undefined,
-        searchName || undefined
+        searchName || undefined,
+        page,
+        20
       );
 
-      // console.log("BACK->UI count:", d.length, "DNIs:", d.slice(0, 5).map(x => x.dni));
-
-      // let filtered = d;
-      // if (searchName) {
-      //   const q = searchName.trim().toLowerCase();
-      //   filtered = filtered.filter(r => {
-      //     // nombre + apellido del responsable
-      //     const mainName = `${r.nombre ?? ""} ${r.apellido ?? ""}`.toLowerCase();
-
-      //     // ¿coincide con algún acompañante?
-      //     const companionMatch = r.companions?.some(c => {
-      //       const compName = `${c.nombre ?? ""} ${c.apellido ?? ""}`.toLowerCase();
-      //       return compName.includes(q);
-      //     }) ?? false;
-
-      //     // matchea responsable O algún acompañante
-      //     return mainName.includes(q) || companionMatch;
-      //   });
-      // }
-
-      // if (searchDni) {
-      //   const q = searchDni.replace(/\D+/g, "");
-      //   filtered = filtered.filter(r => {
-      //     const mainDni = (r.dni ?? "").replace(/\D+/g, "");
-      //     // FUTURO: incluir también los acompañantes
-      //     const companionMatch = r.companions?.some(c =>
-      //       (c.dni ?? "").replace(/\D+/g, "").includes(q)
-      //     );
-      //     return mainDni.includes(q) || companionMatch;
-      //     // return mainDni.includes(q);
-      //   });
-      // }
-
       // setData(filtered);
-      setData(d);
+      // setData(d);
+      setData(res.items);
+      setTotalPages(res.totalPages);
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
+  }, [status, searchDate, searchName, searchDni, page]);
+
+  React.useEffect(() => {
+    setPage(0);
   }, [status, searchDate, searchName, searchDni]);
-
-
 
   React.useEffect(() => { load(); }, [load]);
 
@@ -482,7 +455,8 @@ export default function ReservasPage() {
                   </div>
 
                   <div><dt className="text-neutral-400">Tipo</dt><dd className="break-words">{tipoToEs(r.tipoVisitante)}</dd></div>
-                  <div><dt className="text-neutral-400">Circuito</dt><dd>{r.circuito ?? "-"}</dd></div>
+                  {/* <div><dt className="text-neutral-400">Circuito</dt><dd>{r.circuito ?? "-"}</dd></div> */}
+                  <div><dt className="text-neutral-400">Ciudad</dt><dd>{r.originLocation ?? "-"}</dd></div>
                   {/* <div><dt className="text-neutral-400">Estado</dt><dd>{r.status}</dd></div> */}
                   <div> <dt className="text-neutral-400">Estado</dt><dd>{statusToEs(r.status)}</dd></div>
                   <div> <dt className="text-neutral-400">Email</dt><dd className="break-words">{r.correo ?? "-"}</dd></div>
@@ -558,7 +532,7 @@ export default function ReservasPage() {
                     <th className="w-20">Pax</th>
                     {/* Tipo puede crecer pero con límite y rompiendo palabras */}
                     <th className="max-w-[14rem]">Tipo</th>
-                    <th className="w-20">Circuito</th>
+                    <th className="w-20">Ciudad origen</th>
                     <th className="w-28">Estado</th>
 
                     {/* Acciones con ancho fijo y sin shrink */}
@@ -594,7 +568,8 @@ export default function ReservasPage() {
                         </td>
 
                         <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
-                        <td className="whitespace-nowrap">{r.circuito ?? "-"}</td>
+                        {/* <td className="whitespace-nowrap">{r.circuito ?? "-"}</td> */}
+                          <td className="whitespace-nowrap">{r.originLocation ?? "-"}</td>
                         <td className="whitespace-nowrap">{statusToEs(r.status)}</td>
 
 
@@ -678,14 +653,77 @@ export default function ReservasPage() {
                     </React.Fragment>
                   ))}
                 </tbody>
-
-
               </table>
             </div>
-
           </div>
         </>
       )}
+      {/* {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-4">
+          <button
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            className="px-3 py-1 rounded border border-neutral-700 disabled:opacity-40"
+          >
+            Anterior
+          </button>
+
+          <span className="text-sm text-neutral-400">
+            Página {page + 1} de {totalPages}
+          </span>
+
+          <button
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            className="px-3 py-1 rounded border border-neutral-700 disabled:opacity-40"
+          >
+            Siguiente
+          </button>
+        </div>
+      )} */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-1 sm:gap-2 mt-4">
+          <button
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            className="
+        px-2 sm:px-3 py-1
+        rounded-md border border-neutral-700
+        text-xs sm:text-sm
+        disabled:opacity-40
+        hover:bg-neutral-800
+      "
+          >
+            ←
+            <span className="hidden sm:inline ml-1">Anterior</span>
+          </button>
+
+          <span className="text-xs sm:text-sm text-neutral-400 min-w-[4rem] text-center">
+            <span className="sm:hidden">
+              {page + 1} / {totalPages}
+            </span>
+            <span className="hidden sm:inline">
+              Página {page + 1} de {totalPages}
+            </span>
+          </span>
+
+          <button
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            className="
+        px-2 sm:px-3 py-1
+        rounded-md border border-neutral-700
+        text-xs sm:text-sm
+        disabled:opacity-40
+        hover:bg-neutral-800
+      "
+          >
+            <span className="hidden sm:inline mr-1">Siguiente</span>
+            →
+          </button>
+        </div>
+      )}
     </div>
+
   );
 }

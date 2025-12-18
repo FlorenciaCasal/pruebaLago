@@ -25,6 +25,7 @@ export type AdminReservation = {
     bebes: number;
     movilidadReducida: number;      // cantidad
     comentarios?: string;
+    originLocation?: string;
 };
 
 export type CalendarMonthState = {

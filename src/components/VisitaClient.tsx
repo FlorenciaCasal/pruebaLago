@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/Toast";
 import Image from "next/image";
 import { isVisitante } from "@/utils/visitante";
 
-export default function HomePage() {
+export default function VisitaPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -35,7 +35,6 @@ export default function HomePage() {
       setSubmittedType(null);
       setFormInstanceId((n) => n + 1); // por si quedaba algo montado
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // sólo una vez al montar
 
   // 👉 Si la URL trae step, forzamos el formulario
@@ -46,17 +45,11 @@ export default function HomePage() {
     isVisitante(vtQS ?? "") ? (vtQS as "PARTICULAR" | "INSTITUCION_EDUCATIVA") : undefined;
 
   return (
-    // <main className="min-h-screen flex flex-col bg-gray-900 items-center justify-center overflow-x-hidden p-4">
-    // <main className="bg-rose-50 overflow-x-hidden flex-1 flex flex-col min-h-0 h-full">
     <main className="bg-[#f5f5f5] overflow-x-hidden flex-1 flex flex-col min-h-0 h-full">
-      {/* HERO SPLIT */}
-      {/* <section className="mx-auto grid grid-cols-1 lg:grid-cols-2"> */}
       <section className="flex-1 flex flex-col h-full lg:flex-row items-stretch min-h-0">
-        {/* Izquierda: imagen */}
-        {/* <div className="relative h-[40vh] lg:h-[calc(100vh-64px)]"> */}
         <div className="relative flex-1 flex min-h-[40vh] lg:min-h-0 ">
           <Image
-            src="/img/form.jpeg"            // ⚠️ poné tu imagen real
+            src="/img/form.jpeg"
             alt="Lago Escondido"
             fill
             priority
@@ -66,24 +59,17 @@ export default function HomePage() {
         </div>
 
         {/* Derecha: tarjeta clara */}
-        {/* <div className="flex items-center justify-center pt-6 lg:pt-10"> */}
         <div className="flex-1 flex items-center justify-center p-6 lg:p-8 min-h-0">
-          {/* <div className="w-full max-w-md rounded-2xl bg-white border border-emerald-200/60 shadow-xl p-6 md:p-7"> */}
-          {/* <div className=" w-[90vw] max-w-xl lg:max-w-md rounded-2xl md:p-6 "> */}
           <div className="w-[90vw] max-w-xl lg:max-w-md">
-
             <Suspense fallback={<div className="text-white">Cargando...</div>}>
               {!(showForm || forceForm) ? (
                 <ReservationWizard
-                  // onComplete={({ visitorType, circuitId, dateISO, visitors }) => {
                   onComplete={({ visitorType, dateISO, visitors }) => {
-
                     // 🚧 Guardia extra: si escuela está deshabilitada, no avancemos
                     if (
                       visitorType === "INSTITUCION_EDUCATIVA" &&
                       flags && !flags.schoolEnabled
                     ) {
-                      // toast("Por ahora no se aceptan reservas para instituciones educativas.");
                       toast("En este momento no tenemos disponibilidad para instituciones educativas.");
                       return; // no abrir el form ni tocar la URL
                     }
@@ -103,17 +89,14 @@ export default function HomePage() {
                     setFormInstanceId((n) => n + 1);
                     setShowForm(true);
                   }}
-
                 />
               ) : (
                 <RegisterForm
-                  // si venimos con ?step en la URL, priorizar tipo de la URL
                   key={`rf-${(forceForm ? (tipoFromQS ?? "PARTICULAR") : (submittedType ?? "PARTICULAR"))}-${formInstanceId}`}
                   initialTipo={(forceForm ? (tipoFromQS ?? "PARTICULAR") : (submittedType ?? "PARTICULAR"))}
                   onCancel={() => {
-                    // Opcional: podés limpiar la URL si querés
-                    // router.replace(pathname, { scroll: false });
                     setShowForm(false);
+                    router.replace("/", { scroll: true });
                   }}
                 />
               )}

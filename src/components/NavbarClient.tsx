@@ -9,6 +9,8 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
   const pathname = usePathname();
   const isHome = pathname == "/";
   const showHomeLink = pathname !== "/";
+  const isVisitas = pathname == "/visitas";
+  const showVisitasLink = pathname !== "/visitas";
 
   // 👇 rutas donde NO queremos mostrar el navbar
   const HIDE_ON: string[] = ["/politicas-de-visita"];
@@ -74,7 +76,16 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
                 </Link>
               )}
 
-              {isHome && (isLogged && isAdmin || isAdminLimit) && (
+              {showVisitasLink && (
+                <Link
+                  href="/visitas"
+                  className="transition hover:text-secondary-dark"
+                >
+                  VENÍ A CONOCER
+                </Link>
+              )}
+
+              {(isHome || isVisitas) && (isLogged && isAdmin || isAdminLimit) && (
                 <Link
                   href="/admin"
                   className="transition hover:text-secondary-dark"
@@ -148,7 +159,18 @@ export default function NavbarClient({ isLogged, isAdmin, isAdminLimit }: { isLo
               </li>
             )}
 
-            {isHome && (isLogged && isAdmin || isAdminLimit) && (
+            {showVisitasLink && (
+              <li>
+                <Link
+                  href="/visitas"
+                  className="block rounded-xl px-3 py-2 hover:bg-neutral-800"
+                >
+                  Vení a conocer
+                </Link>
+              </li>
+            )}
+
+            {(isHome || isVisitas) && (isLogged && isAdmin || isAdminLimit) && (
               <li>
                 <Link
                   href="/admin"

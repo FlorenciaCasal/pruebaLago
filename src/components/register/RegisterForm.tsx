@@ -111,11 +111,6 @@ export default function RegisterForm({
   }, [tipoForm, initialTipo, tipoFromQS]);
 
   const tp = Number(totalPersonas ?? 0);
-  // ANTES:
-  // const totalEsperado = tipo === "INSTITUCION_EDUCATIVA" ? tp : Math.max(0, tp - 1);  
-  // AHORA: SIEMPRE igual al total (porque los visitantes son todos los que van físicamente)
-  // const totalEsperado = tp;
-  // console.log("totalEsperado", totalEsperado)
 
   const reservaAsiste = watch("reservaAsiste") ?? true;
   // 👇 cantidad de filas que hay que cargar en el listado (solo acompañantes)
@@ -541,7 +536,7 @@ export default function RegisterForm({
       <SuccessModal
         open={!!successMsg}
         title={successMsg ?? "¡Listo!"}
-        text="Vas a recibir la confirmación en tu email y WhatsApp en las próximas horas."
+        text="Vas a recibir la confirmación a través de WhatsApp en las próximas horas."
         primaryLabel="Volver al inicio"
         onPrimary={() => {
           setSuccessMsg(null);
