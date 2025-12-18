@@ -1,12 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
 
+type FireRiskLevel = "BAJO" | "MODERADO" | "ALTO";
+
+type HomeStatusResponse =
+  | {
+    ok: true;
+    weather: {
+      temperature: number;
+    };
+    alerts: {
+      fireRisk: FireRiskLevel;
+    };
+  }
+  | {
+    ok: false;
+  };
+
 export default function HomeStatus() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<HomeStatusResponse | null>(null);
 
   useEffect(() => {
     fetch("/api/home-status")
-      .then(r => r.json())
+      .then(r => r.json() as Promise<HomeStatusResponse>)
       .then(setData)
       .catch(() => setData({ ok: false }));
   }, []);
@@ -34,8 +50,8 @@ export default function HomeStatus() {
                 data.alerts.fireRisk === "ALTO"
                   ? "text-red-400"
                   : data.alerts.fireRisk === "MODERADO"
-                  ? "text-yellow-400"
-                  : "text-green-400"
+                    ? "text-yellow-400"
+                    : "text-green-400"
               }
             >
               {data.alerts.fireRisk}

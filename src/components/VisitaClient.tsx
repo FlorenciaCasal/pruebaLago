@@ -28,6 +28,7 @@ export default function VisitaPage() {
   }, []);
 
   // 👇 Si la URL viene con ?step=..., al refrescar limpiamos y volvemos al wizard
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (searchParams.get("step") !== null) {
       router.replace(pathname, { scroll: false });

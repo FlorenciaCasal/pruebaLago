@@ -23,7 +23,9 @@ export default function CalendarioAdminPage() {
     const today = new Date();
     const [{ y, m }, setYM] = React.useState(ym(today));
     const [state, setState] = React.useState<CalendarMonthState | null>(null);
+    // const [reservations, setReservations] = React.useState<AdminReservation[]>([]);
     const [reservations, setReservations] = React.useState<AdminReservation[]>([]);
+
     const [loading, setLoading] = React.useState<boolean>(true);
     const [busy, setBusy] = React.useState<boolean>(false);
     const [selectedDay, setSelectedDay] = React.useState<string | null>(null);
@@ -35,8 +37,10 @@ export default function CalendarioAdminPage() {
                 const s = await getCalendarState(yy, mm);
                 setState(s);
                 // Obtener reservas confirmadas
-                const allReservations = await fetchReservations("CONFIRMED");
-                setReservations(allReservations);
+                // const allReservations = await fetchReservations("CONFIRMED");
+                // setReservations(allReservations);
+                const { items } = await fetchReservations("CONFIRMED", undefined, undefined, undefined, 0, 5000);
+                setReservations(items);
             } catch (e: unknown) {
                 alert(getErrorMessage(e));
             } finally {

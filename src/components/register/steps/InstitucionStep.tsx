@@ -31,9 +31,9 @@ export default function InstitucionStep({
             </div>
 
             <div className="grid sm:grid-cols-3 gap-3">
-                <input {...register("responsableNombre")} placeholder="Nombre (responsable)" className={inputBase} />
-                <input {...register("responsableApellido")} placeholder="Apellido (responsable)" className={inputBase} />
-                <input {...register("responsableDni")} placeholder="DNI (responsable)" className={inputBase} />
+                <input {...register("responsableNombre")} placeholder="Nombre" className={inputBase} />
+                <input {...register("responsableApellido")} placeholder="Apellido" className={inputBase} />
+                <input {...register("responsableDni")} placeholder="DNI" className={inputBase} />
             </div>
 
             <label className="mt-4 flex items-center justify-between gap-4">

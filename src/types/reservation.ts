@@ -16,7 +16,7 @@ export type ReservationFormData = {
   tipoVisitante?: "PARTICULAR" | "INSTITUCION_EDUCATIVA";
   // circuito?: string;
   fechaISO?: string;
-  personas: { nombre: string; apellido: string; dni: string }[];
+  personas: { nombre: string; apellido: string; dni: string; telefono?: string }[];
   institucion?: string;
   institucionLocalidad?: string;
   institucionEmail?: string;
@@ -24,11 +24,14 @@ export type ReservationFormData = {
   responsableNombre?: string;
   responsableApellido?: string;
   responsableDni?: string;
+  responsableTelefono?: string;
   tmpNombreApe?: string;
-  tmpDni?: string; reservationDate?: string;  // opcional, derivada de fechaISO
+  tmpDni?: string;
+  tmpTelefono?: string;
+   reservationDate?: string;  // opcional, derivada de fechaISO
   totalPersonas?: number;    // opcional, adultos+ninos+bebes
   reservaAsiste: boolean;
-  visitantes?: { nombre: string; apellido: string; dni: string }[];
+  visitantes?: { nombre: string; apellido: string; dni: string; telefono: string }[];
 };
 
 
@@ -50,7 +53,7 @@ export type BackendReservationDTO = {
   createdAt: string;
   dni: string;
   //  Agregar este campo cuando esté implementado en el backend:
-  visitors?: { firstName: string; lastName: string; dni: string }[];
+  visitors?: { firstName: string; lastName: string; dni: string; phone: string }[];
   reducedMobility: number;
   comment: string;
 };

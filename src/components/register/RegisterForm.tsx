@@ -264,6 +264,7 @@ export default function RegisterForm({
     responsableNombre: (watch("responsableNombre") ?? "").trim(),
     responsableApellido: (watch("responsableApellido") ?? "").trim(),
     responsableDni: (watch("responsableDni") ?? "").trim(),
+    responsableTelefono: (watch("responsableTelefono") ?? "").trim(),
   });
 
   const validateInstitucionWithYup = async (): Promise<string | null> => {
@@ -275,7 +276,7 @@ export default function RegisterForm({
     }
   };
 
-  const getListadoValues = () => (watch("personas") ?? []) as Array<{ nombre: string; apellido: string; dni: string }>;
+  const getListadoValues = () => (watch("personas") ?? []) as Array<{ nombre: string; apellido: string; dni: string; telefono: string }>;
 
   const prettyArrayError = (e: Yup.ValidationError) => {
     if (e.path) {
@@ -289,18 +290,19 @@ export default function RegisterForm({
   };
 
   const getResponsableParticular = () => {
-    const { nombre, apellido, dni } = getContactoValues();
-    return { nombre, apellido, dni };
+    const { nombre, apellido, dni, telefono } = getContactoValues();
+    return { nombre, apellido, dni, telefono };
   };
 
   const getResponsableInstitucion = () => {
     const nombre = clean(watch("responsableNombre"));
     const apellido = clean(watch("responsableApellido"));
     const dni = clean(watch("responsableDni"));
-    return { nombre, apellido, dni };
+    const telefono = clean(watch("responsableTelefono"));
+    return { nombre, apellido, dni, telefono };
   };
 
-  const composeVisitantes = (): Array<{ nombre: string; apellido: string; dni: string }> => {
+  const composeVisitantes = (): Array<{ nombre: string; apellido: string; dni: string; telefono: string }> => {
     const base = getListadoValues();
 
     // Si la persona que reserva NO asiste, simplemente devolvemos el listado tal cual
@@ -315,7 +317,7 @@ export default function RegisterForm({
         : getResponsableParticular();
 
     // Pequeña defensa por si en algún flujo todavía no está seteado
-    if (!responsable.nombre && !responsable.apellido && !responsable.dni) {
+    if (!responsable.nombre && !responsable.apellido && !responsable.dni && !responsable.telefono) {
       return base;
     }
 
@@ -379,6 +381,7 @@ export default function RegisterForm({
       setValue("responsableNombre", "");
       setValue("responsableApellido", "");
       setValue("responsableDni", "");
+      setValue("responsableTelefono", "");
     }
     setValue("personas", []);
   }, [tipo, setValue]);
@@ -504,7 +507,7 @@ export default function RegisterForm({
               <button
                 type="button"
                 onClick={prevStep}
-                  className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border-2 border-button text-button hover:bg-white hover:text-gray-900 transition cursor-pointer"
+                className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg border-2 border-button text-button hover:bg-white hover:text-gray-900 transition cursor-pointer"
               >
                 Volver
               </button>
@@ -514,7 +517,7 @@ export default function RegisterForm({
                   <button
                     type="submit"
                     disabled={submitting || !aceptaReglas}
-                   className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-button text-white hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
+                    className="px-4 py-2 w-28 md:w-36 sm:px-6 sm:py-3 rounded-lg bg-button text-white hover:opacity-90 transition disabled:opacity-40 cursor-pointer"
                   >
                     Enviar
                   </button>

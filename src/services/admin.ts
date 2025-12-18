@@ -2,7 +2,13 @@ import { CalendarMonthState } from "@/types/admin";
 import { BackendReservationDTO } from "@/types/reservation";
 import type { AdminReservation } from "@/types/admin";
 
-
+type Page<T> = {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+};
 
 // Detección server/client + helper para URLs
 const IS_SERVER = typeof window === "undefined";
@@ -101,7 +107,7 @@ export async function fetchReservations(
     //         dni: (c.dni ?? "").replace(/\D+/g, "")
     //     })) ?? [],
     // }));
-    const raw = await ok<any>(res);
+    const raw = await ok<Page<BackendReservationDTO>>(res);
 
     // Spring Boot Page<T> → usamos content
     const backendData: BackendReservationDTO[] = Array.isArray(raw?.content)
