@@ -26,7 +26,8 @@ export default function CompanionsDisclosure({
     }
 
     return (
-        <div className="w-full">
+        // <div className="flex w-full items-start">
+        <div className="flex w-full flex-col items-start ">
             <button
                 type="button"
                 onClick={() => setOpen(v => !v)}
@@ -59,9 +60,29 @@ export default function CompanionsDisclosure({
                             {companions.map((c, i) => {
                                 const fullName = [c.nombre, c.apellido].filter(Boolean).join(" ");
                                 return (
-                                    <li key={i} className="flex justify-between gap-2">
-                                        <span className="break-words">{formatName(fullName)}</span>
-                                        <span className="font-mono text-neutral-300">{c.dni || "-"}</span>
+                                    // <li key={i} className="flex justify-between gap-2">
+                                    //     <span className="break-words">{formatName(fullName)}</span>
+                                    //     <span className="font-mono text-neutral-300">{c.dni || "-"}</span>
+                                    //     {c.telefono && <span> {c.telefono}</span>}
+                                    // </li>
+                                    <li key={i} className="flex items-start justify-between gap-3">
+                                        {/* izquierda */}
+                                        <div className="min-w-0">
+                                            <div className="break-words">
+                                                {formatName(fullName)}
+                                            </div>
+
+                                            {c.telefono && (
+                                                <div className="mt-0.5 text-xs text-neutral-400">
+                                                    Tel: <span className="font-mono text-neutral-300">{c.telefono}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* derecha */}
+                                        <span className="shrink-0 font-mono text-neutral-300">
+                                            {c.dni || "-"}
+                                        </span>
                                     </li>
                                 );
                             })}
@@ -72,6 +93,7 @@ export default function CompanionsDisclosure({
                                 <tr className="[&>th]:px-3 [&>th]:py-2 text-left">
                                     <th className="w-1/2">Nombre y apellido</th>
                                     <th className="w-1/2">DNI</th>
+                                    <th className="w-1/4">Teléfono</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-800">
@@ -81,6 +103,7 @@ export default function CompanionsDisclosure({
                                         <tr key={i} className="[&>td]:px-3 [&>td]:py-2">
                                             <td className="truncate">{formatName(fullName)}</td>
                                             <td className="font-mono">{c.dni || "-"}</td>
+                                            <td className="font-mono text-neutral-300">{c.telefono || "-"}</td>
                                         </tr>
                                     );
                                 })}

@@ -54,6 +54,7 @@ export async function submitReservation(data: ReservationFormData): Promise<{ id
     firstName: v.nombre,
     lastName: v.apellido,
     dni: v.dni,
+    phone: v.telefono?.trim() || null,
   }));
 
 

@@ -519,10 +519,12 @@ export default function ReservasPage() {
 
           {/* En md+ : tabla (ya no debería generar scroll del body) */}
           <div className="hidden lg:block">
-            <div className="rounded-2xl border border-gray-800 overflow-x-auto">
+            <div className="rounded-2xl border border-gray-800 overflow-x-auto lg:overflow-y-auto lg:max-h-[70vh]">
               <table className="w-full text-[13px] table-auto">
-                <thead className="bg-neutral-950/80">
-                  <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400">
+                {/* <thead className="bg-neutral-950/80"> */}
+                <thead className="bg-neutral-950/95 lg:sticky lg:top-0 lg:z-20">
+                  {/* <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400"> */}
+                  <tr className="[&>th]:px-2 [&>th]:py-2 [&>th]:text-left text-neutral-400 [&>th]:bg-neutral-950/95 lg:[&>th]:sticky lg:[&>th]:top-0">
                     {/* “Creada” solo en xl, para priorizar Acciones en lg */}
                     {/* <th className="w-44 xl:table-cell">Creada</th> */}
                     <th className="w-32">Creada</th>
@@ -569,7 +571,7 @@ export default function ReservasPage() {
 
                         <td className="break-words">{tipoToEs(r.tipoVisitante)}</td>
                         {/* <td className="whitespace-nowrap">{r.circuito ?? "-"}</td> */}
-                          <td className="whitespace-nowrap">{r.originLocation ?? "-"}</td>
+                        <td className="whitespace-nowrap">{r.originLocation ?? "-"}</td>
                         <td className="whitespace-nowrap">{statusToEs(r.status)}</td>
 
 
@@ -658,29 +660,6 @@ export default function ReservasPage() {
           </div>
         </>
       )}
-      {/* {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-4">
-          <button
-            disabled={page === 0}
-            onClick={() => setPage(p => Math.max(0, p - 1))}
-            className="px-3 py-1 rounded border border-neutral-700 disabled:opacity-40"
-          >
-            Anterior
-          </button>
-
-          <span className="text-sm text-neutral-400">
-            Página {page + 1} de {totalPages}
-          </span>
-
-          <button
-            disabled={page >= totalPages - 1}
-            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-            className="px-3 py-1 rounded border border-neutral-700 disabled:opacity-40"
-          >
-            Siguiente
-          </button>
-        </div>
-      )} */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-1 sm:gap-2 mt-4">
           <button

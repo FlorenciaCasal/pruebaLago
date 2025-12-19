@@ -32,7 +32,7 @@ export type ReservationFormData = {
   reservationDate?: string;  // opcional, derivada de fechaISO
   totalPersonas?: number;    // opcional, adultos+ninos+bebes
   reservaAsiste: boolean;
-  visitantes?: { nombre: string; apellido: string; dni: string; telefono: string }[];
+  visitantes?: { nombre: string; apellido: string; dni: string; telefono?: string }[];
 };
 
 
@@ -54,7 +54,7 @@ export type BackendReservationDTO = {
   createdAt: string;
   dni: string;
   //  Agregar este campo cuando esté implementado en el backend:
-  visitors?: { firstName: string; lastName: string; dni: string; phone: string }[];
+  visitors?: { firstName: string; lastName: string; dni: string; phone?: string }[];
   reducedMobility: number;
   comment: string;
 };

@@ -415,7 +415,7 @@ export default function RegisterForm({
         visitantes: composeVisitantes(),
       });
       reset();
-      setSuccessMsg("¡Reserva realizada con éxito!");
+      setSuccessMsg("¡Reserva enviada con éxito!");
     } catch (e: unknown) {
       const err = isAppError(e) ? e : new Error("Error desconocido");
       if ((err as AppError).code === "DUPLICATE_DNI_DATE" || /DNI.+fecha/i.test(err.message ?? "")) {

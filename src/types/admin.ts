@@ -3,6 +3,7 @@ export type Companion = {
     nombre: string;
     apellido: string;
     dni: string;
+    telefono?: string;
 };
 
 export type AdminReservation = {
