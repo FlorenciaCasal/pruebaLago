@@ -41,7 +41,8 @@ export default function ListadoStep({
   }>({});
 
   const [localErrors, setLocalErrors] = useState<{
-    nombreApe?: string;
+    nombre?: string;
+    apellido?: string;
     dni?: string;
     telefono?: string;
   }>({});
@@ -96,12 +97,14 @@ export default function ListadoStep({
       telefono: String(watch(`personas.${editIndex}.telefono`) ?? ""),
     };
 
+
     const errs = await validateVisitor(data);
 
     if (Object.keys(errs).length) {
       setEditErrors(errs);
       return; // ❌ NO cerramos edición
     }
+
 
     // OK
     setEditErrors({});
@@ -130,15 +133,25 @@ export default function ListadoStep({
       {/* mini form para agregar */}
       <div className="rounded-lg border border-gray-900 bg-white/5 p-4 space-y-3">
         <input
-          {...register("tmpNombreApe")}
-          placeholder="Nombre y apellido"
-          className={`${inputBase} ${localErrors.nombreApe ? "border-red-500" : ""}`}
+          {...register("tmpNombre")}
+          placeholder="Nombre"
+          className={`${inputBase} ${localErrors.nombre ? "border-red-500" : ""}`}
           disabled={!canAddMore}
-        // maxLength={120}
         />
-        {localErrors.nombreApe && (
-          <p className="text-xs text-red-500">{localErrors.nombreApe}</p>
+        {localErrors.nombre && (
+          <p className="text-xs text-red-500">{localErrors.nombre}</p>
         )}
+
+        <input
+          {...register("tmpApellido")}
+          placeholder="Apellido"
+          className={`${inputBase} ${localErrors.apellido ? "border-red-500" : ""}`}
+          disabled={!canAddMore}
+        />
+        {localErrors.apellido && (
+          <p className="text-xs text-red-500">{localErrors.apellido}</p>
+        )}
+
         <input
           {...register("tmpDni", {
             setValueAs: v => String(v ?? "").replace(/\D+/g, "").slice(0, 8),
@@ -154,13 +167,15 @@ export default function ListadoStep({
           <p className="text-xs text-red-500">{localErrors.dni}</p>
         )}
         <input
-          {...register("tmpTelefono", {
-            setValueAs: v => String(v ?? "").replace(/\D+/g, "").slice(0, 10),
-          })}
+          // {...register("tmpTelefono", {
+          //   setValueAs: v => String(v ?? "").replace(/\D+/g, "").slice(0, 10),
+          // })}
+          {...register("tmpTelefono")}
           placeholder="Teléfono (10 dígitos)"
           className={`${inputBase} ${localErrors.telefono ? "border-red-500" : ""}`}
-
           disabled={!canAddMore}
+          inputMode="numeric"
+          maxLength={10}
         // inputMode="numeric"
         // pattern="^[0-9]{10}$"
         // maxLength={10}
@@ -177,27 +192,28 @@ export default function ListadoStep({
             onClick={async () => {
               if (!canAddMore) return;
 
-              const na = (watch("tmpNombreApe") ?? "").toString().trim();
-              const parts = na.split(/\s+/).filter(Boolean);
+              // const na = (watch("tmpNombreApe") ?? "").toString().trim();
+              // const parts = na.split(/\s+/).filter(Boolean);
 
-              // si querés mantener el mensaje específico para “nombre y apellido”
-              if (parts.length < 2) {
-                setLocalErrors({ nombreApe: "Ingresá nombre y apellido completos." });
-                return;
-              }
+              // // si querés mantener el mensaje específico para “nombre y apellido”
+              // if (parts.length < 2) {
+              //   setLocalErrors({ nombreApe: "Ingresá nombre y apellido completos." });
+              //   return;
+              // }
 
               const data = {
-                nombre: parts[0],
-                apellido: parts.slice(1).join(" "),
-                dni: (watch("tmpDni") ?? "").toString(),
-                telefono: (watch("tmpTelefono") ?? "").toString(),
+                nombre: watch("tmpNombre") ?? "",
+                apellido: watch("tmpApellido") ?? "",
+                dni: watch("tmpDni") ?? "",
+                telefono: watch("tmpTelefono") ?? "",
               };
 
               const errs = await validateVisitor(data);
 
               if (Object.keys(errs).length) {
                 setLocalErrors({
-                  nombreApe: errs.nombre || errs.apellido,
+                  nombre: errs.nombre,
+                  apellido: errs.apellido,
                   dni: errs.dni,
                   telefono: errs.telefono,
                 });
@@ -209,10 +225,12 @@ export default function ListadoStep({
                 nombre: data.nombre,
                 apellido: data.apellido,
                 dni: data.dni.replace(/\D+/g, "").slice(0, 8),
-                telefono: data.telefono.replace(/\D+/g, "").slice(0, 10),
+                // telefono: data.telefono.replace(/\D+/g, "").slice(0, 10),
+                telefono: data.telefono ? data.telefono.replace(/\D+/g, "").slice(0, 10) : "",
               });
 
-              setValue("tmpNombreApe", "");
+              setValue("tmpNombre", "");
+              setValue("tmpApellido", "");
               setValue("tmpDni", "");
               setValue("tmpTelefono", "");
               onListChanged?.();
@@ -239,12 +257,13 @@ export default function ListadoStep({
       </div>
 
       {/* tabla */}
-      <div className="rounded-lg border border-gray-900 overflow-hidden">
+      <div className="rounded-lg border border-gray-900 overflow-x-auto">
         <table className="w-full text-xs sm:text-sm">
-          <thead className="bg-white/10">
+          <thead className="bg-white/10 colSpan={5}">
             <tr>
-              <th className="text-center px-1 md:px-3 py-2">#</th>
-              <th className="text-center px-1 md:px-3 py-2">Nombre y apellido</th>
+              {/* <th className="text-center px-1 md:px-3 py-2">#</th> */}
+              <th className="text-center px-1 md:px-3 py-2">Nombre</th>
+              <th className="text-center px-1 md:px-3 py-2">Apellido</th>
               <th className="text-center px-1 md:px-3 py-2">DNI</th>
               <th className="text-center px-1 md:px-3 py-2">Teléfono</th>
               <th className="text-center px-1 md:px-3 py-2"></th>
@@ -268,47 +287,50 @@ export default function ListadoStep({
 
               return (
                 <tr key={f.id ?? i} className="border-t border-gray-900">
-                  <td className="px-1 md:px-3 py-2 text-center">{i + 1}</td>
+                  {/* <td className="px-1 md:px-3 py-2 text-center">{i + 1}</td> */}
+                   {/* <td className="px-1 py-2 text-center">{i + 1}</td> */}
 
                   {/* Nombre y apellido */}
-                  <td className="px-1 md:px-3 py-2 text-center">
+                  {/* <td className="px-1 md:px-3 py-2 text-center"> */}
+                     <td className="px-1 py-2 text-center">
                     {editing ? (
-                      <div className="grid sm:grid-cols-2 gap-2">
-                        <div>
-                          <input
-                            className={`${inputBase} ${editErrors.nombre ? "border-red-500" : ""}`}
-                            placeholder="Nombre"
-                            value={nombre}
-                            onChange={(e) =>
-                              setValue(`personas.${i}.nombre`, e.target.value, { shouldDirty: true })
-                            }
-                          />
-                          {/* {editErrors.nombre && (
-                            <p className="text-xs text-red-500">{editErrors.nombre}</p>
-                          )} */}
-                        </div>
-
-                        <div>
-                          <input
-                            className={`${inputBase} ${editErrors.apellido ? "border-red-500" : ""}`}
-                            placeholder="Apellido"
-                            value={apellido}
-                            onChange={(e) =>
-                              setValue(`personas.${i}.apellido`, e.target.value, { shouldDirty: true })
-                            }
-                          />
-                          {/* {editErrors.apellido && (
-                            <p className="text-xs text-red-500">{editErrors.apellido}</p>
-                          )} */}
-                        </div>
+                      <div>
+                        <input
+                          className={`${inputBase} ${editErrors.nombre ? "border-red-500" : ""}`}
+                          placeholder="Nombre"
+                          value={nombre}
+                          onChange={(e) =>
+                            setValue(`personas.${i}.nombre`, e.target.value, { shouldDirty: true })
+                          }
+                        />
                       </div>
                     ) : (
-                      `${nombre} ${apellido}`.trim()
+                      nombre
+                    )}
+                  </td>
+
+                  {/* APELLIDO */}
+                  {/* <td className="px-1 md:px-3 py-2 text-center"> */}
+                  <td className="px-1 py-2 text-center">
+                    {editing ? (
+                      <div>
+                        <input
+                          className={`${inputBase} ${editErrors.apellido ? "border-red-500" : ""}`}
+                          placeholder="Apellido"
+                          value={apellido}
+                          onChange={(e) =>
+                            setValue(`personas.${i}.apellido`, e.target.value, { shouldDirty: true })
+                          }
+                        />
+                      </div>
+                    ) : (
+                      apellido
                     )}
                   </td>
 
                   {/* DNI */}
-                  <td className="px-1 md:px-3 py-2 text-center">
+                  {/* <td className="px-1 md:px-3 py-2 text-center"> */}
+                  <td className="px-1 py-2 text-center">
                     {editing ? (
                       <div>
                         <input
@@ -330,7 +352,8 @@ export default function ListadoStep({
                   </td>
 
                   {/* TELEFONO */}
-                  <td className="px-1 md:px-3 py-2 text-center">
+                  {/* <td className="px-1 md:px-3 py-2 text-center"> */}
+                  <td className="px-1 py-2 text-center">
                     {editing ? (
                       <div>
                         <input
@@ -352,7 +375,7 @@ export default function ListadoStep({
                   </td>
 
                   {/* Acciones */}
-                  <td className="px-1 md:px-3 py-1 md:py-2">
+                  <td className="px-1 xxl:px-3 py-1 md:py-2">
                     <div className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2">
                       {editing ? (
                         <>
@@ -380,7 +403,7 @@ export default function ListadoStep({
                           <button
                             type="button"
                             onClick={() => startEdit(i)}
-                            className="rounded p-2 border border-gray-900 hover:bg-gray-400"
+                            className="rounded p-1 md:p-2 border border-gray-900 hover:bg-gray-400"
                             aria-label="Editar"
                             title="Editar"
                           >
@@ -391,7 +414,7 @@ export default function ListadoStep({
                             onClick={() => {
                               if (confirm("¿Quitar este registro?")) remove(i);
                             }}
-                            className="rounded p-2 border border-gray-900 hover:bg-gray-400 text-red-500"
+                            className="rounded p-1 md:p-2 border border-gray-900 hover:bg-gray-400 text-red-500"
                             aria-label="Eliminar"
                             title="Eliminar"
                           >

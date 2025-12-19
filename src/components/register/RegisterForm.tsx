@@ -433,8 +433,9 @@ export default function RegisterForm({
   return (
     <div className="flex flex-1 min-h-0 items-stretch bg-transparent">
       <form onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-main overflow-x-hidden"
-      >
+        // className="w-full max-w-3xl text-left px-4 sm:px-6 py-6 text-main overflow-x-hidden"
+        className="w-full max-w-3xl text-left px-2 sm:px-6 py-6 text-main overflow-x-hidden"
+>
         {serverError && (
           <div className="mb-4 rounded-lg bg-red-600/20 border border-red-600 px-3 py-2 text-sm">
             {serverError}

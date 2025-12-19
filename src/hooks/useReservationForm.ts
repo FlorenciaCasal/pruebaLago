@@ -35,7 +35,9 @@ export function useReservationForm(options?: UseFormProps<ReservationFormData>) 
       responsableNombre: "", responsableApellido: "", responsableDni: "",
 
       // inputs auxiliares de UI
-      tmpNombreApe: "", tmpDni: "",
+      tmpNombre: "", 
+      tmpApellido: "",
+      tmpDni: "",
 
       // 👇 permite sobrescribir desde afuera
       ...(options?.defaultValues ?? {}),

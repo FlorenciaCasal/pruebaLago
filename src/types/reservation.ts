@@ -25,10 +25,11 @@ export type ReservationFormData = {
   responsableApellido?: string;
   responsableDni?: string;
   responsableTelefono?: string;
-  tmpNombreApe?: string;
+  tmpNombre?: string;
+  tmpApellido?: string;
   tmpDni?: string;
   tmpTelefono?: string;
-   reservationDate?: string;  // opcional, derivada de fechaISO
+  reservationDate?: string;  // opcional, derivada de fechaISO
   totalPersonas?: number;    // opcional, adultos+ninos+bebes
   reservaAsiste: boolean;
   visitantes?: { nombre: string; apellido: string; dni: string; telefono: string }[];

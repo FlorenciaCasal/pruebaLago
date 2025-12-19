@@ -1,8 +1,8 @@
 "use client";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquareFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
+// import Link from "next/link";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faSquareFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
 
 
 export default function Footer() {
@@ -36,9 +36,10 @@ export default function Footer() {
         {/* ENLACES (opcionales) */}
         {/* <div className="flex items-center gap-6 text-sm opacity-90"> */}
 
-        {/* <Link href="/politicas-de-visita" className="hover:opacity-100">
-            Políticas de visita
-          </Link> */}
+
+
+
+        {/*          Actualizar con face e instagram de la reserva!!!!
 
         <div className="flex items-center gap-6">
           <Link
@@ -59,7 +60,7 @@ export default function Footer() {
               className="hover:opacity-80 transition"
             />
           </Link>
-        </div>
+        </div> */}
       </div>
     </footer>
   );

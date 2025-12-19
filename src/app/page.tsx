@@ -3,7 +3,7 @@ import HomeStatus from "../components/Home";
 export default function Page() {
   return (
     <>
-    <main className="p-4">
+    <main className="flex flex-col p-4 items-center">
       <h1 className="py-4">
         La pagina se encuentra en proceso de reestructuración
       </h1>

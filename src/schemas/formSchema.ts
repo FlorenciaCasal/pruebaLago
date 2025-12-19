@@ -54,13 +54,28 @@ export const dniSchema = yup
   .required("Completá el DNI.")
   .matches(/^\d{8}$/, "DNI inválido: deben ser exactamente 8 dígitos.");
 
+// export const telefonoSchema = yup
+//   .string()
+//   .transform(v => String(v ?? "").replace(/\D+/g, ""))
+//   .test(
+//     "telefono-opcional",
+//     "Teléfono inválido: deben ser exactamente 10 dígitos.",
+//     v => !v || /^\d{10}$/.test(v)
+//   );
 export const telefonoSchema = yup
   .string()
-  .transform(v => String(v ?? "").replace(/\D+/g, ""))
   .test(
     "telefono-opcional",
     "Teléfono inválido: deben ser exactamente 10 dígitos.",
-    v => !v || /^\d{10}$/.test(v)
+    function () {
+      const original = this.originalValue;
+
+      // vacío → OK
+      if (!original || String(original).trim() === "") return true;
+
+      // si escribió algo, debe ser SOLO números y exactamente 10
+      return /^\d{10}$/.test(String(original));
+    }
   );
 
 // Un visitante de listado
