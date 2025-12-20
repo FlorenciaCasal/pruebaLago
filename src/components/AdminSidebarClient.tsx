@@ -74,7 +74,7 @@ export default function AdminSidebarClient({
                         </div>
                     </div>
                     {/* <main className="col-span-12 px-4 min-w-0"> */}
-                    <main className="col-span-14 px-0 min-w-0">
+                    <main className="col-span-14 px-2 min-w-0">
                         {children}
                     </main>
                 </div>
