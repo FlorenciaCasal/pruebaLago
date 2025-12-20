@@ -3,11 +3,11 @@ import { BackendReservationDTO } from "@/types/reservation";
 import type { AdminReservation } from "@/types/admin";
 
 type Page<T> = {
-  content: T[];
-  totalPages: number;
-  totalElements: number;
-  number: number;
-  size: number;
+    content: T[];
+    totalPages: number;
+    totalElements: number;
+    number: number;
+    size: number;
 };
 
 // Detección server/client + helper para URLs
@@ -145,6 +145,7 @@ export async function fetchReservations(
                 nombre: c.firstName,
                 apellido: c.lastName,
                 dni: (c.dni ?? "").replace(/\D+/g, ""),
+                telefono: c.phone ?? undefined,
             })) ?? [],
     }));
     return {

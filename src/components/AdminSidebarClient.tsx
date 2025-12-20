@@ -73,7 +73,8 @@ export default function AdminSidebarClient({
 
                         </div>
                     </div>
-                    <main className="col-span-12 px-4 min-w-0">
+                    {/* <main className="col-span-12 px-4 min-w-0"> */}
+                    <main className="col-span-14 px-0 min-w-0">
                         {children}
                     </main>
                 </div>
@@ -83,22 +84,12 @@ export default function AdminSidebarClient({
                 {/* Overlay con fade */}
                 <div
                     onClick={() => setOpen(false)}
-                    className={`
-    fixed inset-0 z-40 bg-black/50 sm:hidden
-    transition-opacity duration-300
-    ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
-  `}
+                    className={`fixed inset-0 z-40 bg-black/50 sm:hidden transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
                 />
 
                 {/* Panel lateral con slide-in / slide-out */}
                 <div
-                    className={`
-    fixed z-50 inset-y-0 left-0 w-72 max-w-[80vw]
-    bg-neutral-950/90 border-r border-neutral-800 p-4 shadow-2xl sm:hidden
-
-    transform transition-transform duration-300 ease-out
-    ${open ? "translate-x-0" : "-translate-x-full"}
-  `}
+                    className={`fixed z-50 inset-y-0 left-0 w-72 max-w-[80vw] bg-neutral-950/90 border-r border-neutral-800 p-4 shadow-2xl sm:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}
                 >
                     <div className="flex items-center justify-between mb-3">
                         <p className="text-xs uppercase tracking-wide text-neutral-400">

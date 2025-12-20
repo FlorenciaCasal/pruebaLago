@@ -58,6 +58,7 @@ export default function CompanionsDisclosure({
                     {dense ? (
                         <ul className="p-2 text-sm space-y-1">
                             {companions.map((c, i) => {
+                                console.log("companion raw:", c);
                                 const fullName = [c.nombre, c.apellido].filter(Boolean).join(" ");
                                 return (
                                     // <li key={i} className="flex justify-between gap-2">
@@ -98,6 +99,7 @@ export default function CompanionsDisclosure({
                             </thead>
                             <tbody className="divide-y divide-neutral-800">
                                 {companions.map((c, i) => {
+                                    console.log("companion raw:", c);
                                     const fullName = [c.nombre, c.apellido].filter(Boolean).join(" ");
                                     return (
                                         <tr key={i} className="[&>td]:px-3 [&>td]:py-2">

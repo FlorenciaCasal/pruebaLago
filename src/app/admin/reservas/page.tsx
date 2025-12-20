@@ -519,7 +519,7 @@ export default function ReservasPage() {
 
           {/* En md+ : tabla (ya no debería generar scroll del body) */}
           <div className="hidden lg:block">
-            <div className="rounded-2xl border border-gray-800 overflow-x-auto lg:overflow-y-auto lg:max-h-[70vh]">
+            <div className=" border border-gray-800 overflow-x-auto lg:overflow-y-auto lg:max-h-[70vh]">
               <table className="w-full text-[13px] table-auto">
                 {/* <thead className="bg-neutral-950/80"> */}
                 <thead className="bg-neutral-950/95 lg:sticky lg:top-0 lg:z-20">
@@ -665,13 +665,7 @@ export default function ReservasPage() {
           <button
             disabled={page === 0}
             onClick={() => setPage(p => Math.max(0, p - 1))}
-            className="
-        px-2 sm:px-3 py-1
-        rounded-md border border-neutral-700
-        text-xs sm:text-sm
-        disabled:opacity-40
-        hover:bg-neutral-800
-      "
+            className="px-2 sm:px-3 py-1 rounded-md border border-neutral-700 text-xs sm:text-sm disabled:opacity-40 hover:bg-neutral-800"
           >
             ←
             <span className="hidden sm:inline ml-1">Anterior</span>
@@ -689,14 +683,7 @@ export default function ReservasPage() {
           <button
             disabled={page >= totalPages - 1}
             onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-            className="
-        px-2 sm:px-3 py-1
-        rounded-md border border-neutral-700
-        text-xs sm:text-sm
-        disabled:opacity-40
-        hover:bg-neutral-800
-      "
-          >
+            className="px-2 sm:px-3 py-1 rounded-md border border-neutral-700 text-xs sm:text-sm disabled:opacity-40 hover:bg-neutral-800">
             <span className="hidden sm:inline mr-1">Siguiente</span>
             →
           </button>
