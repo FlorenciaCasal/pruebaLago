@@ -3,7 +3,7 @@ import type { UseFormSetValue, UseFormWatch } from "react-hook-form";
 import type { ReservationFormData } from "@/types/reservation";
 
 export default function SubmitStep({
-    tipo, adultos, ninos, bebes, watch, aceptaReglas, setValue, policiesUrl, uxError, renderActions = true,
+    tipo, adultos, ninos, bebes, watch, aceptaReglas, setValue, uxError, renderActions = true,
 }: {
     tipo: "PARTICULAR" | "INSTITUCION_EDUCATIVA" | null;
     adultos: number | undefined;
@@ -62,7 +62,6 @@ export default function SubmitStep({
             </div>
 
             <PolicyCheckbox
-                href={policiesUrl}
                 checked={aceptaReglas}
                 onChange={(v) => setValue("aceptaReglas", v, { shouldDirty: true })}
             />
