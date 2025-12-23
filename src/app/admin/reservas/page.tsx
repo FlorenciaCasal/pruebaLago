@@ -47,6 +47,10 @@ function tipoToEs(v?: string) {
     .replace(/\b\p{L}/gu, (ch) => ch.toUpperCase());
 }
 
+const isIOS =
+  typeof window !== "undefined" &&
+  /iPad|iPhone|iPod/.test(navigator.userAgent);
+
 
 export default function ReservasPage() {
   const [status, setStatus] = React.useState<AdminStatus>("ALL");
@@ -355,7 +359,8 @@ export default function ReservasPage() {
               className="w-full rounded-lg border border-neutral-700 bg-white px-3 h-[40px] text-sm text-black placeholder:text-neutral-500 focus:border-neutral-500 focus:outline-none appearance-none"
             /> */}
             <div className="relative">
-              {!searchDate && (
+              {/* {!searchDate && ( */}
+              {isIOS && !searchDate && (
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400">
                   Fecha de visita
                 </span>
